@@ -1,0 +1,666 @@
+
+<h2 class="sr-only">The Catalyst by AV ASCENT — newsletter platform with reader view, article view, public share page, and password-protected admin panel.</h2>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07090e;--bg2:#0c1019;--bg3:#111621;--bg4:#171e2d;
+  --gold:#b8965a;--gold2:#d4b07a;--goldA:rgba(184,150,90,.1);
+  --w:#f0ede6;--w2:#c8c0ae;--w3:#6e6860;
+  --br:rgba(184,150,90,.18);--br2:rgba(255,255,255,.07);
+  --gr:#1d9e75;--rd:#c0312b;
+  --serif:Georgia,'Times New Roman',serif;
+  --mono:'Courier New',monospace;
+}
+body{font-family:system-ui,sans-serif}
+.wrap{background:var(--bg);color:var(--w);min-height:600px}
+.nl-header{background:var(--bg2);border-bottom:1px solid var(--br);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between}
+.nl-brand{display:flex;flex-direction:column}
+.nl-logo{font-size:22px;font-weight:900;letter-spacing:.12em;color:var(--w)}
+.nl-logo span{color:var(--gold)}
+.nl-tag{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--w3);margin-top:2px}
+.nl-hright{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.btn{font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;padding:.38rem .85rem;cursor:pointer;border:1px solid;transition:all .15s;background:transparent}
+.btn-ghost{color:var(--w3);border-color:var(--br2)}.btn-ghost:hover{color:var(--w);border-color:rgba(255,255,255,.2)}
+.btn-gold{background:var(--gold);color:var(--bg);border-color:var(--gold)}.btn-gold:hover{background:var(--gold2)}
+.btn-outline{color:var(--gold);border-color:var(--br)}.btn-outline:hover{background:var(--goldA)}
+.btn-danger{color:#e74c3c;border-color:rgba(192,49,43,.25)}.btn-danger:hover{background:rgba(192,49,43,.08)}
+.btn-share{color:#2ec48f;border-color:rgba(29,158,117,.25)}.btn-share:hover{background:rgba(29,158,117,.08)}
+.view{display:none}.view.on{display:block}
+.reader-hero{background:var(--bg2);border-bottom:1px solid var(--br2);padding:2rem 1.5rem;text-align:center}
+.rh-issue{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem}
+.rh-title{font-size:clamp(22px,4vw,36px);font-weight:900;color:var(--w);line-height:1;margin-bottom:.5rem}
+.rh-sub{font-family:var(--serif);font-size:14px;font-style:italic;color:var(--w2);line-height:1.55;max-width:540px;margin:0 auto .8rem}
+.rh-meta{display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap}
+.rh-date{font-family:var(--mono);font-size:10px;color:var(--w3)}
+.rh-author{font-family:var(--mono);font-size:10px;color:var(--gold)}
+.edition-list{padding:1.2rem 1.5rem;max-width:760px;margin:0 auto}
+.edition-card{background:var(--bg2);border:1px solid var(--br2);padding:1.2rem 1.4rem;margin-bottom:.75rem;cursor:pointer;transition:border-color .18s}
+.edition-card:hover{border-color:rgba(184,150,90,.25)}
+.ec-top{display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem;margin-bottom:.4rem}
+.ec-num{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);flex-shrink:0}
+.ec-date{font-family:var(--mono);font-size:9px;color:var(--w3);flex-shrink:0}
+.ec-title{font-size:17px;font-weight:800;color:var(--w);margin-bottom:.25rem}
+.ec-excerpt{font-size:12px;color:var(--w3);line-height:1.65}
+.ec-tags{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem}
+.ec-tag{font-family:var(--mono);font-size:8px;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;background:var(--goldA);color:var(--gold);border:1px solid var(--br)}
+.article-nav{padding:.75rem 1.5rem;background:var(--bg2);border-bottom:1px solid var(--br2);display:flex;align-items:center;justify-content:space-between;gap:.5rem;flex-wrap:wrap}
+.article-body{max-width:680px;margin:0 auto;padding:2rem 1.5rem}
+.ab-issue{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem}
+.ab-title{font-size:clamp(24px,4vw,38px);font-weight:900;color:var(--w);line-height:.95;margin-bottom:.75rem}
+.ab-meta{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;padding-bottom:1.2rem;border-bottom:1px solid var(--br2);flex-wrap:wrap}
+.ab-author{display:flex;align-items:center;gap:.5rem}
+.ab-avatar{width:28px;height:28px;border-radius:50%;background:var(--goldA);border:1px solid var(--br);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;font-weight:500;color:var(--gold);flex-shrink:0}
+.ab-name{font-size:12px;font-weight:500;color:var(--w2)}
+.ab-role{font-family:var(--mono);font-size:9px;color:var(--w3)}
+.ab-date{font-family:var(--mono);font-size:10px;color:var(--w3);margin-left:auto}
+.ab-content{font-size:15px;color:var(--w2);line-height:1.85;white-space:pre-wrap;font-family:var(--serif)}
+.ab-cta-box{background:var(--goldA);border:1px solid var(--br);padding:1.2rem 1.4rem;margin:2rem 0;text-align:center}
+.ab-cta-label{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem}
+.ab-cta-text{font-family:var(--serif);font-size:15px;font-style:italic;color:var(--w2);margin-bottom:.8rem;line-height:1.5}
+.ab-footer{margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid var(--br2);text-align:center}
+.ab-footer-brand{font-size:16px;font-weight:900;letter-spacing:.12em;color:var(--w);margin-bottom:.25rem}
+.ab-footer-brand span{color:var(--gold)}
+.ab-footer-sub{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--w3)}
+/* PUBLIC PAGE */
+.pub-wrap{background:var(--bg);min-height:600px}
+.pub-header{background:var(--bg2);border-bottom:1px solid var(--br);padding:1.2rem 1.5rem;text-align:center}
+.pub-logo{font-size:20px;font-weight:900;letter-spacing:.12em;color:var(--w)}
+.pub-logo span{color:var(--gold)}
+.pub-sub{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--w3);margin-top:4px}
+.pub-hero{padding:2.5rem 1.5rem;text-align:center;max-width:680px;margin:0 auto}
+.pub-title{font-size:clamp(28px,5vw,48px);font-weight:900;color:var(--w);line-height:.92;margin-bottom:.75rem}
+.pub-title span{color:var(--gold)}
+.pub-desc{font-family:var(--serif);font-size:16px;font-style:italic;color:var(--w2);line-height:1.6;margin-bottom:1.5rem}
+.pub-editions{max-width:720px;margin:0 auto;padding:0 1.5rem 2rem}
+.pub-edition-card{background:var(--bg2);border:1px solid var(--br2);padding:1.2rem 1.4rem;margin-bottom:.75rem;cursor:pointer;transition:border-color .18s}
+.pub-edition-card:hover{border-color:rgba(184,150,90,.25)}
+.pub-cta{background:var(--goldA);border:1px solid var(--br);padding:1.5rem;text-align:center;margin:1rem 0 2rem}
+.pub-cta-label{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem}
+.pub-cta-text{font-family:var(--serif);font-size:16px;font-style:italic;color:var(--w2);margin-bottom:.9rem;line-height:1.5}
+.pub-footer{border-top:1px solid var(--br2);padding:1.5rem;text-align:center}
+.pub-footer-brand{font-size:15px;font-weight:900;letter-spacing:.12em;color:var(--w);margin-bottom:.3rem}
+.pub-footer-brand span{color:var(--gold)}
+.pub-footer-links{display:flex;align-items:center;justify-content:center;gap:1.2rem;flex-wrap:wrap;margin-top:.5rem}
+.pub-footer-link{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--w3);cursor:pointer;transition:color .15s}
+.pub-footer-link:hover{color:var(--gold)}
+/* SHARE BANNER */
+.share-banner{background:rgba(29,158,117,.06);border:1px solid rgba(29,158,117,.2);padding:.85rem 1.2rem;margin:.75rem 1.5rem 0;display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap}
+.sb-text{font-size:12px;color:var(--w2);flex:1}
+.sb-text strong{color:#2ec48f;font-weight:500}
+.sb-url{font-family:var(--mono);font-size:10px;color:#2ec48f;background:rgba(29,158,117,.1);padding:.35rem .65rem;border:1px solid rgba(29,158,117,.2);cursor:pointer;transition:all .15s;flex-shrink:0}
+.sb-url:hover{background:rgba(29,158,117,.18)}
+.share-banner-close{background:transparent;border:none;color:var(--w3);cursor:pointer;font-size:16px;padding:0;flex-shrink:0;line-height:1}
+/* ADMIN */
+.admin-panel{padding:1.2rem 1.5rem;max-width:900px;margin:0 auto}
+.admin-tabs{display:flex;gap:.5rem;margin-bottom:1.2rem;border-bottom:1px solid var(--br2);padding-bottom:.75rem;flex-wrap:wrap}
+.atab{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:.35rem .75rem;cursor:pointer;color:var(--w3);border-bottom:2px solid transparent;transition:all .15s;background:transparent;border-left:none;border-right:none;border-top:none}
+.atab.on{color:var(--gold);border-bottom-color:var(--gold)}.atab:hover{color:var(--w2)}
+.atab-content{display:none}.atab-content.on{display:block}
+.field-label{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:.4rem}
+.field-wrap{margin-bottom:1rem}
+.finp,.fta,.fsel{width:100%;background:var(--bg3);border:1px solid var(--br2);padding:.6rem .8rem;color:var(--w);font-family:system-ui,sans-serif;font-size:13px;outline:none;transition:border-color .15s}
+.finp:focus,.fta:focus,.fsel:focus{border-color:var(--gold)}
+.finp::placeholder,.fta::placeholder{color:var(--w3)}
+.fta{resize:vertical;min-height:280px;line-height:1.7;font-family:var(--serif)}
+.fsel option{background:var(--bg2)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.ae-item{background:var(--bg3);border:1px solid var(--br2);padding:.85rem 1rem;display:flex;align-items:center;gap:.75rem;margin-bottom:.35rem;flex-wrap:wrap}
+.ae-num{font-family:var(--mono);font-size:9px;color:var(--gold);min-width:50px;flex-shrink:0}
+.ae-title{font-size:12px;font-weight:500;color:var(--w);flex:1;min-width:0}
+.ae-date{font-family:var(--mono);font-size:9px;color:var(--w3);flex-shrink:0}
+.ae-status{font-family:var(--mono);font-size:8px;padding:2px 7px;flex-shrink:0}
+.ae-pub{background:rgba(29,158,117,.12);color:#2ec48f}.ae-draft{background:var(--goldA);color:var(--gold)}
+.ae-btns{display:flex;gap:.35rem;flex-shrink:0}
+.auth-wrap{padding:2rem 1.5rem;max-width:400px;margin:0 auto;text-align:center}
+.auth-title{font-size:20px;font-weight:900;color:var(--w);margin-bottom:.3rem}
+.auth-sub{font-family:var(--serif);font-size:13px;font-style:italic;color:var(--w3);margin-bottom:1.5rem}
+.auth-err{font-family:var(--mono);font-size:10px;color:#e74c3c;margin-top:.5rem;display:none}
+.empty{text-align:center;padding:3rem 1.5rem;color:var(--w3)}
+.empty-title{font-size:20px;font-weight:700;color:var(--w2);margin-bottom:.4rem}
+.empty-sub{font-size:12px;color:var(--w3);line-height:1.65}
+.toast-wrap{padding:.5rem 1.5rem;background:var(--goldA);border-bottom:1px solid var(--br);font-family:var(--mono);font-size:10px;color:var(--gold);display:none;letter-spacing:.06em}
+.toast-wrap.show{display:block}
+</style>
+
+<div class="wrap" id="appRoot">
+
+<div class="toast-wrap" id="toast"></div>
+
+<!-- HEADER (hidden in public page view) -->
+<div class="nl-header" id="mainHeader">
+  <div class="nl-brand">
+    <div class="nl-logo">THE <span>CATALYST</span></div>
+    <div class="nl-tag">by AV ASCENT &nbsp;&middot;&nbsp; Operational Architecture for A.C.E. Leaders</div>
+  </div>
+  <div class="nl-hright">
+    <button class="btn btn-share" onclick="showPublicPage()">&#9670; Public page</button>
+    <button class="btn btn-ghost" onclick="switchView('reader')" id="btn-reader">Read</button>
+    <button class="btn btn-ghost" onclick="switchView('auth')" id="btn-admin">Admin</button>
+  </div>
+</div>
+
+<!-- READER VIEW -->
+<div class="view on" id="view-reader">
+  <div class="reader-hero">
+    <div class="rh-issue">Operational Intelligence for Engineering Leaders</div>
+    <div class="rh-title" style="font-weight:900">The Catalyst</div>
+    <div class="rh-sub">Areeba Viqar writes about operational architecture, the Chaos Tax, and what it actually takes to build a firm that runs without you.</div>
+    <div class="rh-meta">
+      <span class="rh-author">Areeba Viqar &middot; AV ASCENT</span>
+      <span class="rh-date" id="editionCount">Loading...</span>
+    </div>
+  </div>
+  <div class="edition-list" id="editionList"></div>
+</div>
+
+<!-- ARTICLE VIEW -->
+<div class="view" id="view-article">
+  <div class="article-nav">
+    <button class="btn btn-ghost" id="art-back-btn">&larr; All editions</button>
+    <div style="display:flex;gap:.4rem">
+      <button class="btn btn-share" onclick="copyArticleLink()" id="art-share-btn">Copy link</button>
+      <button class="btn btn-ghost" onclick="window.print()">Print</button>
+    </div>
+  </div>
+  <div class="article-body">
+    <div class="ab-issue" id="art-issue"></div>
+    <div class="ab-title" id="art-title"></div>
+    <div class="ab-meta">
+      <div class="ab-author">
+        <div class="ab-avatar">AV</div>
+        <div>
+          <div class="ab-name">Areeba Viqar</div>
+          <div class="ab-role">System Architect &middot; AV ASCENT</div>
+        </div>
+      </div>
+      <div class="ab-date" id="art-date"></div>
+    </div>
+    <div class="ab-content" id="art-body"></div>
+    <div class="ab-cta-box">
+      <div class="ab-cta-label">Ready to know your F-Score?</div>
+      <div class="ab-cta-text">"The only way to know your firm's Friction Score is the audit. 90 minutes. One verdict."</div>
+      <button class="btn btn-gold" onclick="openLink('https://calendly.com/avascent/90min')">Book the EFA &rarr;</button>
+    </div>
+    <div class="ab-footer">
+      <div class="ab-footer-brand">AV <span>ASCENT</span></div>
+      <div class="ab-footer-sub">info.avascent@gmail.com &nbsp;&middot;&nbsp; +92 333 6076231</div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH VIEW -->
+<div class="view" id="view-auth">
+  <div class="auth-wrap">
+    <div class="auth-title">Admin Access</div>
+    <div class="auth-sub">Enter your password to publish and manage editions.</div>
+    <div class="field-wrap" style="text-align:left">
+      <label class="field-label">Password</label>
+      <input type="password" class="finp" id="authInp" placeholder="Admin password">
+    </div>
+    <button class="btn btn-gold" style="width:100%" onclick="checkAuth()">Enter &rarr;</button>
+    <div class="auth-err" id="authErr">Incorrect password. Try again.</div>
+  </div>
+</div>
+
+<!-- ADMIN VIEW -->
+<div class="view" id="view-admin">
+  <div class="admin-panel">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem">
+      <div style="font-size:18px;font-weight:800;color:var(--w)">Admin &mdash; The Catalyst</div>
+      <div style="display:flex;gap:.4rem;flex-wrap:wrap">
+        <button class="btn btn-share" onclick="showPublicPage()">&#9670; Public page</button>
+        <button class="btn btn-ghost" onclick="switchView('reader')">View live</button>
+        <button class="btn btn-danger" onclick="logout()">Sign out</button>
+      </div>
+    </div>
+
+    <div id="shareBanner" class="share-banner" style="margin:0 0 1rem;border-radius:0">
+      <div class="sb-text"><strong>Share your public newsletter page</strong> &mdash; send this to subscribers, post it on LinkedIn, add it to your website.</div>
+      <div class="sb-url" onclick="copyPublicLink()" title="Click to copy">&#9670; Copy public link</div>
+      <button class="share-banner-close" onclick="document.getElementById('shareBanner').style.display='none'">&times;</button>
+    </div>
+
+    <div class="admin-tabs">
+      <button class="atab on" data-tab="write">Write edition</button>
+      <button class="atab" data-tab="manage">Manage editions</button>
+      <button class="atab" data-tab="settings">Settings</button>
+    </div>
+
+    <div class="atab-content on" id="tab-write">
+      <div class="field-row">
+        <div class="field-wrap">
+          <label class="field-label">Edition number</label>
+          <input type="text" class="finp" id="f-num" placeholder="e.g. Edition 02">
+        </div>
+        <div class="field-wrap">
+          <label class="field-label">Status</label>
+          <select class="fsel" id="f-status">
+            <option value="draft">Draft — not visible to readers</option>
+            <option value="published">Published — live for readers</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">Title</label>
+        <input type="text" class="finp" id="f-title" placeholder="e.g. The Decision Lag — Why Your Firm Moves at Half Speed">
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">Subtitle / opener line</label>
+        <input type="text" class="finp" id="f-sub" placeholder="One italic sentence that draws the reader in...">
+      </div>
+      <div class="field-row">
+        <div class="field-wrap">
+          <label class="field-label">Tags (comma separated)</label>
+          <input type="text" class="finp" id="f-tags" placeholder="Operations, EFA, Mandates">
+        </div>
+        <div class="field-wrap">
+          <label class="field-label">Edition ID (leave blank for new)</label>
+          <input type="text" class="finp" id="f-id" placeholder="Auto-filled when editing existing">
+        </div>
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">Body &mdash; use ## for section headings</label>
+        <textarea class="fta" id="f-body" placeholder="Start writing...
+
+## Use double hash for section headings
+
+Write naturally in paragraphs. The EFA booking button appears automatically at the end — you do not need to add it."></textarea>
+      </div>
+      <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+        <button class="btn btn-gold" onclick="saveEdition()">Save edition &rarr;</button>
+        <button class="btn btn-outline" onclick="previewEdition()">Preview</button>
+        <button class="btn btn-ghost" onclick="clearForm()">Clear</button>
+        <span style="font-family:var(--mono);font-size:9px;color:var(--w3);margin-left:.25rem" id="saveStatus"></span>
+      </div>
+    </div>
+
+    <div class="atab-content" id="tab-manage">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem">
+        <span style="font-family:var(--mono);font-size:9px;color:var(--w3)" id="manageCount"></span>
+        <button class="btn btn-ghost" onclick="loadManage()">Refresh</button>
+      </div>
+      <div id="adminEditions"></div>
+    </div>
+
+    <div class="atab-content" id="tab-settings">
+      <div style="background:var(--bg3);border:1px solid var(--br2);padding:1.1rem;margin-bottom:1rem">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem">Public newsletter link</div>
+        <div style="font-size:12px;color:var(--w2);margin-bottom:.75rem">This is the link you share with subscribers. It shows all your published editions in a clean, branded page.</div>
+        <button class="btn btn-share" onclick="copyPublicLink()">&#9670; Copy public link</button>
+        <button class="btn btn-ghost" style="margin-left:.4rem" onclick="showPublicPage()">Preview public page</button>
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">Change admin password</label>
+        <input type="password" class="finp" id="newPwd" placeholder="New password">
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">Confirm new password</label>
+        <input type="password" class="finp" id="confirmPwd" placeholder="Confirm">
+      </div>
+      <button class="btn btn-gold" onclick="changePwd()" style="margin-bottom:1.5rem">Update password</button>
+      <div style="border-top:1px solid var(--br2);padding-top:1.2rem">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#e74c3c;margin-bottom:.6rem">Danger zone</div>
+        <button class="btn btn-danger" onclick="deleteAllEditions()">Delete all editions</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PUBLIC PAGE VIEW -->
+<div class="view" id="view-public">
+  <div class="pub-header">
+    <div class="pub-logo">THE <span>CATALYST</span></div>
+    <div class="pub-sub">by AV ASCENT &nbsp;&middot;&nbsp; Operational Architecture for A.C.E. Leaders</div>
+  </div>
+  <div class="pub-hero">
+    <div class="pub-title">Operational<br><span>Intelligence</span><br>for Engineering Leaders</div>
+    <div class="pub-desc">Areeba Viqar writes about the systems, decisions, and architecture that determine whether an A.C.E. firm thrives — or stalls at the ceiling of its founder's capacity.</div>
+    <button class="btn btn-gold" style="font-size:11px;padding:.55rem 1.4rem" onclick="openLink('https://calendly.com/avascent/90min')">Book the EFA &rarr;</button>
+    <div style="margin-top:.75rem;font-family:var(--mono);font-size:9px;color:var(--w3)">Or scroll down to read the latest editions</div>
+  </div>
+  <div class="pub-editions">
+    <div id="pubEditionList"></div>
+    <div class="pub-cta">
+      <div class="pub-cta-label">Ready to know your Friction Score?</div>
+      <div class="pub-cta-text">"The only way to know your firm's F-Score is the 90-minute Executive Friction Audit. One session. One verdict. One path forward."</div>
+      <button class="btn btn-gold" style="font-size:11px;padding:.55rem 1.4rem" onclick="openLink('https://calendly.com/avascent/90min')">Book the EFA &rarr;</button>
+    </div>
+    <div class="pub-footer">
+      <div class="pub-footer-brand">AV <span>ASCENT</span></div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--w3);margin-top:.3rem">Operational Architecture for A.C.E. Sector Leaders</div>
+      <div class="pub-footer-links">
+        <span class="pub-footer-link" onclick="openLink('mailto:info.avascent@gmail.com')">info.avascent@gmail.com</span>
+        <span class="pub-footer-link" onclick="openLink('https://wa.me/923336076231')">+92 333 6076231</span>
+        <span class="pub-footer-link" onclick="openLink('https://www.linkedin.com/in/areebaviqar')">LinkedIn</span>
+        <span class="pub-footer-link" onclick="openLink('https://www.instagram.com/av_ascent/')">Instagram</span>
+      </div>
+      <div style="margin-top:1.2rem">
+        <button class="btn btn-ghost" style="font-size:9px" onclick="backFromPublic()">&#8592; Back to reader</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+var DATA_KEY = 'catalyst_editions_v2';
+var PWD_KEY  = 'catalyst_pwd_v2';
+var AUTH_KEY = 'catalyst_session';
+var _prevView = 'reader';
+
+function getPwd()       { return localStorage.getItem(PWD_KEY) || null; }
+function getEditions()  { try { return JSON.parse(localStorage.getItem(DATA_KEY) || '[]'); } catch(e){ return []; } }
+function saveEditions(a){ localStorage.setItem(DATA_KEY, JSON.stringify(a)); }
+function isAuthed()     { return sessionStorage.getItem(AUTH_KEY) === '1'; }
+
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2400);
+}
+
+function switchView(v) {
+  if (v === 'auth' && isAuthed()) { v = 'admin'; }
+  document.querySelectorAll('.view').forEach(function(el){ el.classList.remove('on'); });
+  document.getElementById('view-' + v).classList.add('on');
+  document.getElementById('mainHeader').style.display = (v === 'public') ? 'none' : '';
+  if (v === 'reader')  loadReader();
+  if (v === 'admin')   loadManage();
+  if (v === 'public')  loadPublicPage();
+}
+
+function showPublicPage() {
+  _prevView = document.querySelector('.view.on') ? document.querySelector('.view.on').id.replace('view-','') : 'reader';
+  switchView('public');
+}
+function backFromPublic() {
+  switchView(_prevView || 'reader');
+}
+
+function copyPublicLink() {
+  var url = window.location.href.split('#')[0];
+  try {
+    navigator.clipboard.writeText(url).then(function(){
+      toast('Public link copied! Share this with your subscribers.');
+    });
+  } catch(e){
+    toast('Link: ' + url);
+  }
+}
+
+function copyArticleLink() {
+  var id = document.getElementById('art-back-btn').getAttribute('data-current-id') || '';
+  var url = window.location.href.split('#')[0] + (id ? '#' + id : '');
+  try {
+    navigator.clipboard.writeText(url).then(function(){ toast('Article link copied!'); });
+  } catch(e){ toast('Copied!'); }
+}
+
+function checkAuth() {
+  var val = document.getElementById('authInp').value;
+  var stored = getPwd();
+  if (!stored && val.length >= 4) {
+    localStorage.setItem(PWD_KEY, val);
+    sessionStorage.setItem(AUTH_KEY, '1');
+    document.getElementById('authInp').value = '';
+    document.getElementById('authErr').style.display = 'none';
+    switchView('admin');
+    toast('Password set. Welcome to The Catalyst admin.');
+    return;
+  }
+  if (stored && val === stored) {
+    sessionStorage.setItem(AUTH_KEY, '1');
+    document.getElementById('authInp').value = '';
+    document.getElementById('authErr').style.display = 'none';
+    switchView('admin');
+  } else {
+    document.getElementById('authErr').style.display = 'block';
+  }
+}
+
+function logout() {
+  sessionStorage.removeItem(AUTH_KEY);
+  switchView('reader');
+}
+
+function fmtDate(iso) {
+  try { return new Date(iso).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}); }
+  catch(e){ return iso; }
+}
+function readTime(body) {
+  var words = (body||'').split(/\s+/).length;
+  return Math.max(1, Math.round(words/200)) + ' min read';
+}
+function genId() { return 'ed_' + Date.now() + '_' + Math.random().toString(36).substr(2,5); }
+
+function parseBody(raw) {
+  return (raw||'')
+    .replace(/## ([^\n]+)/g, '<h2 style="font-size:21px;font-weight:900;color:var(--w);margin:1.5rem 0 .5rem;line-height:1;font-family:system-ui">$1</h2>')
+    .replace(/# ([^\n]+)/g,  '<h1 style="font-size:28px;font-weight:900;color:var(--w);margin:1.5rem 0 .5rem;line-height:1;font-family:system-ui">$1</h1>');
+}
+
+function loadReader() {
+  var eds = getEditions().filter(function(e){ return e.status === 'published'; });
+  eds.sort(function(a,b){ return new Date(b.date)-new Date(a.date); });
+  var cEl = document.getElementById('editionCount');
+  if (cEl) cEl.textContent = eds.length + ' edition' + (eds.length!==1?'s':'') + ' published';
+  var el = document.getElementById('editionList');
+  if (!el) return;
+  el.innerHTML = '';
+  if (!eds.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-title">First edition coming soon</div><div class="empty-sub">Areeba is writing. Check back soon.</div></div>';
+    return;
+  }
+  eds.forEach(function(ed) { el.appendChild(makeEditionCard(ed, false)); });
+}
+
+function loadPublicPage() {
+  var eds = getEditions().filter(function(e){ return e.status === 'published'; });
+  eds.sort(function(a,b){ return new Date(b.date)-new Date(a.date); });
+  var el = document.getElementById('pubEditionList');
+  if (!el) return;
+  el.innerHTML = '';
+  if (!eds.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-title">First edition coming soon</div><div class="empty-sub">Subscribe to be notified.</div></div>';
+    return;
+  }
+  eds.forEach(function(ed) {
+    var card = makeEditionCard(ed, true);
+    el.appendChild(card);
+  });
+}
+
+function makeEditionCard(ed, isPublic) {
+  var card = document.createElement('div');
+  card.className = isPublic ? 'pub-edition-card' : 'edition-card';
+  var top = document.createElement('div'); top.className = 'ec-top';
+  var num = document.createElement('div'); num.className = 'ec-num'; num.textContent = ed.num || 'Edition';
+  var dt  = document.createElement('div'); dt.className  = 'ec-date';
+  dt.innerHTML = fmtDate(ed.date) + ' &nbsp;&middot;&nbsp; ' + readTime(ed.body);
+  top.appendChild(num); top.appendChild(dt);
+  var title   = document.createElement('div'); title.className = 'ec-title'; title.textContent = ed.title;
+  var excerpt = document.createElement('div'); excerpt.className = 'ec-excerpt';
+  var preview = (ed.sub || (ed.body||'').replace(/##[^\n]*/g,'').trim()).substring(0,180);
+  excerpt.textContent = preview + (preview.length>=180?'...':'');
+  var tags = document.createElement('div'); tags.className = 'ec-tags';
+  (ed.tags||'').split(',').forEach(function(t){
+    var tg=t.trim(); if(!tg)return;
+    var span=document.createElement('span'); span.className='ec-tag'; span.textContent=tg;
+    tags.appendChild(span);
+  });
+  card.appendChild(top); card.appendChild(title); card.appendChild(excerpt); card.appendChild(tags);
+  card.addEventListener('click', function(){
+    if (isPublic) {
+      switchView('reader');
+      setTimeout(function(){ openArticle(ed.id, true); }, 50);
+    } else {
+      openArticle(ed.id, false);
+    }
+  });
+  return card;
+}
+
+function openArticle(id, fromPublic) {
+  var ed = getEditions().find(function(e){ return e.id===id; });
+  if (!ed) return;
+  document.getElementById('art-issue').textContent = ed.num || 'The Catalyst';
+  document.getElementById('art-title').textContent = ed.title;
+  document.getElementById('art-date').innerHTML   = fmtDate(ed.date) + ' &nbsp;&middot;&nbsp; ' + readTime(ed.body);
+  document.getElementById('art-body').innerHTML   = parseBody(ed.body);
+  var backBtn = document.getElementById('art-back-btn');
+  backBtn.setAttribute('data-current-id', id);
+  backBtn.onclick = function(){ switchView(fromPublic ? 'public' : 'reader'); };
+  document.querySelectorAll('.view').forEach(function(el){ el.classList.remove('on'); });
+  document.getElementById('view-article').classList.add('on');
+  document.getElementById('mainHeader').style.display = '';
+}
+
+function loadManage() {
+  var eds = getEditions();
+  eds.sort(function(a,b){ return new Date(b.date)-new Date(a.date); });
+  var cEl = document.getElementById('manageCount');
+  if (cEl) cEl.textContent = eds.length + ' edition' + (eds.length!==1?'s':'') + ' total';
+  var el = document.getElementById('adminEditions');
+  if (!el) return;
+  el.innerHTML = '';
+  if (!eds.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-title">No editions yet</div><div class="empty-sub">Write your first edition in the Write tab.</div></div>';
+    return;
+  }
+  eds.forEach(function(ed) {
+    var item = document.createElement('div'); item.className = 'ae-item';
+    var num  = document.createElement('div'); num.className='ae-num'; num.textContent=ed.num||'—';
+    var title= document.createElement('div'); title.className='ae-title'; title.textContent=ed.title;
+    var dt   = document.createElement('div'); dt.className='ae-date'; dt.textContent=fmtDate(ed.date);
+    var stat = document.createElement('div'); stat.className='ae-status '+(ed.status==='published'?'ae-pub':'ae-draft'); stat.textContent=ed.status==='published'?'Live':'Draft';
+    var btns = document.createElement('div'); btns.className='ae-btns';
+    var eb = document.createElement('button'); eb.className='btn btn-ghost'; eb.textContent='Edit';
+    eb.addEventListener('click',(function(id){ return function(){ loadForEdit(id); }; })(ed.id));
+    var tb = document.createElement('button');
+    tb.className='btn '+(ed.status==='published'?'btn-ghost':'btn-outline');
+    tb.textContent=ed.status==='published'?'Unpublish':'Publish';
+    tb.addEventListener('click',(function(id){ return function(){ toggleStatus(id); }; })(ed.id));
+    var db = document.createElement('button'); db.className='btn btn-danger'; db.textContent='\u00d7';
+    db.addEventListener('click',(function(id){ return function(){ deleteEdition(id); }; })(ed.id));
+    btns.appendChild(eb); btns.appendChild(tb); btns.appendChild(db);
+    item.appendChild(num); item.appendChild(title); item.appendChild(dt); item.appendChild(stat); item.appendChild(btns);
+    el.appendChild(item);
+  });
+}
+
+function saveEdition() {
+  var num    = document.getElementById('f-num').value.trim();
+  var title  = document.getElementById('f-title').value.trim();
+  var sub    = document.getElementById('f-sub').value.trim();
+  var body   = document.getElementById('f-body').value.trim();
+  var tags   = document.getElementById('f-tags').value.trim();
+  var status = document.getElementById('f-status').value;
+  var fid    = document.getElementById('f-id').value.trim();
+  if (!title||!body) { toast('Title and body are required'); return; }
+  var eds = getEditions();
+  if (fid) {
+    var idx = eds.findIndex(function(e){ return e.id===fid; });
+    if (idx>=0) { Object.assign(eds[idx],{num,title,sub,body,tags,status}); toast('Edition updated'); }
+  } else {
+    eds.push({id:genId(),num,title,sub,body,tags,status,date:new Date().toISOString()});
+    toast(status==='published'?'Edition published — now live':'Edition saved as draft');
+  }
+  saveEditions(eds);
+  document.getElementById('saveStatus').textContent='Saved '+new Date().toLocaleTimeString();
+  clearForm(); loadManage();
+}
+
+function clearForm() {
+  ['f-num','f-title','f-sub','f-body','f-tags','f-id'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('f-status').value='draft';
+  document.getElementById('saveStatus').textContent='';
+}
+
+function loadForEdit(id) {
+  var ed = getEditions().find(function(e){ return e.id===id; });
+  if (!ed) return;
+  document.getElementById('f-num').value  =ed.num||'';
+  document.getElementById('f-title').value=ed.title||'';
+  document.getElementById('f-sub').value  =ed.sub||'';
+  document.getElementById('f-body').value =ed.body||'';
+  document.getElementById('f-tags').value =ed.tags||'';
+  document.getElementById('f-id').value   =ed.id;
+  document.getElementById('f-status').value=ed.status||'draft';
+  switchTab('write'); toast('Loaded for editing');
+}
+
+function previewEdition() {
+  var ed = {
+    id:'__preview__',
+    num: document.getElementById('f-num').value||'Preview',
+    title: document.getElementById('f-title').value||'(No title)',
+    sub: document.getElementById('f-sub').value,
+    body: document.getElementById('f-body').value,
+    date: new Date().toISOString(), status:'published'
+  };
+  var eds = getEditions();
+  var i = eds.findIndex(function(e){ return e.id==='__preview__'; });
+  if (i>=0) eds[i]=ed; else eds.push(ed);
+  saveEditions(eds);
+  openArticle('__preview__', false);
+}
+
+function toggleStatus(id) {
+  var eds = getEditions();
+  var i = eds.findIndex(function(e){ return e.id===id; });
+  if (i>=0) {
+    eds[i].status = eds[i].status==='published'?'draft':'published';
+    saveEditions(eds);
+    toast(eds[i].status==='published'?'Published — now live for readers':'Unpublished — moved to draft');
+    loadManage();
+  }
+}
+
+function deleteEdition(id) {
+  if (!confirm('Delete this edition permanently?')) return;
+  saveEditions(getEditions().filter(function(e){ return e.id!==id; }));
+  toast('Edition deleted'); loadManage();
+}
+
+function deleteAllEditions() {
+  if (!confirm('Delete ALL editions? This cannot be undone.')) return;
+  saveEditions([]); toast('All editions deleted'); loadManage();
+}
+
+function changePwd() {
+  var np=document.getElementById('newPwd').value;
+  var cp=document.getElementById('confirmPwd').value;
+  if (!np){toast('Enter a new password');return;}
+  if (np!==cp){toast('Passwords do not match');return;}
+  localStorage.setItem(PWD_KEY,np);
+  document.getElementById('newPwd').value='';
+  document.getElementById('confirmPwd').value='';
+  toast('Password updated successfully');
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.atab').forEach(function(t){ t.classList.toggle('on',t.getAttribute('data-tab')===name); });
+  document.querySelectorAll('.atab-content').forEach(function(c){ c.classList.toggle('on',c.id==='tab-'+name); });
+}
+
+document.querySelectorAll('.atab').forEach(function(btn){
+  btn.addEventListener('click', function(){ switchTab(btn.getAttribute('data-tab')); });
+});
+document.getElementById('authInp').addEventListener('keydown', function(e){ if(e.key==='Enter') checkAuth(); });
+
+if (!getEditions().length) {
+  saveEditions([{
+    id:'ed_sample_01',
+    num:'Edition 01',
+    title:'The Chaos Tax — What Your Operational Disorder Is Costing You Every Year',
+    sub:'Most engineering principals are paying a tax they never calculated. This is what it looks like.',
+    body:'There is a cost that never appears on a P&L.\n\nIt does not show up in your accountant\'s report. Your project manager does not track it. Your clients never invoice it. But it is real, it is compounding, and it is the single most expensive line item in your firm\'s operating model.\n\nWe call it the Chaos Tax.\n\n## What is the Chaos Tax?\n\nThe Chaos Tax is the cumulative annual cost of running a firm without operational architecture. It is not a single event. It is not one bad quarter. It is the slow bleed of a firm that runs on heroic effort instead of designed systems.\n\nA senior engineer who should be leading bids is instead answering questions the junior team should handle independently. A proposal that should take two days takes nine because three people need to approve it. A client who was ready to sign waits, follows up twice, and then signs with a competitor — not because of price, but because your response time felt uncertain.\n\nNone of these feel catastrophic in isolation. Combined over twelve months, across every project, every client, every proposal — they constitute the Chaos Tax.\n\n## The three fractures\n\nIn every A.C.E. firm I have worked with, the Chaos Tax comes from the same three places.\n\nThe first is Pipeline Gaps — revenue that was available but never converted, because the BD system depended entirely on the principal\'s personal relationships.\n\nThe second is Decision Lag — the time between a question being asked and an answer being given. In most firms, every meaningful decision travels back to one person.\n\nThe third is System Misalignment — the gap between the firm\'s vision and the firm\'s infrastructure.\n\n## The test I give every principal\n\nIf you went offline for 14 days right now, what would happen to your firm?\n\nMost principals pause before answering. The pause is the answer.\n\n## What this means for you\n\nThe Chaos Tax is not a character flaw. It is the natural result of a firm that outgrew the system that launched it — and never installed a new one.\n\nThe architecture exists. The frameworks are established. The only question is whether you choose to install them before the cost becomes visible on your balance sheet.',
+    tags:'Operations, Chaos Tax, EFA',
+    status:'published',
+    date:new Date(Date.now()-14*24*60*60*1000).toISOString()
+  }]);
+}
+
+loadReader();
+</script>
