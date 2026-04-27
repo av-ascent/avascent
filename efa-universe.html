@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Executive Friction Audit™ — AV ASCENT</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Barlow+Condensed:wght@200;300;400;500;600;700;800;900&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#05080e;--bg2:#080d17;--bg3:#0c1220;
+  --navy:#0a1628;--navy2:#0f1f3d;
+  --gold:#c9a227;--gold2:#e0b840;--gold3:#f0d060;
+  --goldA:rgba(201,162,39,.10);--goldB:rgba(201,162,39,.06);
+  --blue:#1e6fff;--blue2:#4d8fe0;--blue3:#82b4f7;
+  --blueA:rgba(30,111,255,.10);--blueB:rgba(30,111,255,.05);
+  --red:#e74c3c;--red2:#c0392b;--redA:rgba(231,76,60,.10);
+  --green:#27c491;--greenA:rgba(39,196,145,.10);
+  --silver:#b8c8dc;--silver2:#7a90a8;--silver3:#3a4a5c;
+  --white:#f0ede6;--white2:#c8d4e4;
+  --cond:'Barlow Condensed',sans-serif;
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --mono:'DM Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--white);font-family:var(--cond);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+::selection{background:var(--blue);color:#fff}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--gold)}
+body::before{content:"";position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:999;opacity:.55}
+body::after{content:"";position:fixed;inset:0;background-image:linear-gradient(rgba(30,111,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(30,111,255,.025) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:18px 52px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.04);background:rgba(5,8,14,.85);backdrop-filter:blur(24px)}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-brand-t{font-family:var(--cond);font-size:15px;font-weight:800;letter-spacing:.18em;color:var(--white)}
+.nav-brand-t span{color:var(--gold)}
+.nav-badge{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;background:var(--blueA);color:var(--blue3);border:1px solid rgba(30,111,255,.25);padding:3px 10px}
+.nav-cta{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;background:var(--blue);color:#fff;border:none;padding:9px 22px;cursor:pointer;transition:all .22s;text-decoration:none;display:inline-block}
+.nav-cta:hover{background:var(--blue2);transform:translateY(-1px)}
+.hero{min-height:100vh;position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:100px 40px 60px;overflow:hidden}
+.hero-glow{position:absolute;top:20%;left:50%;transform:translate(-50%,-50%);width:900px;height:600px;background:radial-gradient(ellipse at center,rgba(30,111,255,.12) 0%,rgba(201,162,39,.06) 45%,transparent 75%);pointer-events:none;animation:glow-pulse 6s ease-in-out infinite}
+@keyframes glow-pulse{0%,100%{opacity:.7;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.06)}}
+.hero-orb{position:absolute;top:15%;right:8%;width:320px;height:320px;border-radius:50%;background:conic-gradient(from 0deg,transparent 0deg,rgba(30,111,255,.06) 60deg,rgba(201,162,39,.08) 120deg,transparent 180deg,rgba(30,111,255,.04) 240deg,transparent 360deg);animation:orb-spin 22s linear infinite;pointer-events:none}
+@keyframes orb-spin{to{transform:rotate(360deg)}}
+.hero-orb-inner{position:absolute;inset:40px;border-radius:50%;border:1px solid rgba(30,111,255,.12);box-shadow:inset 0 0 60px rgba(30,111,255,.06)}
+.hero-eye{font-family:var(--mono);font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--blue3);display:flex;align-items:center;gap:12px;margin-bottom:24px;animation:fadeUp .9s ease .2s both}
+.hero-eye::before,.hero-eye::after{content:"";width:36px;height:1px;background:var(--blue);opacity:.45}
+.hero-title{font-family:var(--cond);font-size:clamp(52px,9vw,120px);font-weight:900;line-height:.84;letter-spacing:-.02em;color:var(--white);margin-bottom:8px;animation:fadeUp .9s ease .4s both}
+.hero-title .g{color:var(--gold)}.hero-title .b{color:var(--blue2)}.hero-title .dim{color:rgba(240,237,230,.06)}
+.hero-subtitle{font-family:var(--serif);font-size:clamp(18px,2.4vw,24px);font-weight:300;font-style:italic;color:var(--white2);line-height:1.6;max-width:620px;margin:18px auto 36px;animation:fadeUp .9s ease .6s both}
+.hero-stats-row{display:flex;gap:1px;background:rgba(255,255,255,.05);margin-top:40px;animation:fadeUp .9s ease .9s both;width:100%;max-width:860px}
+.h-stat{flex:1;padding:22px 18px;background:var(--bg2);text-align:center;transition:background .2s}
+.h-stat:hover{background:var(--bg3)}
+.h-stat-n{font-family:var(--cond);font-size:clamp(32px,4vw,50px);font-weight:900;line-height:1;margin-bottom:4px}
+.h-stat-l{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--silver2);line-height:1.5}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+section{position:relative;z-index:1}
+.section-wrap{max-width:1180px;margin:0 auto;padding:0 52px}
+.sec-eye{font-family:var(--mono);font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--blue3);display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.sec-eye::before{content:"";width:22px;height:1px;background:var(--blue2);opacity:.5}
+.sec-h{font-family:var(--cond);font-size:clamp(34px,5vw,58px);font-weight:900;line-height:.9;color:var(--white);margin-bottom:10px}
+.sec-h .g{color:var(--gold)}.sec-h .b{color:var(--blue2)}
+.sec-lead{font-family:var(--serif);font-size:clamp(16px,2vw,20px);font-weight:300;font-style:italic;color:var(--white2);line-height:1.7;max-width:580px}
+/* FORMULA */
+.formula-sec{padding:100px 0;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 50%,var(--bg) 100%)}
+.formula-block{display:flex;flex-direction:column;align-items:center;gap:36px;margin-top:60px}
+.formula-eq{font-family:var(--mono);font-size:clamp(14px,1.8vw,19px);color:var(--gold2);letter-spacing:.08em;background:var(--goldA);border:1px solid rgba(201,162,39,.25);padding:20px 36px;text-align:center;position:relative}
+.formula-eq::before{content:"PROPRIETARY FORMULA";position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:11px;letter-spacing:.24em;color:var(--blue3);background:var(--bg2);padding:2px 12px;border:1px solid rgba(30,111,255,.2)}
+.formula-vars{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.05);width:100%}
+.fv{background:var(--bg2);padding:28px 24px;position:relative;overflow:hidden;transition:background .25s}
+.fv:hover{background:var(--bg3)}
+.fv::before{content:"";position:absolute;top:0;left:0;right:0;height:2px}
+.fv-pg::before{background:linear-gradient(90deg,var(--blue),transparent)}
+.fv-dl::before{background:linear-gradient(90deg,var(--gold),transparent)}
+.fv-sm::before{background:linear-gradient(90deg,var(--green),transparent)}
+.fv-abbr{font-family:var(--cond);font-size:52px;font-weight:900;line-height:1;margin-bottom:8px}
+.fv-pg .fv-abbr{color:var(--blue2)}.fv-dl .fv-abbr{color:var(--gold)}.fv-sm .fv-abbr{color:var(--green)}
+.fv-name{font-family:var(--cond);font-size:18px;font-weight:700;letter-spacing:.06em;color:var(--white);margin-bottom:4px}
+.fv-weight{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--white2);margin-bottom:12px}
+.fv-body{font-family:var(--serif);font-size:16px;font-weight:300;color:var(--white);line-height:1.75}
+.fv-bar{margin-top:14px;height:3px;background:rgba(255,255,255,.07);position:relative}
+.fv-bar-fill{height:100%;width:0;transition:width 1.4s cubic-bezier(.4,0,.2,1)}
+.fv-pg .fv-bar-fill{background:var(--blue)}.fv-dl .fv-bar-fill{background:var(--gold)}.fv-sm .fv-bar-fill{background:var(--green)}
+/* ZONES */
+.zones-sec{padding:100px 0;background:var(--bg)}
+.gauge-wrap{position:relative;height:220px;margin:60px 0 40px;display:flex;align-items:center;justify-content:center}
+.gauge-svg{width:100%;max-width:700px}
+.zone-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.05)}
+.zc{padding:24px 20px;background:var(--bg2);transition:background .2s;cursor:default}
+.zc:hover{background:var(--bg3)}
+.zc-range{font-family:var(--cond);font-size:32px;font-weight:900;line-height:1;margin-bottom:6px}
+.zc-label{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px}
+.zc-desc{font-family:var(--serif);font-size:15px;font-weight:300;color:var(--white);line-height:1.6}
+.zc-bar{height:2px;margin-top:14px}
+/* STATS BENTO */
+.stats-sec{padding:100px 0;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%)}
+.stats-bento{display:grid;grid-template-columns:1.3fr 1fr 1fr;grid-template-rows:auto auto;gap:1px;background:rgba(255,255,255,.05);margin-top:60px}
+.sb{background:var(--bg2);padding:32px 28px;transition:background .2s;position:relative;overflow:hidden}
+.sb:hover{background:var(--bg3)}
+.sb.span2{grid-column:span 2}.sb.tall{grid-row:span 2}
+.sb-tag{font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--blue3);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.sb-tag::before{content:"";width:12px;height:1px;background:var(--blue2);opacity:.5}
+.sb-n{font-family:var(--cond);font-size:clamp(46px,5vw,68px);font-weight:900;line-height:1;margin-bottom:6px}
+.sb-desc{font-family:var(--serif);font-size:16px;font-weight:300;color:var(--white);line-height:1.65}
+.sb-source{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--silver);margin-top:12px}
+.donut-wrap{display:flex;align-items:center;gap:28px;margin-top:16px}
+.donut-svg{flex-shrink:0}
+.bar-chart{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.bc-row{display:flex;align-items:center;gap:10px}
+.bc-label{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--silver2);min-width:80px}
+.bc-track{flex:1;height:6px;background:rgba(255,255,255,.06);position:relative}
+.bc-fill{height:100%;width:0;transition:width 1.4s cubic-bezier(.4,0,.2,1)}
+.bc-val{font-family:var(--mono);font-size:12px;color:var(--white);min-width:36px;text-align:right}
+.roi-display{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+.roi-row{display:grid;grid-template-columns:1fr auto;align-items:center;padding:10px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05)}
+.roi-label{font-family:var(--serif);font-size:15px;color:var(--white)}
+.roi-value{font-family:var(--cond);font-size:20px;font-weight:800;color:var(--gold)}
+.roi-total{display:grid;grid-template-columns:1fr auto;align-items:center;padding:12px 14px;background:var(--goldA);border:1px solid rgba(201,162,39,.25)}
+.roi-total-lbl{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold2)}
+.roi-total-val{font-family:var(--cond);font-size:28px;font-weight:900;color:var(--gold2)}
+/* PHASES */
+.phases-sec{padding:100px 0;background:var(--bg)}
+.phases-timeline{display:flex;gap:0;margin-top:60px;position:relative}
+.phases-timeline::before{content:"";position:absolute;top:42px;left:0;right:0;height:1px;background:linear-gradient(to right,transparent,rgba(30,111,255,.3),rgba(201,162,39,.3),rgba(39,196,145,.3),transparent)}
+.phase{flex:1;padding:0 16px;display:flex;flex-direction:column}
+.phase-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;font-weight:500;margin-bottom:18px;border:1px solid;flex-shrink:0}
+.phase-body{flex:1;padding:20px;background:var(--bg2);border:1px solid rgba(255,255,255,.06);transition:all .25s;position:relative;overflow:hidden}
+.phase-body::before{content:"";position:absolute;top:0;left:0;right:0;height:2px}
+.phase:nth-child(1) .phase-body::before{background:var(--blue)}
+.phase:nth-child(2) .phase-body::before{background:var(--gold)}
+.phase:nth-child(3) .phase-body::before{background:var(--green)}
+.phase:nth-child(4) .phase-body::before{background:rgba(255,100,100,.8)}
+.phase-body:hover{background:var(--bg3);transform:translateY(-3px);box-shadow:0 16px 40px rgba(0,0,0,.3)}
+.phase-tag{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--silver2);margin-bottom:6px}
+.phase-time{font-family:var(--cond);font-size:16px;font-weight:700;color:var(--white2);margin-bottom:4px}
+.phase-title{font-family:var(--cond);font-size:20px;font-weight:800;color:var(--white);margin-bottom:8px}
+.phase-desc{font-family:var(--serif);font-size:15px;font-weight:300;color:var(--white);line-height:1.65}
+.phase-weight{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.08em;margin-top:12px;padding:4px 10px;display:inline-block}
+/* MANDATES */
+.mandate-sec{padding:100px 0;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%)}
+.mandate-flow{display:flex;flex-direction:column;gap:1px;background:rgba(255,255,255,.05);margin-top:60px}
+.mf-row{display:grid;grid-template-columns:100px 1fr auto;align-items:stretch;background:var(--bg2);transition:background .2s;position:relative;overflow:hidden}
+.mf-row:hover{background:var(--bg3)}
+.mf-row::after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;transform:scaleY(0);transform-origin:top;transition:transform .35s}
+.mf-row:hover::after{transform:scaleY(1)}
+.mf-efa::after{background:var(--blue)}.mf-1::after{background:var(--gold)}.mf-2::after{background:rgba(255,140,0,.8)}.mf-3::after{background:var(--red)}.mf-ongoing::after{background:var(--green)}
+.mf-num{padding:24px 20px;display:flex;align-items:center;justify-content:center;border-right:1px solid rgba(255,255,255,.05)}
+.mf-num-inner{font-family:var(--cond);font-size:36px;font-weight:900;opacity:.2;line-height:1}
+.mf-body{padding:22px 24px;display:flex;flex-direction:column;gap:5px}
+.mf-tag{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--white2)}
+.mf-title{font-family:var(--cond);font-size:22px;font-weight:800;color:var(--white)}
+.mf-sub{font-family:var(--serif);font-size:15px;font-style:italic;color:var(--white)}
+.mf-items{display:flex;gap:16px;margin-top:4px;flex-wrap:wrap}
+.mf-item{font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:var(--white2)}
+.mf-meta{padding:22px 28px;text-align:right;border-left:1px solid rgba(255,255,255,.05);display:flex;flex-direction:column;justify-content:center;gap:4px;min-width:140px}
+.mf-dur{font-family:var(--cond);font-size:18px;font-weight:700;color:var(--white)}
+.mf-score{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--white2)}
+/* QUOTE */
+.quote-sec{padding:100px 0;background:var(--bg);position:relative}
+.quote-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 50%,rgba(30,111,255,.05) 0%,transparent 70%);pointer-events:none}
+.big-quote{font-family:var(--serif);font-size:clamp(24px,3.8vw,46px);font-weight:300;font-style:italic;color:var(--white);line-height:1.35;text-align:center;max-width:820px;margin:0 auto;padding:0 40px;position:relative;z-index:1}
+.big-quote::before{content:'"';font-size:120px;color:rgba(201,162,39,.06);position:absolute;top:-20px;left:0;font-style:normal;line-height:1;font-family:var(--serif)}
+.big-quote .g{color:var(--gold)}.big-quote .b{color:var(--blue2)}
+.quote-attr{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--silver2);text-align:center;margin-top:24px}
+.proof-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.05);margin-top:60px}
+.pr{background:var(--bg2);padding:24px 20px;text-align:center;transition:background .2s}
+.pr:hover{background:var(--bg3)}
+.pr-n{font-family:var(--cond);font-size:40px;font-weight:900;line-height:1;margin-bottom:4px}
+.pr-l{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--white2)}
+/* CTA */
+.cta-sec{padding:120px 0;background:linear-gradient(135deg,var(--bg) 0%,#0a152a 50%,var(--bg) 100%);position:relative;overflow:hidden}
+.cta-orb{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:800px;height:600px;border-radius:50%;background:conic-gradient(from 180deg,rgba(30,111,255,.06),rgba(201,162,39,.08),rgba(30,111,255,.04),transparent);animation:orb-spin 30s linear infinite;pointer-events:none}
+.cta-inner{position:relative;z-index:1;text-align:center;max-width:820px;margin:0 auto;padding:0 40px}
+.cta-title{font-family:var(--cond);font-size:clamp(46px,8vw,100px);font-weight:900;line-height:.86;letter-spacing:-.02em;color:var(--white);margin-bottom:14px}
+.cta-title .g{color:var(--gold)}.cta-title .b{color:var(--blue2)}
+.cta-sub{font-family:var(--serif);font-size:clamp(17px,2.2vw,22px);font-weight:300;font-style:italic;color:var(--white2);line-height:1.65;max-width:580px;margin:0 auto 40px}
+.cta-checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:540px;margin:0 auto 40px;text-align:left}
+.cta-check{display:flex;gap:10px;font-family:var(--serif);font-size:16px;color:var(--white);line-height:1.5}
+.cta-check::before{content:"✓";color:var(--blue2);flex-shrink:0;font-family:system-ui;font-weight:700}
+.cta-buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-main{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;background:var(--blue);color:#fff;border:none;padding:16px 40px;cursor:pointer;transition:all .25s;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn-main:hover{background:var(--blue2);transform:translateY(-2px);box-shadow:0 16px 48px rgba(30,111,255,.3)}
+.btn-secondary{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;background:transparent;color:var(--gold);border:1px solid rgba(201,162,39,.3);padding:16px 40px;cursor:pointer;transition:all .25s;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn-secondary:hover{background:var(--goldA);transform:translateY(-2px)}
+.cta-contact{font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--white2);margin-top:28px}
+.cta-contact a{color:var(--blue3);text-decoration:none}
+footer{background:var(--bg2);border-top:1px solid rgba(255,255,255,.04);padding:32px 52px;display:flex;align-items:center;justify-content:space-between}
+.ft-brand{font-family:var(--cond);font-size:13px;font-weight:800;letter-spacing:.16em;color:var(--silver2)}
+.ft-brand span{color:var(--gold)}
+.ft-note{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--silver3)}
+.reveal{opacity:0;transform:translateY(32px);transition:opacity .7s ease,transform .7s ease}
+.reveal.on{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:.1s}.reveal-delay-2{transition-delay:.2s}.reveal-delay-3{transition-delay:.3s}
+@media(max-width:768px){
+  nav{padding:14px 20px}.section-wrap{padding:0 20px}
+  .formula-vars,.zone-cards,.stats-bento,.phases-timeline,.proof-row{grid-template-columns:1fr!important;display:flex!important;flex-direction:column!important}
+  .sb.span2,.sb.tall{grid-column:span 1;grid-row:span 1}
+  .hero-stats-row{flex-direction:column}.mf-row{grid-template-columns:60px 1fr}
+  .mf-meta{display:none}.cta-checks{grid-template-columns:1fr}
+  footer{flex-direction:column;gap:10px;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    <div class="nav-brand-t">AV <span>ASCENT</span></div>
+    <div class="nav-badge">Executive Friction Audit™</div>
+  </div>
+  <a href="https://calendly.com/avascent/90min" target="_blank" class="nav-cta">Book the EFA →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-orb"><div class="hero-orb-inner"></div></div>
+  <div class="hero-eye">Operational Architecture · A.C.E. Sector</div>
+  <div class="hero-title">THE<br>EXECUTIVE<br>FRICTION <span class="g">AUDIT</span><span class="dim">™</span></div>
+  <div class="hero-subtitle">The 90-minute diagnostic that calculates the exact number your firm's chaos is costing you — and prescribes the mandate to end it.</div>
+  <div class="hero-stats-row">
+    <div class="h-stat"><div class="h-stat-n" style="color:var(--red)">$2.4M</div><div class="h-stat-l">Avg annual chaos tax<br>mid-size A.C.E. firm</div></div>
+    <div class="h-stat"><div class="h-stat-n" style="color:var(--blue2)">73%</div><div class="h-stat-l">Principals personally making<br>delegatable decisions</div></div>
+    <div class="h-stat"><div class="h-stat-n" style="color:var(--gold)">9d</div><div class="h-stat-l">Avg decision delay<br>without a system</div></div>
+    <div class="h-stat"><div class="h-stat-n" style="color:var(--green)">90</div><div class="h-stat-l">Minutes to know<br>your F-Score</div></div>
+    <div class="h-stat"><div class="h-stat-n" style="color:var(--blue3)">4×</div><div class="h-stat-l">Post-mandate growth<br>velocity multiplier</div></div>
+  </div>
+</section>
+
+<!-- FORMULA -->
+<section class="formula-sec">
+  <div class="section-wrap">
+    <div class="reveal">
+      <div class="sec-eye">The Proprietary Framework</div>
+      <div class="sec-h">FRICTION IS NOT A FEELING.<br>IT IS A <span class="g">CALCULATION.</span></div>
+      <div class="sec-lead">Three variables. One precise number. The F-Score tells you exactly how much operational chaos is costing your firm — and which mandate will end it.</div>
+    </div>
+    <div class="formula-block">
+      <div class="formula-eq reveal reveal-delay-1">
+        F = &nbsp;[ (PG × 5) + (DL × 3) + (SM × 2) ] × C
+        <div style="margin-top:10px;font-family:var(--mono);font-size:12px;color:var(--white2)">C = Complexity Multiplier: ×1.0 small &nbsp;·&nbsp; ×1.5 mid-size &nbsp;·&nbsp; ×2.0 large or regulated</div>
+      </div>
+      <div class="formula-vars reveal reveal-delay-2">
+        <div class="fv fv-pg">
+          <div class="fv-abbr">PG</div>
+          <div class="fv-name">Pipeline Gaps</div>
+          <div class="fv-weight">Weight ×5 &nbsp;·&nbsp; Highest Impact</div>
+          <div class="fv-body">Where is qualified revenue leaking? Untracked leads, no standard proposal process, non-systemic BD that dies when you're unavailable. Scored 1–10 during the session. Every point here is direct lost top-line revenue.</div>
+          <div class="fv-bar"><div class="fv-bar-fill" data-width="83%"></div></div>
+          <div style="font-family:var(--mono);font-size:12px;color:var(--white2);margin-top:6px">Phase 1 · 30 minutes of the diagnostic</div>
+        </div>
+        <div class="fv fv-dl">
+          <div class="fv-abbr">DL</div>
+          <div class="fv-name">Decision Lag</div>
+          <div class="fv-weight">Weight ×3 &nbsp;·&nbsp; Most Personal</div>
+          <div class="fv-body">How fast do decisions move from question to action? The consensus trap, authority debt, and the number of decisions that currently require your personal sign-off. The most personal variable — and the most honest mirror of your leadership structure.</div>
+          <div class="fv-bar"><div class="fv-bar-fill" data-width="60%"></div></div>
+          <div style="font-family:var(--mono);font-size:12px;color:var(--white2);margin-top:6px">Phase 2 · 25 minutes of the diagnostic</div>
+        </div>
+        <div class="fv fv-sm">
+          <div class="fv-abbr">SM</div>
+          <div class="fv-name">System Misalignment</div>
+          <div class="fv-weight">Weight ×2 &nbsp;·&nbsp; Silent Tax</div>
+          <div class="fv-body">The disconnect between your vision and your infrastructure. The 14-day test: if you went completely offline for 14 days — no calls, no approvals — what actually keeps moving? System misalignment is the variable that compounds invisibly over years.</div>
+          <div class="fv-bar"><div class="fv-bar-fill" data-width="40%"></div></div>
+          <div style="font-family:var(--mono);font-size:12px;color:var(--white2);margin-top:6px">Phase 3 · 20 minutes of the diagnostic</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ZONES -->
+<section class="zones-sec">
+  <div class="section-wrap">
+    <div class="reveal">
+      <div class="sec-eye">The Diagnostic Verdict</div>
+      <div class="sec-h">WHERE DOES YOUR<br>FIRM <span class="b">SIT?</span></div>
+      <div class="sec-lead">The F-Score zones determine the mandate. Your number prescribes the path — not a vague strategy session, a specific, time-bound engagement.</div>
+    </div>
+    <div class="gauge-wrap reveal reveal-delay-1">
+      <svg class="gauge-svg" viewBox="0 0 700 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="gaugeGrad" x1="0" y1="0" x2="700" y2="0">
+            <stop offset="0%" stop-color="#27c491"/><stop offset="30%" stop-color="#c9a227"/>
+            <stop offset="60%" stop-color="#e74c3c"/><stop offset="100%" stop-color="#6b0000"/>
+          </linearGradient>
+          <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <path d="M 50 180 A 300 300 0 0 1 650 180" stroke="rgba(255,255,255,0.06)" stroke-width="24" stroke-linecap="round" fill="none"/>
+        <path d="M 50 180 A 300 300 0 0 1 650 180" stroke="url(#gaugeGrad)" stroke-width="24" stroke-linecap="round" fill="none" opacity="0.85" filter="url(#glow)"/>
+        <line x1="230" y1="185" x2="230" y2="155" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+        <line x1="400" y1="186" x2="400" y2="156" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+        <line x1="510" y1="180" x2="510" y2="152" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+        <text x="50" y="210" fill="#27c491" font-family="'DM Mono'" font-size="11" text-anchor="middle" opacity="0.8">1</text>
+        <text x="230" y="210" fill="rgba(255,255,255,0.4)" font-family="'DM Mono'" font-size="11" text-anchor="middle">30</text>
+        <text x="400" y="210" fill="rgba(255,255,255,0.4)" font-family="'DM Mono'" font-size="11" text-anchor="middle">60</text>
+        <text x="510" y="210" fill="rgba(255,255,255,0.4)" font-family="'DM Mono'" font-size="11" text-anchor="middle">80</text>
+        <text x="650" y="210" fill="#8b0000" font-family="'DM Mono'" font-size="11" text-anchor="middle" opacity="0.8">100</text>
+        <text x="140" y="140" fill="#27c491" font-family="'Barlow Condensed'" font-size="14" font-weight="700" text-anchor="middle">LOW</text>
+        <text x="315" y="132" fill="#c9a227" font-family="'Barlow Condensed'" font-size="14" font-weight="700" text-anchor="middle">HIGH</text>
+        <text x="455" y="128" fill="#e74c3c" font-family="'Barlow Condensed'" font-size="14" font-weight="700" text-anchor="middle">CRITICAL</text>
+        <text x="590" y="130" fill="#8b2020" font-family="'Barlow Condensed'" font-size="14" font-weight="700" text-anchor="middle">SYSTEMIC</text>
+        <g id="gauge-needle" style="transform-origin:350px 180px;transform:rotate(-90deg);transition:transform 1.8s cubic-bezier(.4,0,.2,1)">
+          <line x1="350" y1="180" x2="200" y2="80" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+          <circle cx="350" cy="180" r="7" fill="white" opacity="0.9"/>
+          <circle cx="350" cy="180" r="4" fill="#1e6fff"/>
+        </g>
+        <text x="350" y="62" fill="white" font-family="'Barlow Condensed'" font-size="28" font-weight="900" text-anchor="middle" id="gauge-score" opacity="0">64</text>
+        <text x="350" y="78" fill="rgba(255,255,255,0.4)" font-family="'DM Mono'" font-size="9" text-anchor="middle" id="gauge-label" opacity="0">CRITICAL FRICTION</text>
+      </svg>
+    </div>
+    <div class="zone-cards reveal reveal-delay-2">
+      <div class="zc"><div class="zc-range" style="color:var(--green)">1–30</div><div class="zc-label" style="color:var(--green)">Low Friction</div><div class="zc-desc">System is stable. High-leverage BD is operational. The EFA confirms your baseline and maps optimisation for accelerated scale.</div><div class="zc-bar" style="background:var(--green);width:30%"></div></div>
+      <div class="zc"><div class="zc-range" style="color:var(--gold)">31–60</div><div class="zc-label" style="color:var(--gold)">High Friction</div><div class="zc-desc">Growth possible but inconsistent. 1–2 major leaks. Mandate I prescribed: Complete Blueprints, 4–6 week engagement.</div><div class="zc-bar" style="background:var(--gold);width:60%"></div></div>
+      <div class="zc"><div class="zc-range" style="color:var(--red)">61–80</div><div class="zc-label" style="color:var(--red)">Critical Friction</div><div class="zc-desc">Growth severely capped. Founder is permanent bottleneck. Mandate II: The System Launchpad, 3-month retainer.</div><div class="zc-bar" style="background:var(--red);width:80%"></div></div>
+      <div class="zc" style="background:rgba(139,0,0,.06)"><div class="zc-range" style="color:#c44">80+</div><div class="zc-label" style="color:#c44">Systemic Failure</div><div class="zc-desc">Expertise actively sabotaged by broken architecture. Mandate III: The Ecosystem, 6-month fractional CGA engagement.</div><div class="zc-bar" style="background:#8b0000;width:100%"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BENTO -->
+<section class="stats-sec">
+  <div class="section-wrap">
+    <div class="reveal">
+      <div class="sec-eye">The Data — Why This Is Urgent</div>
+      <div class="sec-h">THE NUMBERS<br>DON'T <span class="b">LIE.</span></div>
+      <div class="sec-lead">The cost of operational friction in A.C.E. firms is not theoretical. It is calculated, documented, and compounding right now in your firm.</div>
+    </div>
+    <div class="stats-bento reveal reveal-delay-1">
+      <div class="sb tall">
+        <div class="sb-tag">The Chaos Tax</div>
+        <div class="sb-n" style="color:var(--red)">$2.4M</div>
+        <div class="sb-desc">Average annual revenue lost to unmapped operational friction in mid-size A.C.E. firms. Not to the market. To internal chaos.</div>
+        <div class="sb-source">Deloitte Operations Study 2023 · McKinsey A.C.E. Sector Report</div>
+        <div class="bar-chart" style="margin-top:22px">
+          <div style="font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--silver2);margin-bottom:8px">Where it leaks</div>
+          <div class="bc-row"><div class="bc-label">Pipeline</div><div class="bc-track"><div class="bc-fill" style="background:var(--red)" data-width="78%"></div></div><div class="bc-val">78%</div></div>
+          <div class="bc-row"><div class="bc-label">Decisions</div><div class="bc-track"><div class="bc-fill" style="background:var(--gold)" data-width="55%"></div></div><div class="bc-val">55%</div></div>
+          <div class="bc-row"><div class="bc-label">Handoffs</div><div class="bc-track"><div class="bc-fill" style="background:var(--blue2)" data-width="42%"></div></div><div class="bc-val">42%</div></div>
+          <div class="bc-row"><div class="bc-label">Rework</div><div class="bc-track"><div class="bc-fill" style="background:var(--green)" data-width="31%"></div></div><div class="bc-val">31%</div></div>
+        </div>
+        <div class="sb-source" style="margin-top:10px">% of firms citing each as primary leakage source</div>
+      </div>
+      <div class="sb">
+        <div class="sb-tag">Decision Lag</div>
+        <div class="sb-n" style="color:var(--gold)">9 Days</div>
+        <div class="sb-desc">Average time a strategic decision takes in a founder-led A.C.E. firm without a Decision Authority Matrix.</div>
+        <div class="sb-source">Harvard Business Review · Leadership in Professional Services 2022</div>
+        <div class="donut-wrap" style="margin-top:16px">
+          <svg class="donut-svg" width="80" height="80" viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="30" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="12"/>
+            <circle cx="40" cy="40" r="30" fill="none" stroke="var(--gold)" stroke-width="12" stroke-dasharray="188.5" stroke-dashoffset="141" stroke-linecap="round" transform="rotate(-90 40 40)" opacity=".85"/>
+            <text x="40" y="44" fill="white" font-family="'Barlow Condensed'" font-size="14" font-weight="900" text-anchor="middle">73%</text>
+          </svg>
+          <div style="font-family:var(--serif);font-size:15px;color:var(--white);line-height:1.6">of principals personally make decisions that should be delegated two levels below them.</div>
+        </div>
+      </div>
+      <div class="sb">
+        <div class="sb-tag">The Founder Trap</div>
+        <div class="sb-n" style="color:var(--blue2)">89%</div>
+        <div class="sb-desc">of A.C.E. firms cannot operate for 14 days without the principal's direct involvement in key decisions.</div>
+        <div class="sb-source">FND × AV ASCENT Field Assessment 2025 · McKinsey SME Study</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:16px">
+          <div style="font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--silver2);margin-bottom:5px">Firm autonomy by size</div>
+          <div class="bc-row"><div class="bc-label" style="font-size:12px">1–10 staff</div><div class="bc-track"><div class="bc-fill" style="background:var(--red)" data-width="96%"></div></div><div class="bc-val">96%</div></div>
+          <div class="bc-row"><div class="bc-label" style="font-size:12px">10–50</div><div class="bc-track"><div class="bc-fill" style="background:rgba(231,76,60,.6)" data-width="82%"></div></div><div class="bc-val">82%</div></div>
+          <div class="bc-row"><div class="bc-label" style="font-size:12px">50+</div><div class="bc-track"><div class="bc-fill" style="background:var(--gold)" data-width="61%"></div></div><div class="bc-val">61%</div></div>
+        </div>
+        <div class="sb-source" style="margin-top:10px">% captive on 14-day test</div>
+      </div>
+      <div class="sb span2">
+        <div class="sb-tag">The Investment Case — EFA ROI Calculator</div>
+        <div class="roi-display">
+          <div class="roi-row"><div class="roi-label">Annual revenue leakage (avg $2.4M × your score %)</div><div class="roi-value">$960K</div></div>
+          <div class="roi-row"><div class="roi-label">Decision lag cost (9 days × 80 decisions/yr × $3,200/day)</div><div class="roi-value">$2.3M</div></div>
+          <div class="roi-row"><div class="roi-label">Opportunity cost of founder captivity (strategic projects deferred)</div><div class="roi-value">$1.1M</div></div>
+          <div class="roi-total"><div class="roi-total-lbl">Total annual friction cost (conservative model)</div><div class="roi-total-val">$4.36M</div></div>
+        </div>
+        <div style="font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--silver);margin-top:12px">Model based on Deloitte 2023 · McKinsey SME · AV ASCENT EFA averages. Your real number: calculated in 90 minutes.</div>
+      </div>
+      <div class="sb">
+        <div class="sb-tag">Post-EFA Growth</div>
+        <div class="sb-n" style="color:var(--green)">3.8×</div>
+        <div class="sb-desc">Average revenue growth velocity increase in firms that implement their prescribed mandate within 90 days of the EFA.</div>
+        <div class="sb-source">AV ASCENT Internal Data 2024–25</div>
+        <div style="margin-top:14px;height:3px;background:linear-gradient(to right,var(--bg3),var(--green));opacity:.6"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PHASES -->
+<section class="phases-sec">
+  <div class="section-wrap">
+    <div class="reveal">
+      <div class="sec-eye">The 90-Minute Session</div>
+      <div class="sec-h">FOUR PHASES.<br>ONE <span class="g">COMPLETE VERDICT.</span></div>
+      <div class="sec-lead">Not a conversation. Not a strategy session. A diagnostic audit with a precise, written, time-stamped verdict — delivered before you leave the room.</div>
+    </div>
+    <div class="phases-timeline reveal reveal-delay-1">
+      <div class="phase">
+        <div class="phase-num" style="background:rgba(30,111,255,.1);color:var(--blue2);border-color:rgba(30,111,255,.3)">01</div>
+        <div class="phase-body">
+          <div class="phase-tag">Phase 1</div>
+          <div class="phase-time">30 Minutes</div>
+          <div class="phase-title">Pipeline Gaps</div>
+          <div class="phase-desc">Where is qualified revenue leaking? Lead loss, proposal velocity, BD standardisation, and pipeline architecture mapped end-to-end.</div>
+          <div class="phase-weight" style="background:rgba(30,111,255,.1);color:var(--blue2)">Weight ×5 — Highest</div>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-num" style="background:rgba(201,162,39,.1);color:var(--gold);border-color:rgba(201,162,39,.3)">02</div>
+        <div class="phase-body">
+          <div class="phase-tag">Phase 2</div>
+          <div class="phase-time">25 Minutes</div>
+          <div class="phase-title">Decision Lag</div>
+          <div class="phase-desc">How fast are strategic decisions made? The consensus trap, authority debt, and the exact number of decisions requiring your sign-off today.</div>
+          <div class="phase-weight" style="background:rgba(201,162,39,.1);color:var(--gold)">Weight ×3 — Personal</div>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-num" style="background:rgba(39,196,145,.1);color:var(--green);border-color:rgba(39,196,145,.3)">03</div>
+        <div class="phase-body">
+          <div class="phase-tag">Phase 3</div>
+          <div class="phase-time">20 Minutes</div>
+          <div class="phase-title">System Misalignment</div>
+          <div class="phase-desc">The 14-day test administered. Would your firm run for two weeks without you? The silent tax of infrastructure that doesn't match your vision.</div>
+          <div class="phase-weight" style="background:rgba(39,196,145,.1);color:var(--green)">Weight ×2 — Silent Tax</div>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-num" style="background:rgba(201,162,39,.08);color:var(--gold2);border-color:rgba(201,162,39,.25)">04</div>
+        <div class="phase-body" style="background:var(--goldA);border-color:rgba(201,162,39,.2)">
+          <div class="phase-tag" style="color:var(--gold)">Phase 4</div>
+          <div class="phase-time" style="color:var(--gold2)">15 Minutes</div>
+          <div class="phase-title" style="color:var(--gold2)">The Verdict</div>
+          <div class="phase-desc" style="color:var(--silver)">Your F-Score calculated live. Your mandate prescribed — not sold. You leave knowing exactly what must change and in what order. In writing.</div>
+          <div class="phase-weight" style="background:rgba(201,162,39,.15);color:var(--gold2)">The mandate prescription</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.04);margin-top:1px" class="reveal reveal-delay-2">
+      <div style="background:var(--bg2);padding:18px 20px;text-align:center"><div style="font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--blue3);margin-bottom:6px">Deliverable 1</div><div style="font-family:var(--cond);font-size:17px;font-weight:800;color:var(--white)">Your F-Score</div><div style="font-family:var(--serif);font-size:15px;color:var(--white);margin-top:4px">Precise metric, zoned and explained</div></div>
+      <div style="background:var(--bg2);padding:18px 20px;text-align:center"><div style="font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Deliverable 2</div><div style="font-family:var(--cond);font-size:17px;font-weight:800;color:var(--white)">The Friction Map</div><div style="font-family:var(--serif);font-size:15px;color:var(--white);margin-top:4px">3 bottlenecks visualised + ranked</div></div>
+      <div style="background:var(--bg2);padding:18px 20px;text-align:center"><div style="font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--green);margin-bottom:6px">Deliverable 3</div><div style="font-family:var(--cond);font-size:17px;font-weight:800;color:var(--white)">Written Report</div><div style="font-family:var(--serif);font-size:15px;color:var(--white);margin-top:4px">Root cause + mandate in writing</div></div>
+      <div style="background:var(--goldA);border:1px solid rgba(201,162,39,.15);padding:18px 20px;text-align:center"><div style="font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold2);margin-bottom:6px">Deliverable 4</div><div style="font-family:var(--cond);font-size:17px;font-weight:800;color:var(--gold2)">90-Day Blueprint</div><div style="font-family:var(--serif);font-size:15px;color:var(--white);margin-top:4px">First 90 days fully mapped</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- MANDATE STACK -->
+<section class="mandate-sec">
+  <div class="section-wrap">
+    <div class="reveal">
+      <div class="sec-eye">The Ascending Mandate Stack</div>
+      <div class="sec-h">THE DIAGNOSIS<br>DETERMINES THE <span class="b">PRESCRIPTION.</span></div>
+      <div class="sec-lead">Every engagement begins with the EFA. The F-Score determines which mandate is right. We don't sell mandates — we prescribe them.</div>
+    </div>
+    <div class="mandate-flow reveal reveal-delay-1">
+      <div class="mf-row mf-efa" style="background:rgba(30,111,255,.06)">
+        <div class="mf-num"><div class="mf-num-inner" style="color:var(--blue)">EFA</div></div>
+        <div class="mf-body">
+          <div class="mf-tag" style="color:var(--blue3)">Required Entry Point — All Mandates Begin Here</div>
+          <div class="mf-title">Executive Friction Audit™</div>
+          <div class="mf-sub">The 90-minute diagnostic that changes everything</div>
+          <div class="mf-items">
+            <div class="mf-item" style="color:var(--blue3)">✓ F-Score calculated live</div>
+            <div class="mf-item" style="color:var(--blue3)">✓ Friction Map delivered</div>
+            <div class="mf-item" style="color:var(--blue3)">✓ Written report in-session</div>
+            <div class="mf-item" style="color:var(--blue3)">✓ 90-Day Blueprint</div>
+            <div class="mf-item" style="color:var(--blue3)">✓ Mandate prescription</div>
+          </div>
+        </div>
+        <div class="mf-meta">
+          <div class="mf-dur" style="color:var(--blue2)">90 Min</div>
+          <div class="mf-score">All F-Score ranges</div>
+          <div style="margin-top:10px"><a href="https://calendly.com/avascent/90min" target="_blank" style="font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;background:var(--blue);color:#fff;padding:9px 18px;text-decoration:none;display:inline-block">Book Now →</a></div>
+        </div>
+      </div>
+      <div class="mf-row mf-1">
+        <div class="mf-num"><div class="mf-num-inner" style="color:var(--gold)">I</div></div>
+        <div class="mf-body">
+          <div class="mf-tag">Post-EFA · F-Score 31–60 · High Friction</div>
+          <div class="mf-title">The Complete Blueprints</div>
+          <div class="mf-sub">Full BD System Blueprint installation</div>
+          <div class="mf-items">
+            <div class="mf-item">Complete pipeline architecture</div>
+            <div class="mf-item">Decision Authority Matrix</div>
+            <div class="mf-item">Lead qualification system</div>
+            <div class="mf-item">Authority asset library</div>
+          </div>
+        </div>
+        <div class="mf-meta"><div class="mf-dur">4–6 Weeks</div><div class="mf-score">F-Score 31–60</div></div>
+      </div>
+      <div class="mf-row mf-2">
+        <div class="mf-num"><div class="mf-num-inner" style="color:rgba(255,140,0,.4)">II</div></div>
+        <div class="mf-body">
+          <div class="mf-tag">Post-EFA · F-Score 61–80 · Critical Friction</div>
+          <div class="mf-title">The System Launchpad</div>
+          <div class="mf-sub">System build + ongoing governance + monthly calibration</div>
+          <div class="mf-items">
+            <div class="mf-item">Complete Blueprint + installation</div>
+            <div class="mf-item">Leadership team training</div>
+            <div class="mf-item">Governance architecture</div>
+            <div class="mf-item">Delivery partner protocol</div>
+          </div>
+        </div>
+        <div class="mf-meta"><div class="mf-dur">3 Months</div><div class="mf-score">F-Score 61–80</div></div>
+      </div>
+      <div class="mf-row mf-3">
+        <div class="mf-num"><div class="mf-num-inner" style="color:var(--red)">III</div></div>
+        <div class="mf-body">
+          <div class="mf-tag">Post-EFA · F-Score 80+ · Systemic Failure</div>
+          <div class="mf-title">The Ecosystem</div>
+          <div class="mf-sub">Fractional CGA embedded · Full principal extraction</div>
+          <div class="mf-items">
+            <div class="mf-item">Fractional CGA embedded</div>
+            <div class="mf-item">All verticals installed</div>
+            <div class="mf-item">Principal fully extracted</div>
+            <div class="mf-item">Legacy documentation</div>
+          </div>
+        </div>
+        <div class="mf-meta"><div class="mf-dur">6 Months</div><div class="mf-score">F-Score 80+</div></div>
+      </div>
+      <div class="mf-row mf-ongoing" style="background:rgba(39,196,145,.04)">
+        <div class="mf-num"><div class="mf-num-inner" style="color:var(--green)">∞</div></div>
+        <div class="mf-body">
+          <div class="mf-tag" style="color:var(--green)">Post-Mandate · Retained Partnership</div>
+          <div class="mf-title">Ongoing Partner</div>
+          <div class="mf-sub">Quarterly recalibration · Odoo ERP integration · Referral network</div>
+          <div class="mf-items">
+            <div class="mf-item" style="color:var(--green)">✓ Quarterly F-Score recalibration</div>
+            <div class="mf-item" style="color:var(--green)">✓ Market calibration sessions</div>
+            <div class="mf-item" style="color:var(--green)">✓ Referral network activation</div>
+          </div>
+        </div>
+        <div class="mf-meta"><div class="mf-dur" style="color:var(--green)">Retained</div><div class="mf-score">Post any mandate</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<section class="quote-sec">
+  <div class="quote-bg"></div>
+  <div class="section-wrap">
+    <div class="big-quote reveal">"The session pays for itself before you leave the room. Not because the fee is low — but because <span class="g">knowing your number</span> is the first decision that costs you nothing and saves you <span class="b">everything."</span></div>
+    <div class="quote-attr reveal reveal-delay-1">— Areeba Viqar &nbsp;·&nbsp; System Architect & Founder &nbsp;·&nbsp; AV ASCENT</div>
+    <div class="proof-row reveal reveal-delay-2">
+      <div class="pr"><div class="pr-n" style="color:var(--blue2)">90</div><div class="pr-l">Minutes to full<br>F-Score verdict</div></div>
+      <div class="pr"><div class="pr-n" style="color:var(--gold)">4</div><div class="pr-l">Written deliverables<br>every session</div></div>
+      <div class="pr"><div class="pr-n" style="color:var(--green)">3.8×</div><div class="pr-l">Avg growth velocity<br>post-mandate</div></div>
+      <div class="pr"><div class="pr-n" style="color:var(--red)">14d</div><div class="pr-l">The autonomy test<br>most firms fail</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-sec">
+  <div class="cta-orb"></div>
+  <div class="cta-inner reveal">
+    <div class="cta-title">THE CHAOS<br>ENDS WHEN<br>YOU CHOOSE <span class="g">ORDER.</span></div>
+    <div class="cta-sub">Book the Executive Friction Audit™. 90 minutes. One number. One verdict. One mandate. No prep needed.</div>
+    <div class="cta-checks">
+      <div class="cta-check">F-Score calculated and zoned precisely</div>
+      <div class="cta-check">Complete written report delivered</div>
+      <div class="cta-check">Mandate prescribed — not a vague roadmap</div>
+      <div class="cta-check">90-Day Transformation Blueprint</div>
+      <div class="cta-check">Friction Map — 3 bottlenecks visualised</div>
+      <div class="cta-check">Limited availability — qualified firms only</div>
+    </div>
+    <div class="cta-buttons">
+      <a href="https://calendly.com/avascent/90min" target="_blank" class="btn-main">Book the EFA Diagnostic →</a>
+      <a href="https://wa.me/923336076231" target="_blank" class="btn-secondary">WhatsApp Areeba →</a>
+    </div>
+    <div class="cta-contact">
+      <a href="mailto:info.avascent@gmail.com">info.avascent@gmail.com</a> &nbsp;·&nbsp;
+      <a href="tel:+923336076231">+92 333 6076231</a> &nbsp;·&nbsp;
+      <a href="https://calendly.com/avascent/90min" target="_blank">calendly.com/avascent/90min</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="ft-brand">AV <span>ASCENT</span></div>
+  <div class="ft-note">© 2025 AV ASCENT · Karachi, Pakistan · Serving the Global A.C.E. Sector · Executive Friction Audit™ is a registered service mark</div>
+</footer>
+
+<script>
+// Reveal on scroll
+const reveals=document.querySelectorAll('.reveal');
+const ro=new IntersectionObserver(e=>{e.forEach(en=>{if(en.isIntersecting)en.target.classList.add('on')});},{threshold:.08});
+reveals.forEach(el=>ro.observe(el));
+
+// Animate bar fills
+const barFills=document.querySelectorAll('.bc-fill,.fv-bar-fill');
+const barObs=new IntersectionObserver(e=>{
+  e.forEach(en=>{
+    if(en.isIntersecting){
+      const w=en.target.getAttribute('data-width');
+      if(w)setTimeout(()=>{en.target.style.width=w;},300);
+      barObs.unobserve(en.target);
+    }
+  });
+},{threshold:.1});
+barFills.forEach(el=>barObs.observe(el));
+
+// Gauge needle
+const gaugeEl=document.querySelector('.gauge-wrap');
+if(gaugeEl){
+  const gObs=new IntersectionObserver(e=>{
+    e.forEach(en=>{
+      if(en.isIntersecting){
+        const score=64;
+        const angle=((score-1)/99)*180-90;
+        setTimeout(()=>{
+          const needle=document.getElementById('gauge-needle');
+          const scoreEl=document.getElementById('gauge-score');
+          const labelEl=document.getElementById('gauge-label');
+          if(needle){needle.style.transform=`rotate(${angle}deg)`;}
+          if(scoreEl){scoreEl.style.opacity='1';scoreEl.style.transition='opacity .6s ease .8s';}
+          if(labelEl){labelEl.style.opacity='1';labelEl.style.transition='opacity .6s ease 1s';}
+          let n=0;
+          const iv=setInterval(()=>{
+            n=Math.min(n+2,score);
+            if(scoreEl)scoreEl.textContent=n;
+            if(n>=score)clearInterval(iv);
+          },30);
+        },400);
+        gObs.unobserve(en.target);
+      }
+    });
+  },{threshold:.3});
+  gObs.observe(gaugeEl);
+}
+</script>
+</body>
+</html>
