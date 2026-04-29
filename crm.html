@@ -244,27 +244,35 @@ body{font-family:var(--cond);background:var(--bg);color:var(--w);height:100vh;ov
 <div class="toast" id="toast"></div>
 
 <!-- SETUP SCREEN -->
-<div id="setupScreen" style="display:none">
-  <div class="setup">
-    <div>
-      <div class="setup-logo">AV <span>ASCENT</span></div>
-      <div style="font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--w3)">Command CRM — First-Time Setup</div>
-    </div>
-    <div class="setup-box">
-      <div style="font-family:var(--cond);font-size:17px;font-weight:800;color:var(--w);margin-bottom:.25rem">Connect to Supabase</div>
-      <div class="setup-note">
-        1. Go to supabase.com → New project<br>
-        2. Settings → API → copy URL and anon key<br>
-        3. Run the schema SQL in SQL Editor (button below)<br>
-        4. Paste credentials here
+<div id="loginScreen" style="display:none">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);position:relative;overflow:hidden">
+    <!-- Grid bg -->
+    <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(184,150,90,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(184,150,90,.04) 1px,transparent 1px);background-size:44px 44px;pointer-events:none"></div>
+    <!-- Glow -->
+    <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:600px;height:600px;background:radial-gradient(ellipse,rgba(184,150,90,.06) 0%,transparent 65%);pointer-events:none"></div>
+    <!-- Left bar -->
+    <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(to bottom,transparent,var(--gold) 30%,var(--gold) 70%,transparent)"></div>
+    <!-- Top bar -->
+    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)"></div>
+    <div style="position:relative;z-index:1;width:380px;text-align:center">
+      <!-- Brand -->
+      <div style="margin-bottom:2.5rem">
+        <div style="font-family:var(--cond);font-size:36px;font-weight:900;letter-spacing:.16em;color:var(--w);line-height:1">AV <span style="color:var(--gold)">ASCENT</span></div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--w3);margin-top:6px">Command CRM · Admin Access</div>
+        <div style="width:48px;height:1px;background:var(--gold);opacity:.5;margin:.9rem auto 0"></div>
       </div>
-      <div class="fg"><label>Supabase Project URL</label><input class="finp" id="setupUrl" placeholder="https://xxxx.supabase.co"></div>
-      <div class="fg"><label>Supabase Anon Key</label><input class="finp" id="setupKey" placeholder="eyJhbGci..." type="password"></div>
-      <div style="display:flex;gap:.5rem">
-        <button class="btn btn-gold" onclick="saveSetup()" style="flex:1">Connect & Launch →</button>
-        <button class="btn btn-ghost" onclick="showSchema()">View Schema SQL</button>
+      <!-- Login Box -->
+      <div style="background:var(--bg2);border:1px solid var(--br);padding:2rem 2.2rem">
+        <div style="font-family:var(--serif);font-size:15px;font-style:italic;color:var(--w3);margin-bottom:1.5rem;line-height:1.55">Enter your admin password to access the pipeline.</div>
+        <div class="fg" style="text-align:left;margin-bottom:1rem">
+          <label>Admin Password</label>
+          <input type="password" class="finp" id="loginPwd" placeholder="Enter password" autocomplete="current-password" style="font-size:15px;padding:.65rem .9rem" onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+        <button class="btn btn-gold" style="width:100%;padding:.75rem;font-size:11px" onclick="doLogin()">Enter CRM →</button>
+        <div id="loginErr" style="font-family:var(--mono);font-size:10px;color:#e74c3c;margin-top:.6rem;display:none;letter-spacing:.04em">Incorrect password. Try again.</div>
       </div>
-      <button class="btn btn-ghost" onclick="useDemoMode()" style="font-size:9px">Use demo mode (data not saved)</button>
+      <!-- Footer -->
+      <div style="margin-top:1.2rem;font-family:var(--mono);font-size:8px;letter-spacing:.1em;color:var(--w4)">info.avascent@gmail.com · AV ASCENT © 2026</div>
     </div>
   </div>
 </div>
@@ -300,7 +308,7 @@ body{font-family:var(--cond);background:var(--bg);color:var(--w);height:100vh;ov
       </div>
       <button class="btn btn-gold btn-sm" onclick="openNewDeal()">+ New Deal</button>
       <button class="btn btn-ghost btn-sm" onclick="openNewClient()">+ Client</button>
-      <div class="tb-user" id="tbUser">info.avascent@gmail.com</div>
+      <div class="tb-user" id="tbUser">info.avascent@gmail.com</div><button class="btn btn-ghost btn-sm" onclick="logoutCRM()" style="font-size:8px;padding:.2rem .5rem" title="Sign out">⏻</button>
     </div>
   </div>
 
@@ -500,12 +508,18 @@ Title: Areeba Viqar</textarea></div>
           </div>
         </div>
         <div class="panel">
-          <div class="panel-hd">Supabase Connection</div>
+          <div class="panel-hd">Database & Access</div>
           <div style="padding:1rem;display:flex;flex-direction:column;gap:.75rem">
-            <div class="fg"><label>Project URL</label><input class="finp" id="settingUrl" placeholder="https://xxx.supabase.co" type="text"></div>
-            <div class="fg"><label>Anon Key</label><input class="finp" id="settingKey" placeholder="eyJ..." type="password"></div>
-            <button class="btn btn-outline btn-sm" onclick="reconnectSupabase()">Reconnect</button>
-            <button class="btn btn-ghost btn-sm" onclick="showSchema()">View Schema SQL</button>
+            <div style="font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--w4)">Supabase Status</div>
+            <div id="sbStatus" style="font-family:var(--mono);font-size:10px;color:var(--gr)">● Connected</div>
+            <button class="btn btn-ghost btn-sm" onclick="showSchema()">View / Copy Schema SQL</button>
+            <div style="height:1px;background:var(--br2)"></div>
+            <div style="font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--w4)">Admin Password</div>
+            <div class="fg"><label>New Password</label><input class="finp" id="newAdminPwd" type="password" placeholder="New admin password"></div>
+            <div class="fg"><label>Confirm</label><input class="finp" id="confirmAdminPwd" type="password" placeholder="Confirm password"></div>
+            <button class="btn btn-outline btn-sm" onclick="changeAdminPwd()">Update Password</button>
+            <div style="height:1px;background:var(--br2)"></div>
+            <button class="btn btn-ghost btn-sm" onclick="logoutCRM()">Sign out of CRM</button>
           </div>
         </div>
         <div class="panel">
@@ -817,19 +831,94 @@ create table if not exists invoices (
 -- alter table invoices enable row level security;`;
 
 // ══════════════════════════════════════════
+// AUTH HELPERS
+// ══════════════════════════════════════════
+function logoutCRM(){
+  sessionStorage.removeItem('crm_auth');
+  showLoginScreen();
+  toast('Signed out');
+}
+
+function changeAdminPwd(){
+  var np = (document.getElementById('newAdminPwd').value||'').trim();
+  var cp = (document.getElementById('confirmAdminPwd').value||'').trim();
+  if(!np){ toast('Enter a new password'); return; }
+  if(np !== cp){ toast('Passwords do not match'); return; }
+  ADMIN_PASSWORD = np;
+  document.getElementById('newAdminPwd').value='';
+  document.getElementById('confirmAdminPwd').value='';
+  toast('Password updated — note: resets on page reload unless hardcoded in SB_URL/SB_KEY block');
+}
+
+// ══════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════
+// ══════════════════════════════════════════════
+// SUPABASE CONFIG — paste your credentials here
+// ══════════════════════════════════════════════
+var SB_URL = 'https://asjgmnwhnbhuuzqanelg.supabase.co/rest/v1/';       // e.g. https://abcdefgh.supabase.co
+var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzamdtbndobmJodXV6cWFuZWxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0Mzg4MDgsImV4cCI6MjA5MzAxNDgwOH0.FE1fktOxsEfOKcfECDCgdVCq96Z9tIsdPIGLD9JD3gI';  // eyJhbGciOi...
+
+// Admin password — change this to your own password
+var ADMIN_PASSWORD = 'avascent2026';
+
 function init(){
   document.getElementById('schemaSql').value = SCHEMA_SQL;
   loadLocalSettings();
-  var url = localStorage.getItem('sb_url');
-  var key = localStorage.getItem('sb_key');
-  if(url && key){
-    initSupabase(url, key);
+  // Check if already logged in this session
+  if(sessionStorage.getItem('crm_auth') === '1'){
+    launchCRM();
   } else {
-    document.getElementById('setupScreen').style.display='flex';
-    document.getElementById('mainApp').style.display='none';
+    showLoginScreen();
   }
+}
+
+function showLoginScreen(){
+  document.getElementById('loginScreen').style.display='block';
+  document.getElementById('mainApp').style.display='none';
+  setTimeout(function(){ var p=document.getElementById('loginPwd'); if(p) p.focus(); }, 100);
+}
+
+function doLogin(){
+  var pwd = (document.getElementById('loginPwd').value||'').trim();
+  var errEl = document.getElementById('loginErr');
+  if(pwd === ADMIN_PASSWORD){
+    sessionStorage.setItem('crm_auth','1');
+    document.getElementById('loginScreen').style.display='none';
+    errEl.style.display='none';
+    document.getElementById('loginPwd').value='';
+    launchCRM();
+  } else {
+    errEl.style.display='block';
+    document.getElementById('loginPwd').value='';
+    document.getElementById('loginPwd').focus();
+  }
+}
+
+function launchCRM(){
+  // Connect Supabase with hardcoded credentials
+  if(SB_URL && SB_URL !== 'YOUR_SUPABASE_URL'){
+    try{
+      supabase = window.supabase.createClient(SB_URL, SB_KEY);
+      DEMO_MODE = false;
+      loadAllData();
+    } catch(e){
+      console.warn('Supabase connection failed, using demo mode');
+      DEMO_MODE = true; seedDemo();
+    }
+  } else {
+    // No credentials set — demo mode
+    DEMO_MODE = true; seedDemo();
+    setTimeout(function(){ toast('Running in demo mode — add Supabase credentials to save data'); }, 600);
+  }
+  document.getElementById('mainApp').style.display='grid';
+  switchView('pipeline');
+  buildRichToolbar('noteToolbar','noteEditor');
+  buildRichToolbar('emailToolbar','emailBody');
+  buildEmailTemplates();
+  populateSettingsForm();
+  renderStagesList();
+  updateSidebarStats();
 }
 
 function loadLocalSettings(){
@@ -852,6 +941,9 @@ function saveSettings(){
 }
 
 function populateSettingsForm(){
+  var sbEl = document.getElementById('sbStatus');
+  if(sbEl) sbEl.innerHTML = DEMO_MODE ? '<span style="color:var(--am)">● Demo mode — data not saved</span>' : '<span style="color:var(--gr)">● Connected to Supabase</span>';
+
   document.getElementById('settingBiz').value   = DB.settings.biz;
   document.getElementById('settingEmail').value = DB.settings.email;
   document.getElementById('settingPhone').value = DB.settings.phone;
@@ -893,7 +985,7 @@ function saveSetup(){
 function useDemoMode(){
   DEMO_MODE = true;
   seedDemo();
-  launchApp();
+  launchCRM();
 }
 
 function seedDemo(){
@@ -917,28 +1009,22 @@ function seedDemo(){
   ];
 }
 
-function reconnectSupabase(){
-  var url = document.getElementById('settingUrl').value.trim();
-  var key = document.getElementById('settingKey').value.trim();
-  if(!url||!key){toast('Enter URL and key');return;}
-  localStorage.setItem('sb_url',url);
-  localStorage.setItem('sb_key',key);
-  initSupabase(url,key);
-}
+/* reconnectSupabase removed — credentials are hardcoded */
 
 function initSupabase(url, key){
   try{
     supabase = window.supabase.createClient(url, key);
     toast('Connected to Supabase');
-    launchApp();
+    launchCRM();
     loadAllData();
   } catch(e){
     toast('Connection failed — using demo mode');
-    DEMO_MODE = true; seedDemo(); launchApp();
+    DEMO_MODE = true; seedDemo(); launchCRM();
   }
 }
 
-function launchApp(){
+/* launchApp merged into launchCRM */
+function _deprecated_launchApp(){
   document.getElementById('setupScreen').style.display='none';
   document.getElementById('mainApp').style.display='grid';
   switchView('pipeline');
