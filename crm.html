@@ -1,0 +1,2057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AV ASCENT — Command CRM</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Barlow+Condensed:wght@300;400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07090e;--bg2:#0c1019;--bg3:#111621;--bg4:#161d2c;
+  --gold:#b8965a;--gold2:#d4b07a;--goldA:rgba(184,150,90,.1);--goldB:rgba(184,150,90,.06);
+  --w:#f0ede6;--w2:#c8c0ae;--w3:#6e6860;--w4:#3a3530;
+  --br:rgba(184,150,90,.2);--br2:rgba(255,255,255,.07);--br3:rgba(255,255,255,.04);
+  --gr:#1d9e75;--grA:rgba(29,158,117,.12);
+  --rd:#c0312b;--rdA:rgba(192,49,43,.1);
+  --bl:#185fa5;--blA:rgba(24,95,165,.12);
+  --am:#ba7517;--amA:rgba(186,117,23,.12);
+  --pu:#6c47c9;--puA:rgba(108,71,201,.12);
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --cond:'Barlow Condensed',sans-serif;
+  --mono:'DM Mono','Courier New',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{height:100%}
+body{font-family:var(--cond);background:var(--bg);color:var(--w);height:100vh;overflow:hidden;-webkit-font-smoothing:antialiased}
+::selection{background:var(--gold);color:var(--bg)}
+::-webkit-scrollbar{width:3px;height:3px}::-webkit-scrollbar-thumb{background:var(--gold)}
+
+/* ── LAYOUT ── */
+.app{display:grid;grid-template-columns:220px 1fr;grid-template-rows:52px 1fr;height:100vh}
+.topbar{grid-column:1/-1;background:var(--bg2);border-bottom:1px solid var(--br2);display:flex;align-items:center;justify-content:space-between;padding:0 1.4rem;gap:1rem;z-index:200}
+.sidebar{background:var(--bg2);border-right:1px solid var(--br2);display:flex;flex-direction:column;overflow-y:auto;z-index:100}
+.main{overflow-y:auto;overflow-x:hidden}
+
+/* ── TOPBAR ── */
+.tb-brand{display:flex;align-items:center;gap:.6rem}
+.tb-logo{font-family:var(--cond);font-size:16px;font-weight:900;letter-spacing:.12em;color:var(--w)}
+.tb-logo span{color:var(--gold)}
+.tb-tag{font-family:var(--mono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--w3)}
+.tb-right{display:flex;align-items:center;gap:.5rem}
+.tb-user{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--w3)}
+
+/* ── SIDEBAR ── */
+.sb-section{font-family:var(--mono);font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--w4);padding:.6rem 1rem .25rem;margin-top:.3rem}
+.nav-item{display:flex;align-items:center;gap:.5rem;padding:.45rem 1rem;cursor:pointer;font-size:12px;color:var(--w3);transition:all .15s;border-left:2px solid transparent}
+.nav-item:hover{color:var(--w2);background:var(--br3)}
+.nav-item.on{color:var(--gold);border-left-color:var(--gold);background:var(--goldB)}
+.nav-icon{font-size:13px;width:16px;text-align:center;flex-shrink:0}
+.sb-footer{margin-top:auto;padding:.8rem 1rem;border-top:1px solid var(--br2)}
+.sb-stat{font-family:var(--mono);font-size:9px;color:var(--w4);line-height:1.8}
+.sb-stat span{color:var(--gold)}
+
+/* ── BUTTONS ── */
+.btn{font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;padding:.35rem .8rem;cursor:pointer;border:1px solid;transition:all .15s;white-space:nowrap}
+.btn-gold{background:var(--gold);color:var(--bg);border-color:var(--gold)}.btn-gold:hover{background:var(--gold2)}
+.btn-ghost{background:transparent;color:var(--w3);border-color:var(--br2)}.btn-ghost:hover{color:var(--w);border-color:rgba(255,255,255,.2)}
+.btn-outline{background:transparent;color:var(--gold);border-color:var(--br)}.btn-outline:hover{background:var(--goldA)}
+.btn-sm{padding:.25rem .6rem;font-size:8px}
+.btn-icon{background:transparent;border:none;cursor:pointer;color:var(--w3);font-size:14px;padding:.2rem .4rem;transition:color .15s}.btn-icon:hover{color:var(--gold)}
+
+/* ── PANELS ── */
+.panel{background:var(--bg2);border:1px solid var(--br2)}
+.panel-hd{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);padding:.7rem 1rem;border-bottom:1px solid var(--br2);display:flex;align-items:center;justify-content:space-between}
+
+/* ── PIPELINE BOARD ── */
+.board{display:grid;gap:0;padding:1.2rem;overflow-x:auto;height:100%}
+.board-cols{display:flex;gap:.7rem;min-width:max-content;padding-bottom:1rem}
+.col{width:230px;flex-shrink:0;display:flex;flex-direction:column;gap:0}
+.col-hd{padding:.55rem .8rem;border-bottom:1px solid var(--br2);display:flex;align-items:center;justify-content:space-between;background:var(--bg3)}
+.col-label{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase}
+.col-count{font-family:var(--mono);font-size:9px;color:var(--w4);background:var(--bg4);padding:1px 7px}
+.col-body{flex:1;overflow-y:auto;padding:.5rem;display:flex;flex-direction:column;gap:.4rem;min-height:80px;background:var(--bg)}
+.col-body.drag-over{background:var(--goldB)}
+
+/* ── DEAL CARDS ── */
+.deal-card{background:var(--bg2);border:1px solid var(--br2);padding:.75rem .85rem;cursor:grab;transition:all .18s;position:relative}
+.deal-card:hover{border-color:rgba(184,150,90,.25);background:var(--bg3)}
+.deal-card:active{cursor:grabbing;opacity:.8}
+.deal-card.dragging{opacity:.4}
+.dc-name{font-family:var(--cond);font-size:15px;font-weight:800;color:var(--w);line-height:1;margin-bottom:.25rem}
+.dc-company{font-size:11px;color:var(--w3);margin-bottom:.4rem}
+.dc-value{font-family:var(--mono);font-size:10px;color:var(--gold);font-weight:500}
+.dc-tags{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.4rem}
+.dc-tag{font-family:var(--mono);font-size:7px;letter-spacing:.08em;text-transform:uppercase;padding:1px 6px}
+.dc-date{font-family:var(--mono);font-size:8px;color:var(--w4);margin-top:.35rem}
+.dc-bar{position:absolute;top:0;left:0;bottom:0;width:2px}
+.dc-actions{position:absolute;top:.45rem;right:.4rem;display:flex;gap:.2rem;opacity:0;transition:opacity .15s}
+.deal-card:hover .dc-actions{opacity:1}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.hide{display:none}
+.modal{background:var(--bg2);border:1px solid var(--br);width:680px;max-width:95vw;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column}
+.modal-lg{width:820px}
+.modal-hd{padding:1rem 1.3rem;border-bottom:1px solid var(--br2);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--bg3)}
+.modal-title{font-family:var(--cond);font-size:18px;font-weight:800;color:var(--w)}
+.modal-body{padding:1.3rem;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:1rem}
+.modal-footer{padding:.8rem 1.3rem;border-top:1px solid var(--br2);display:flex;align-items:center;justify-content:flex-end;gap:.5rem;flex-shrink:0;background:var(--bg3)}
+
+/* ── FORM ── */
+.fg{display:flex;flex-direction:column;gap:.35rem}
+.fg label{font-family:var(--mono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.finp,.fsel,.fta{width:100%;background:var(--bg3);border:1px solid var(--br2);padding:.5rem .7rem;color:var(--w);font-family:var(--cond);font-size:13px;outline:none;transition:border-color .15s}
+.finp:focus,.fsel:focus,.fta:focus{border-color:var(--gold)}
+.finp::placeholder,.fta::placeholder{color:var(--w4)}
+.fsel option{background:var(--bg2)}
+.fta{resize:vertical;min-height:80px;font-family:var(--serif);font-size:13px;line-height:1.7}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.frow-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem}
+
+/* ── RICH TEXT ── */
+.rt-toolbar{display:flex;gap:.2rem;padding:.35rem .5rem;border-bottom:1px solid var(--br2);background:var(--bg3);flex-wrap:wrap}
+.rt-btn{background:transparent;border:1px solid transparent;color:var(--w3);cursor:pointer;padding:.2rem .5rem;font-size:11px;transition:all .15s;min-width:26px}
+.rt-btn:hover{border-color:var(--br2);color:var(--w)}
+.rt-btn.on{background:var(--goldA);border-color:var(--br);color:var(--gold)}
+.rt-sep{width:1px;background:var(--br2);margin:2px .2rem}
+.rt-editor{min-height:200px;padding:.75rem;outline:none;color:var(--w2);font-family:var(--serif);font-size:14px;line-height:1.85;background:var(--bg3);border:1px solid var(--br2);border-top:none}
+.rt-editor:focus{border-color:var(--gold)}
+.rt-editor h1{font-family:var(--cond);font-size:24px;font-weight:900;color:var(--w);margin:.5rem 0 .25rem}
+.rt-editor h2{font-family:var(--cond);font-size:18px;font-weight:800;color:var(--w);margin:.4rem 0 .2rem}
+.rt-editor h3{font-family:var(--cond);font-size:15px;font-weight:700;color:var(--gold);margin:.35rem 0 .15rem}
+.rt-editor ul{padding-left:1.2rem;margin:.3rem 0}
+.rt-editor ol{padding-left:1.2rem;margin:.3rem 0}
+.rt-editor li{margin:.15rem 0}
+.rt-editor blockquote{border-left:2px solid var(--gold);padding-left:.8rem;color:var(--w3);font-style:italic;margin:.35rem 0}
+.rt-editor hr{border:none;border-top:1px solid var(--br2);margin:.5rem 0}
+
+/* ── NOTES LIST ── */
+.note-item{background:var(--bg3);border:1px solid var(--br2);padding:.85rem 1rem;margin-bottom:.5rem;transition:border-color .15s}
+.note-item:hover{border-color:rgba(184,150,90,.2)}
+.note-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}
+.note-type{font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;padding:1px 8px}
+.note-date{font-family:var(--mono);font-size:8px;color:var(--w4)}
+.note-preview{font-family:var(--serif);font-size:13px;color:var(--w3);line-height:1.55}
+.note-actions{display:flex;gap:.3rem;opacity:0;transition:opacity .15s}
+.note-item:hover .note-actions{opacity:1}
+
+/* ── INVOICE ── */
+.inv-preview{background:#fff;color:#111;padding:2rem;font-family:Georgia,serif;line-height:1.6;font-size:13px}
+.inv-hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2rem;padding-bottom:1rem;border-bottom:3px solid #b8965a}
+.inv-brand{font-family:'Arial Black',sans-serif;font-size:22px;font-weight:900;letter-spacing:.12em;color:#07090e}
+.inv-brand span{color:#b8965a}
+.inv-tag{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#6e6860;margin-top:3px}
+.inv-num{text-align:right}
+.inv-num h3{font-size:24px;font-weight:900;letter-spacing:.06em;color:#07090e;margin-bottom:.2rem}
+.inv-num p{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#6e6860}
+.inv-parties{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:1.5rem}
+.inv-party-label{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#b8965a;margin-bottom:.35rem}
+.inv-party-name{font-weight:700;font-size:14px;color:#07090e;margin-bottom:.15rem}
+.inv-party-detail{font-size:12px;color:#555;line-height:1.55}
+.inv-table{width:100%;border-collapse:collapse;margin-bottom:1.5rem}
+.inv-table th{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#6e6860;border-bottom:1px solid #ddd;padding:.5rem .75rem;text-align:left;background:#f9f7f4}
+.inv-table td{padding:.65rem .75rem;border-bottom:1px solid #eee;font-size:12px;vertical-align:top}
+.inv-table tr:last-child td{border-bottom:none}
+.inv-totals{text-align:right;padding:1rem 0;border-top:2px solid #b8965a;margin-top:.5rem}
+.inv-total-row{display:flex;justify-content:flex-end;gap:2rem;margin:.2rem 0;font-size:12px;color:#555}
+.inv-total-row.grand{font-weight:700;font-size:15px;color:#07090e;border-top:1px solid #ddd;padding-top:.4rem;margin-top:.4rem}
+.inv-footer{margin-top:2rem;padding-top:1rem;border-top:1px solid #eee;font-size:10px;color:#999;text-align:center}
+.inv-terms{margin-top:1rem;padding:1rem;background:#f9f7f4;font-size:11px;color:#555;line-height:1.6}
+
+/* ── CLIENTS LIST ── */
+.client-row{display:grid;grid-template-columns:1fr 160px 120px 80px 100px;gap:.5rem;align-items:center;padding:.6rem .9rem;border-bottom:1px solid var(--br3);font-size:12px;transition:background .15s;cursor:pointer}
+.client-row:hover{background:var(--bg3)}
+.client-row.hd{background:var(--bg3);font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--w3);cursor:default}
+.client-row.hd:hover{background:var(--bg3)}
+.cl-name{font-weight:600;color:var(--w)}
+.cl-company{color:var(--w3);font-size:11px}
+.cl-stage-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block;margin-right:.4rem}
+.cl-val{font-family:var(--mono);font-size:10px;color:var(--gold)}
+.cl-actions{display:flex;gap:.25rem;opacity:0;transition:opacity .15s}
+.client-row:hover .cl-actions{opacity:1}
+
+/* ── STATS GRID ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;padding:1.2rem;border-bottom:1px solid var(--br2)}
+.stat-card{background:var(--bg2);border:1px solid var(--br2);padding:.9rem 1.1rem;position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.s-gold::after{background:var(--gold)}.s-gr::after{background:var(--gr)}.s-bl::after{background:var(--bl)}.s-am::after{background:var(--am)}
+.sc-label{font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--w3);margin-bottom:.4rem}
+.sc-val{font-family:var(--cond);font-size:30px;font-weight:900;color:var(--w);line-height:1}
+.sc-note{font-family:var(--mono);font-size:8px;color:var(--w4);margin-top:.25rem}
+
+/* ── EMAIL COMPOSER ── */
+.email-header-row{display:grid;grid-template-columns:60px 1fr;gap:.5rem;align-items:center;padding:.4rem .7rem;border-bottom:1px solid var(--br2)}
+.email-label{font-family:var(--mono);font-size:9px;color:var(--w3);text-transform:uppercase;letter-spacing:.1em}
+.email-inp{background:transparent;border:none;outline:none;color:var(--w);font-size:13px;width:100%;font-family:var(--cond)}
+.email-inp::placeholder{color:var(--w4)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--bg3);border:1px solid var(--br);padding:.55rem 1rem;font-family:var(--mono);font-size:10px;color:var(--gold);letter-spacing:.06em;transform:translateY(60px);opacity:0;transition:all .25s cubic-bezier(.4,0,.2,1);z-index:9999}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* ── STATUS TAGS ── */
+.tag-lead{background:var(--blA);color:#5ba4f5;border:1px solid rgba(91,164,245,.2)}
+.tag-discovery{background:var(--puA);color:#a78bfa;border:1px solid rgba(167,139,250,.2)}
+.tag-efa{background:var(--goldA);color:var(--gold);border:1px solid var(--br)}
+.tag-proposal{background:var(--amA);color:#fbbf24;border:1px solid rgba(251,191,36,.2)}
+.tag-mandate{background:var(--grA);color:#34d399;border:1px solid rgba(52,211,153,.2)}
+.tag-active{background:rgba(52,211,153,.15);color:#10b981;border:1px solid rgba(16,185,129,.25)}
+.tag-complete{background:var(--bg3);color:var(--w3);border:1px solid var(--br2)}
+.tag-lost{background:var(--rdA);color:#f87171;border:1px solid rgba(248,113,113,.2)}
+.tag-note{background:var(--blA);color:#60a5fa;border:1px solid rgba(96,165,250,.2)}
+.tag-meeting{background:var(--goldA);color:var(--gold2);border:1px solid var(--br)}
+.tag-call{background:var(--grA);color:#34d399;border:1px solid rgba(52,211,153,.2)}
+.tag-action{background:var(--rdA);color:#f87171;border:1px solid rgba(248,113,113,.2)}
+
+/* ── SETUP SCREEN ── */
+.setup{display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:1.5rem;padding:2rem;text-align:center}
+.setup-logo{font-family:var(--cond);font-size:28px;font-weight:900;letter-spacing:.12em;color:var(--w);margin-bottom:.5rem}
+.setup-logo span{color:var(--gold)}
+.setup-sub{font-family:var(--serif);font-size:16px;font-style:italic;color:var(--w3);max-width:440px;line-height:1.6;margin-bottom:.5rem}
+.setup-box{background:var(--bg2);border:1px solid var(--br);padding:1.8rem 2rem;max-width:480px;width:100%;text-align:left;display:flex;flex-direction:column;gap:1rem}
+.setup-note{font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--w4);line-height:1.6;padding:.7rem .9rem;background:var(--bg3);border-left:2px solid var(--gold)}
+
+/* ── SKELETON / EMPTY ── */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;padding:2rem;color:var(--w3);text-align:center}
+.empty-icon{font-size:28px;opacity:.3}
+.empty-title{font-family:var(--cond);font-size:16px;font-weight:700;color:var(--w4)}
+.empty-sub{font-family:var(--serif);font-size:12px;font-style:italic;color:var(--w4)}
+
+/* ── PAGE HEADER ── */
+.pg-hd{padding:1.1rem 1.4rem;border-bottom:1px solid var(--br2);display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-shrink:0;background:var(--bg2)}
+.pg-title{font-family:var(--cond);font-size:20px;font-weight:900;color:var(--w);letter-spacing:.04em}
+.pg-sub{font-family:var(--serif);font-size:12px;font-style:italic;color:var(--w3)}
+.pg-right{display:flex;align-items:center;gap:.5rem}
+
+/* ── SEARCH ── */
+.search-wrap{position:relative}
+.search-inp{background:var(--bg3);border:1px solid var(--br2);padding:.35rem .7rem .35rem 2rem;color:var(--w);font-size:12px;font-family:var(--cond);outline:none;width:200px;transition:border-color .15s}
+.search-inp:focus{border-color:var(--gold);width:240px}
+.search-icon{position:absolute;left:.6rem;top:50%;transform:translateY(-50%);color:var(--w4);font-size:12px;pointer-events:none}
+
+@media(max-width:900px){
+  .app{grid-template-columns:1fr;grid-template-rows:52px auto 1fr}
+  .sidebar{display:none}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .frow,.frow-3{grid-template-columns:1fr}
+  .client-row{grid-template-columns:1fr 80px}
+}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<!-- SETUP SCREEN -->
+<div id="setupScreen" style="display:none">
+  <div class="setup">
+    <div>
+      <div class="setup-logo">AV <span>ASCENT</span></div>
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--w3)">Command CRM — First-Time Setup</div>
+    </div>
+    <div class="setup-box">
+      <div style="font-family:var(--cond);font-size:17px;font-weight:800;color:var(--w);margin-bottom:.25rem">Connect to Supabase</div>
+      <div class="setup-note">
+        1. Go to supabase.com → New project<br>
+        2. Settings → API → copy URL and anon key<br>
+        3. Run the schema SQL in SQL Editor (button below)<br>
+        4. Paste credentials here
+      </div>
+      <div class="fg"><label>Supabase Project URL</label><input class="finp" id="setupUrl" placeholder="https://xxxx.supabase.co"></div>
+      <div class="fg"><label>Supabase Anon Key</label><input class="finp" id="setupKey" placeholder="eyJhbGci..." type="password"></div>
+      <div style="display:flex;gap:.5rem">
+        <button class="btn btn-gold" onclick="saveSetup()" style="flex:1">Connect & Launch →</button>
+        <button class="btn btn-ghost" onclick="showSchema()">View Schema SQL</button>
+      </div>
+      <button class="btn btn-ghost" onclick="useDemoMode()" style="font-size:9px">Use demo mode (data not saved)</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCHEMA MODAL -->
+<div class="modal-overlay hide" id="schemaModal">
+  <div class="modal">
+    <div class="modal-hd">
+      <div class="modal-title">Supabase Schema SQL</div>
+      <button class="btn-icon" onclick="closeModal('schemaModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-family:var(--serif);font-size:13px;color:var(--w3);font-style:italic;margin-bottom:.5rem">Copy this SQL and run it in your Supabase SQL Editor to create the required tables.</div>
+      <textarea class="fta" style="min-height:320px;font-family:var(--mono);font-size:11px;color:var(--w2)" readonly id="schemaSql"></textarea>
+      <button class="btn btn-gold btn-sm" onclick="copySchema()">Copy SQL</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="app" id="mainApp" style="display:none">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="tb-brand">
+      <div class="tb-logo">AV <span>ASCENT</span></div>
+      <div class="tb-tag">Command CRM</div>
+    </div>
+    <div class="tb-right">
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input class="search-inp" placeholder="Search clients, deals..." id="globalSearch" oninput="globalSearchFn()">
+      </div>
+      <button class="btn btn-gold btn-sm" onclick="openNewDeal()">+ New Deal</button>
+      <button class="btn btn-ghost btn-sm" onclick="openNewClient()">+ Client</button>
+      <div class="tb-user" id="tbUser">info.avascent@gmail.com</div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div style="height:.5rem"></div>
+    <div class="sb-section">Pipeline</div>
+    <div class="nav-item on" data-view="pipeline" onclick="switchView('pipeline')"><span class="nav-icon">◈</span>Pipeline Board</div>
+    <div class="nav-item" data-view="clients" onclick="switchView('clients')"><span class="nav-icon">◉</span>Clients</div>
+    <div class="nav-item" data-view="dashboard" onclick="switchView('dashboard')"><span class="nav-icon">▦</span>Dashboard</div>
+    <div class="sb-section">Work</div>
+    <div class="nav-item" data-view="notes" onclick="switchView('notes')"><span class="nav-icon">◧</span>Notes & Minutes</div>
+    <div class="nav-item" data-view="invoices" onclick="switchView('invoices')"><span class="nav-icon">◫</span>Invoices</div>
+    <div class="nav-item" data-view="email" onclick="switchView('email')"><span class="nav-icon">◻</span>Email Composer</div>
+    <div class="sb-section">Admin</div>
+    <div class="nav-item" data-view="settings" onclick="switchView('settings')"><span class="nav-icon">◎</span>Settings</div>
+    <div class="sb-footer">
+      <div class="sb-stat">Deals: <span id="sbDealCount">0</span></div>
+      <div class="sb-stat">Clients: <span id="sbClientCount">0</span></div>
+      <div class="sb-stat" style="margin-top:.3rem;color:var(--w4);font-size:7px">AV ASCENT © 2026</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main" id="mainContent">
+
+    <!-- ════ PIPELINE VIEW ════ -->
+    <div id="view-pipeline" class="view-pane" style="height:100%;display:flex;flex-direction:column">
+      <div class="pg-hd">
+        <div>
+          <div class="pg-title">Pipeline Board</div>
+          <div class="pg-sub">Drag deals between stages</div>
+        </div>
+        <div class="pg-right">
+          <select class="fsel" style="font-size:11px;padding:.3rem .6rem;width:auto" id="pipeFilter" onchange="renderBoard()">
+            <option value="">All deals</option>
+            <option value="efa">EFA only</option>
+            <option value="mandate">Mandate only</option>
+          </select>
+          <button class="btn btn-gold btn-sm" onclick="openNewDeal()">+ New Deal</button>
+        </div>
+      </div>
+      <div class="board" style="flex:1;overflow:auto">
+        <div class="board-cols" id="boardCols"></div>
+      </div>
+    </div>
+
+    <!-- ════ CLIENTS VIEW ════ -->
+    <div id="view-clients" class="view-pane" style="display:none">
+      <div class="pg-hd">
+        <div>
+          <div class="pg-title">Clients</div>
+          <div class="pg-sub">All contacts and organisations</div>
+        </div>
+        <div class="pg-right">
+          <button class="btn btn-gold btn-sm" onclick="openNewClient()">+ New Client</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <div class="client-row hd">
+          <div>Client</div><div>Stage</div><div>Value</div><div>EFA</div><div></div>
+        </div>
+        <div id="clientsList"></div>
+      </div>
+    </div>
+
+    <!-- ════ DASHBOARD VIEW ════ -->
+    <div id="view-dashboard" class="view-pane" style="display:none">
+      <div class="pg-hd">
+        <div class="pg-title">Dashboard</div>
+      </div>
+      <div class="stats-grid" id="statsGrid"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;padding:1.2rem">
+        <div class="panel">
+          <div class="panel-hd">Pipeline by Stage</div>
+          <div id="stageBreakdown" style="padding:.75rem"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-hd">Recent Activity</div>
+          <div id="recentActivity" style="padding:.75rem;max-height:280px;overflow-y:auto"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ NOTES VIEW ════ -->
+    <div id="view-notes" class="view-pane" style="display:none">
+      <div class="pg-hd">
+        <div>
+          <div class="pg-title">Notes & Minutes</div>
+          <div class="pg-sub">Meeting minutes, call notes, action items</div>
+        </div>
+        <div class="pg-right">
+          <button class="btn btn-gold btn-sm" onclick="openNewNote()">+ New Note</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:260px 1fr;height:calc(100vh - 52px - 62px);overflow:hidden">
+        <div style="border-right:1px solid var(--br2);overflow-y:auto;padding:.75rem">
+          <div id="notesList"></div>
+        </div>
+        <div id="noteDetail" style="padding:1.2rem;overflow-y:auto">
+          <div class="empty"><div class="empty-icon">◧</div><div class="empty-title">Select a note</div><div class="empty-sub">Or create a new one</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ INVOICES VIEW ════ -->
+    <div id="view-invoices" class="view-pane" style="display:none">
+      <div class="pg-hd">
+        <div>
+          <div class="pg-title">Invoices</div>
+          <div class="pg-sub">Generate, preview, and export PDF invoices</div>
+        </div>
+        <div class="pg-right">
+          <button class="btn btn-gold btn-sm" onclick="openNewInvoice()">+ New Invoice</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:260px 1fr;height:calc(100vh - 52px - 62px);overflow:hidden">
+        <div style="border-right:1px solid var(--br2);overflow-y:auto;padding:.75rem">
+          <div id="invoicesList"></div>
+        </div>
+        <div id="invoiceDetail" style="overflow-y:auto;padding:1.2rem">
+          <div class="empty"><div class="empty-icon">◫</div><div class="empty-title">Select an invoice</div><div class="empty-sub">Or create a new one</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ EMAIL VIEW ════ -->
+    <div id="view-email" class="view-pane" style="display:none">
+      <div class="pg-hd">
+        <div>
+          <div class="pg-title">Email Composer</div>
+          <div class="pg-sub">Compose via Gmail · info.avascent@gmail.com</div>
+        </div>
+        <div class="pg-right">
+          <button class="btn btn-ghost btn-sm" onclick="clearEmail()">Clear</button>
+          <button class="btn btn-gold btn-sm" onclick="sendEmail()">Open in Gmail →</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:260px 1fr;height:calc(100vh - 52px - 62px);overflow:hidden">
+        <div style="border-right:1px solid var(--br2);padding:.75rem;overflow-y:auto">
+          <div style="font-family:var(--mono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem">Templates</div>
+          <div id="emailTemplates"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;overflow:hidden">
+          <div style="background:var(--bg2);border-bottom:1px solid var(--br2)">
+            <div class="email-header-row">
+              <div class="email-label">From</div>
+              <div style="color:var(--gold);font-family:var(--mono);font-size:12px;padding:.4rem 0">info.avascent@gmail.com</div>
+            </div>
+            <div class="email-header-row">
+              <div class="email-label">To</div>
+              <input class="email-inp" id="emailTo" placeholder="client@email.com">
+            </div>
+            <div class="email-header-row">
+              <div class="email-label">Subject</div>
+              <input class="email-inp" id="emailSubject" placeholder="Re: AV ASCENT — ...">
+            </div>
+            <div class="email-header-row">
+              <div class="email-label">CC</div>
+              <input class="email-inp" id="emailCc" placeholder="optional cc...">
+            </div>
+          </div>
+          <div style="flex:1;overflow:hidden;display:flex;flex-direction:column">
+            <div class="rt-toolbar" id="emailToolbar"></div>
+            <div class="rt-editor" id="emailBody" contenteditable="true" style="flex:1;overflow-y:auto;min-height:unset;border-left:none;border-right:none;border-bottom:none" placeholder="Write your email here..."></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ SETTINGS VIEW ════ -->
+    <div id="view-settings" class="view-pane" style="display:none;padding:1.5rem">
+      <div class="pg-title" style="margin-bottom:1.2rem">Settings</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;max-width:800px">
+        <div class="panel">
+          <div class="panel-hd">Business Info</div>
+          <div style="padding:1rem;display:flex;flex-direction:column;gap:.75rem">
+            <div class="fg"><label>Business Name</label><input class="finp" id="settingBiz" value="AV ASCENT"></div>
+            <div class="fg"><label>Email</label><input class="finp" id="settingEmail" value="info.avascent@gmail.com"></div>
+            <div class="fg"><label>Phone</label><input class="finp" id="settingPhone" value="+92 333 6076231"></div>
+            <div class="fg"><label>Website</label><input class="finp" id="settingWeb" value="calendly.com/avascent/90min"></div>
+            <div class="fg"><label>Address</label><input class="finp" id="settingAddr" value="Karachi, Pakistan"></div>
+            <button class="btn btn-gold btn-sm" onclick="saveSettings()">Save Settings</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-hd">Invoice Defaults</div>
+          <div style="padding:1rem;display:flex;flex-direction:column;gap:.75rem">
+            <div class="fg"><label>Default Currency</label><select class="fsel" id="settingCurrency"><option>PKR</option><option>USD</option><option>AED</option></select></div>
+            <div class="fg"><label>Payment Terms</label><input class="finp" id="settingTerms" value="Payment due within 7 days of invoice date."></div>
+            <div class="fg"><label>Bank / Payment Details</label><textarea class="fta" id="settingBank" style="min-height:80px">Please transfer to:
+Bank: HBL / Meezan
+Account: XXXX-XXXX-XXXX
+Title: Areeba Viqar</textarea></div>
+            <div class="fg"><label>Tax / NTN (optional)</label><input class="finp" id="settingTax" placeholder="NTN: XXXXXXX"></div>
+            <button class="btn btn-gold btn-sm" onclick="saveSettings()">Save Settings</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-hd">Supabase Connection</div>
+          <div style="padding:1rem;display:flex;flex-direction:column;gap:.75rem">
+            <div class="fg"><label>Project URL</label><input class="finp" id="settingUrl" placeholder="https://xxx.supabase.co" type="text"></div>
+            <div class="fg"><label>Anon Key</label><input class="finp" id="settingKey" placeholder="eyJ..." type="password"></div>
+            <button class="btn btn-outline btn-sm" onclick="reconnectSupabase()">Reconnect</button>
+            <button class="btn btn-ghost btn-sm" onclick="showSchema()">View Schema SQL</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-hd">Pipeline Stages</div>
+          <div style="padding:1rem">
+            <div id="stagesList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- DEAL MODAL -->
+<div class="modal-overlay hide" id="dealModal">
+  <div class="modal">
+    <div class="modal-hd">
+      <div class="modal-title" id="dealModalTitle">New Deal</div>
+      <button class="btn-icon" onclick="closeModal('dealModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="frow">
+        <div class="fg"><label>Client Name</label><input class="finp" id="df-name" placeholder="Areeba Khan"></div>
+        <div class="fg"><label>Company</label><input class="finp" id="df-company" placeholder="Khan & Associates"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Email</label><input class="finp" id="df-email" type="email" placeholder="client@email.com"></div>
+        <div class="fg"><label>Phone</label><input class="finp" id="df-phone" placeholder="+92 xxx xxxxxxx"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Stage</label>
+          <select class="fsel" id="df-stage">
+            <option value="lead">Lead</option>
+            <option value="discovery">Discovery Call</option>
+            <option value="efa">EFA Booked</option>
+            <option value="proposal">Proposal Sent</option>
+            <option value="mandate">Mandate Active</option>
+            <option value="complete">Complete</option>
+            <option value="lost">Lost</option>
+          </select>
+        </div>
+        <div class="fg"><label>Deal Type</label>
+          <select class="fsel" id="df-type">
+            <option value="efa">EFA — PKR 150,000</option>
+            <option value="mandate1">Mandate I</option>
+            <option value="mandate2">Mandate II</option>
+            <option value="mandate3">Mandate III</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Value (PKR)</label><input class="finp" id="df-value" type="number" placeholder="150000"></div>
+        <div class="fg"><label>Expected Close</label><input class="finp" id="df-close" type="date"></div>
+      </div>
+      <div class="fg"><label>Source</label>
+        <select class="fsel" id="df-source">
+          <option>LinkedIn DM</option><option>Referral</option><option>Instagram</option>
+          <option>Cold Outreach</option><option>ABAD Event</option><option>Website</option><option>Other</option>
+        </select>
+      </div>
+      <div class="fg"><label>Notes</label><textarea class="fta" id="df-notes" style="min-height:60px" placeholder="Any initial notes..."></textarea></div>
+      <input type="hidden" id="df-id">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('dealModal')">Cancel</button>
+      <button class="btn btn-gold" onclick="saveDeal()">Save Deal →</button>
+    </div>
+  </div>
+</div>
+
+<!-- DEAL DETAIL MODAL -->
+<div class="modal-overlay hide" id="dealDetailModal">
+  <div class="modal modal-lg">
+    <div class="modal-hd">
+      <div class="modal-title" id="ddTitle">Deal Detail</div>
+      <div style="display:flex;align-items:center;gap:.5rem">
+        <button class="btn btn-ghost btn-sm" onclick="editCurrentDeal()">Edit</button>
+        <button class="btn btn-outline btn-sm" onclick="openEmailForDeal()">Email Client</button>
+        <button class="btn btn-gold btn-sm" onclick="openInvoiceForDeal()">Create Invoice</button>
+        <button class="btn-icon" onclick="closeModal('dealDetailModal')">✕</button>
+      </div>
+    </div>
+    <div class="modal-body" id="dealDetailBody"></div>
+  </div>
+</div>
+
+<!-- NOTE MODAL -->
+<div class="modal-overlay hide" id="noteModal">
+  <div class="modal modal-lg">
+    <div class="modal-hd">
+      <div class="modal-title" id="noteModalTitle">New Note / Minutes</div>
+      <button class="btn-icon" onclick="closeModal('noteModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="frow">
+        <div class="fg"><label>Title</label><input class="finp" id="nf-title" placeholder="Meeting with FND — April 2026"></div>
+        <div class="fg"><label>Type</label>
+          <select class="fsel" id="nf-type">
+            <option value="note">General Note</option>
+            <option value="meeting">Meeting Minutes</option>
+            <option value="call">Call Notes</option>
+            <option value="action">Action Items</option>
+          </select>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Related Client / Deal</label>
+          <select class="fsel" id="nf-deal"><option value="">— None —</option></select>
+        </div>
+        <div class="fg"><label>Date</label><input class="finp" type="datetime-local" id="nf-date"></div>
+      </div>
+      <div class="fg" style="gap:0"><label style="margin-bottom:.4rem">Content</label>
+        <div class="rt-toolbar" id="noteToolbar"></div>
+        <div class="rt-editor" id="noteEditor" contenteditable="true" style="min-height:280px" placeholder="Start typing your notes here...
+
+Use the toolbar above for bold, italic, headings, bullet lists, etc.
+For meeting minutes, structure as: Attendees · Agenda · Discussion · Action Items"></div>
+      </div>
+      <input type="hidden" id="nf-id">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('noteModal')">Cancel</button>
+      <button class="btn btn-outline btn-sm" onclick="exportNotePdf()">Export PDF</button>
+      <button class="btn btn-gold" onclick="saveNote()">Save Note →</button>
+    </div>
+  </div>
+</div>
+
+<!-- INVOICE MODAL -->
+<div class="modal-overlay hide" id="invoiceModal">
+  <div class="modal modal-lg">
+    <div class="modal-hd">
+      <div class="modal-title" id="invModalTitle">New Invoice</div>
+      <button class="btn-icon" onclick="closeModal('invoiceModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="frow">
+        <div class="fg"><label>Invoice #</label><input class="finp" id="inv-num" placeholder="INV-2026-001"></div>
+        <div class="fg"><label>Date</label><input class="finp" type="date" id="inv-date"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Client Name</label><input class="finp" id="inv-client" placeholder="Client Name"></div>
+        <div class="fg"><label>Client Email</label><input class="finp" id="inv-email" placeholder="client@email.com"></div>
+      </div>
+      <div class="fg"><label>Client Company & Address</label><textarea class="fta" id="inv-addr" style="min-height:60px" placeholder="Company Name&#10;Address, City&#10;Pakistan"></textarea></div>
+
+      <div style="font-family:var(--mono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:.5rem 0 .5rem">Line Items</div>
+      <div id="invLines"></div>
+      <button class="btn btn-ghost btn-sm" onclick="addInvLine()" style="margin-top:.35rem">+ Add Line</button>
+
+      <div style="display:grid;grid-template-columns:1fr 200px;gap:1rem;margin-top:.75rem">
+        <div class="fg"><label>Notes / Special Instructions</label><textarea class="fta" id="inv-notes" style="min-height:70px" placeholder="Payment terms, thank you note..."></textarea></div>
+        <div style="display:flex;flex-direction:column;gap:.3rem;align-items:flex-end;justify-content:flex-end">
+          <div style="width:100%">
+            <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--w3);padding:.3rem 0;border-bottom:1px solid var(--br2)">
+              <span>Subtotal</span><span id="inv-subtotal">PKR 0</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:.5rem;padding:.3rem 0;border-bottom:1px solid var(--br2)">
+              <span style="font-family:var(--mono);font-size:10px;color:var(--w3);flex:1">Tax %</span>
+              <input class="finp" id="inv-tax" type="number" value="0" style="width:60px;padding:.2rem .4rem;font-size:11px" oninput="calcInvTotal()">
+            </div>
+            <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:12px;color:var(--gold);padding:.4rem 0;font-weight:500">
+              <span>TOTAL</span><span id="inv-total">PKR 0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <input type="hidden" id="inv-id">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('invoiceModal')">Cancel</button>
+      <button class="btn btn-outline btn-sm" onclick="previewInvoicePdf()">Preview PDF</button>
+      <button class="btn btn-outline btn-sm" onclick="emailInvoice()">Email to Client</button>
+      <button class="btn btn-gold" onclick="saveInvoice()">Save Invoice →</button>
+    </div>
+  </div>
+</div>
+
+<!-- CLIENT MODAL -->
+<div class="modal-overlay hide" id="clientModal">
+  <div class="modal">
+    <div class="modal-hd">
+      <div class="modal-title" id="clientModalTitle">New Client</div>
+      <button class="btn-icon" onclick="closeModal('clientModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="frow">
+        <div class="fg"><label>Full Name</label><input class="finp" id="cf-name" placeholder="Areeba Khan"></div>
+        <div class="fg"><label>Company</label><input class="finp" id="cf-company" placeholder="Khan & Associates Architects"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Email</label><input class="finp" id="cf-email" type="email"></div>
+        <div class="fg"><label>Phone</label><input class="finp" id="cf-phone" placeholder="+92..."></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>City</label><input class="finp" id="cf-city" placeholder="Karachi"></div>
+        <div class="fg"><label>Sector</label>
+          <select class="fsel" id="cf-sector">
+            <option>Architecture</option><option>Engineering</option><option>Construction</option>
+            <option>MEP</option><option>Real Estate</option><option>Industrial</option><option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg"><label>LinkedIn URL</label><input class="finp" id="cf-linkedin" placeholder="linkedin.com/in/..."></div>
+      <div class="fg"><label>Notes</label><textarea class="fta" id="cf-notes" style="min-height:60px" placeholder="How we met, ICP fit score, etc."></textarea></div>
+      <input type="hidden" id="cf-id">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('clientModal')">Cancel</button>
+      <button class="btn btn-gold" onclick="saveClient()">Save Client →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+var DB = {
+  deals:[],clients:[],notes:[],invoices:[],
+  settings:{
+    biz:'AV ASCENT',email:'info.avascent@gmail.com',
+    phone:'+92 333 6076231',web:'calendly.com/avascent/90min',
+    addr:'Karachi, Pakistan',currency:'PKR',
+    terms:'Payment due within 7 days of invoice date.',
+    bank:'Bank: HBL / Meezan\nAccount: XXXX-XXXX-XXXX\nTitle: Areeba Viqar',
+    tax:''
+  }
+};
+
+var STAGES = [
+  {id:'lead',     label:'Lead',          color:'#185fa5'},
+  {id:'discovery',label:'Discovery Call', color:'#6c47c9'},
+  {id:'efa',      label:'EFA Booked',    color:'#b8965a'},
+  {id:'proposal', label:'Proposal Sent', color:'#ba7517'},
+  {id:'mandate',  label:'Mandate Active',color:'#1d9e75'},
+  {id:'complete', label:'Complete',      color:'#6e6860'},
+  {id:'lost',     label:'Lost',          color:'#c0312b'},
+];
+
+var supabase = null;
+var currentDeal = null;
+var currentNote = null;
+var currentInvoice = null;
+var DEMO_MODE = false;
+
+const SCHEMA_SQL = `-- AV ASCENT Command CRM Schema
+-- Run this in Supabase SQL Editor
+
+create table if not exists deals (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  company text,
+  email text,
+  phone text,
+  stage text default 'lead',
+  type text default 'efa',
+  value numeric default 0,
+  close_date date,
+  source text,
+  notes text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create table if not exists clients (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  company text,
+  email text,
+  phone text,
+  city text,
+  sector text,
+  linkedin text,
+  notes text,
+  created_at timestamptz default now()
+);
+
+create table if not exists notes (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  type text default 'note',
+  deal_id uuid references deals(id) on delete set null,
+  content text,
+  note_date timestamptz default now(),
+  created_at timestamptz default now()
+);
+
+create table if not exists invoices (
+  id uuid primary key default gen_random_uuid(),
+  inv_number text,
+  inv_date date,
+  client_name text,
+  client_email text,
+  client_addr text,
+  lines jsonb default '[]',
+  tax_pct numeric default 0,
+  notes text,
+  deal_id uuid references deals(id) on delete set null,
+  created_at timestamptz default now()
+);
+
+-- Enable RLS (optional but recommended)
+-- alter table deals enable row level security;
+-- alter table clients enable row level security;
+-- alter table notes enable row level security;
+-- alter table invoices enable row level security;`;
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+function init(){
+  document.getElementById('schemaSql').value = SCHEMA_SQL;
+  loadLocalSettings();
+  var url = localStorage.getItem('sb_url');
+  var key = localStorage.getItem('sb_key');
+  if(url && key){
+    initSupabase(url, key);
+  } else {
+    document.getElementById('setupScreen').style.display='flex';
+    document.getElementById('mainApp').style.display='none';
+  }
+}
+
+function loadLocalSettings(){
+  var s = localStorage.getItem('av_crm_settings');
+  if(s){ try{ DB.settings = Object.assign(DB.settings, JSON.parse(s)); }catch(e){} }
+}
+
+function saveSettings(){
+  DB.settings.biz   = document.getElementById('settingBiz').value;
+  DB.settings.email = document.getElementById('settingEmail').value;
+  DB.settings.phone = document.getElementById('settingPhone').value;
+  DB.settings.web   = document.getElementById('settingWeb').value;
+  DB.settings.addr  = document.getElementById('settingAddr').value;
+  DB.settings.currency = document.getElementById('settingCurrency').value;
+  DB.settings.terms = document.getElementById('settingTerms').value;
+  DB.settings.bank  = document.getElementById('settingBank').value;
+  DB.settings.tax   = document.getElementById('settingTax').value;
+  localStorage.setItem('av_crm_settings', JSON.stringify(DB.settings));
+  toast('Settings saved');
+}
+
+function populateSettingsForm(){
+  document.getElementById('settingBiz').value   = DB.settings.biz;
+  document.getElementById('settingEmail').value = DB.settings.email;
+  document.getElementById('settingPhone').value = DB.settings.phone;
+  document.getElementById('settingWeb').value   = DB.settings.web;
+  document.getElementById('settingAddr').value  = DB.settings.addr;
+  document.getElementById('settingCurrency').value = DB.settings.currency;
+  document.getElementById('settingTerms').value = DB.settings.terms;
+  document.getElementById('settingBank').value  = DB.settings.bank;
+  document.getElementById('settingTax').value   = DB.settings.tax||'';
+  var urlEl = document.getElementById('settingUrl');
+  var keyEl = document.getElementById('settingKey');
+  if(urlEl) urlEl.value = localStorage.getItem('sb_url')||'';
+  if(keyEl) keyEl.value = localStorage.getItem('sb_key')||'';
+}
+
+function renderStagesList(){
+  var el = document.getElementById('stagesList');
+  if(!el) return;
+  el.innerHTML = '';
+  STAGES.forEach(function(s){
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:.5rem;padding:.35rem 0;border-bottom:1px solid var(--br3)';
+    row.innerHTML = '<div style="width:8px;height:8px;border-radius:50%;background:'+s.color+';flex-shrink:0"></div>'
+      + '<div style="font-size:12px;color:var(--w2);flex:1">'+s.label+'</div>'
+      + '<div style="font-family:var(--mono);font-size:8px;color:var(--w4)">'+s.id+'</div>';
+    el.appendChild(row);
+  });
+}
+
+function saveSetup(){
+  var url = document.getElementById('setupUrl').value.trim();
+  var key = document.getElementById('setupKey').value.trim();
+  if(!url || !key){ toast('Enter both URL and key'); return; }
+  localStorage.setItem('sb_url', url);
+  localStorage.setItem('sb_key', key);
+  initSupabase(url, key);
+}
+
+function useDemoMode(){
+  DEMO_MODE = true;
+  seedDemo();
+  launchApp();
+}
+
+function seedDemo(){
+  DB.deals = [
+    {id:'d1',name:'Tariq Siddiqui',company:'TSS Architects',email:'tariq@tss.pk',phone:'+92 300 1234567',stage:'efa',type:'efa',value:150000,close_date:'2026-05-15',source:'LinkedIn DM',notes:'Very interested, mentioned 3 projects need EFA',created_at:new Date().toISOString()},
+    {id:'d2',name:'Nadia Raza',company:'NR Construction',email:'nadia@nrcon.pk',phone:'+92 321 9876543',stage:'proposal',type:'mandate2',value:450000,close_date:'2026-05-30',source:'Referral',notes:'Referred by Tariq. Big firm, 25 people.',created_at:new Date().toISOString()},
+    {id:'d3',name:'Omar Farooq',company:'Farooq MEP',email:'omar@fmep.pk',phone:'',stage:'lead',type:'efa',value:150000,close_date:'',source:'Instagram',notes:'Liked carousel post',created_at:new Date().toISOString()},
+    {id:'d4',name:'Saima Khan',company:'SKA Designs',email:'saima@ska.pk',phone:'+92 333 5551234',stage:'mandate',type:'mandate1',value:300000,close_date:'2026-04-01',source:'ABAD Event',notes:'Mandate I signed. Month 2 of 4.',created_at:new Date().toISOString()},
+    {id:'d5',name:'Hassan Malik',company:'Malik Group',email:'hassan@malikgroup.pk',phone:'',stage:'discovery',type:'mandate3',value:700000,close_date:'2026-06-30',source:'LinkedIn DM',notes:'CEO of large construction group. Needs full mandate.',created_at:new Date().toISOString()},
+  ];
+  DB.clients = [
+    {id:'c1',name:'Tariq Siddiqui',company:'TSS Architects',email:'tariq@tss.pk',city:'Karachi',sector:'Architecture',created_at:new Date().toISOString()},
+    {id:'c2',name:'Nadia Raza',company:'NR Construction',email:'nadia@nrcon.pk',city:'Karachi',sector:'Construction',created_at:new Date().toISOString()},
+    {id:'c3',name:'Saima Khan',company:'SKA Designs',email:'saima@ska.pk',city:'Lahore',sector:'Architecture',created_at:new Date().toISOString()},
+  ];
+  DB.notes = [
+    {id:'n1',title:'Discovery call — Tariq Siddiqui',type:'meeting',deal_id:'d1',content:'<h2>Meeting Minutes</h2><p><strong>Date:</strong> April 12, 2026</p><p><strong>Attendees:</strong> Areeba Viqar (AV ASCENT), Tariq Siddiqui (TSS Architects)</p><h3>Agenda</h3><ul><li>Intro to EFA framework</li><li>Firm pain points</li><li>Next steps</li></ul><h3>Key Discussion</h3><p>Tariq mentioned that his firm of 12 people cannot function when he travels. Decision lag is approximately 3-5 days on any proposal above PKR 1M. He has tried delegating twice — both times failed.</p><blockquote>&#8220;I built this firm but I am still the firm. My team is excellent but they wait for me.&#8221;</blockquote><h3>Action Items</h3><ol><li>Send EFA proposal by April 15</li><li>Share F-Score explainer document</li><li>Book follow-up call for April 22</li></ol>',note_date:new Date().toISOString(),created_at:new Date().toISOString()},
+  ];
+  DB.invoices = [
+    {id:'i1',inv_number:'INV-2026-001',inv_date:'2026-04-01',client_name:'Saima Khan',client_email:'saima@ska.pk',client_addr:'SKA Designs\nGulberg III\nLahore, Pakistan',lines:[{desc:'Mandate I — Operational Architecture (Month 2 of 4)',qty:1,rate:300000}],tax_pct:0,notes:'Thank you for your trust. Looking forward to delivering results.',created_at:new Date().toISOString()},
+  ];
+}
+
+function reconnectSupabase(){
+  var url = document.getElementById('settingUrl').value.trim();
+  var key = document.getElementById('settingKey').value.trim();
+  if(!url||!key){toast('Enter URL and key');return;}
+  localStorage.setItem('sb_url',url);
+  localStorage.setItem('sb_key',key);
+  initSupabase(url,key);
+}
+
+function initSupabase(url, key){
+  try{
+    supabase = window.supabase.createClient(url, key);
+    toast('Connected to Supabase');
+    launchApp();
+    loadAllData();
+  } catch(e){
+    toast('Connection failed — using demo mode');
+    DEMO_MODE = true; seedDemo(); launchApp();
+  }
+}
+
+function launchApp(){
+  document.getElementById('setupScreen').style.display='none';
+  document.getElementById('mainApp').style.display='grid';
+  switchView('pipeline');
+  buildRichToolbar('noteToolbar', 'noteEditor');
+  buildRichToolbar('emailToolbar', 'emailBody');
+  buildEmailTemplates();
+  populateSettingsForm();
+  renderStagesList();
+  updateSidebarStats();
+}
+
+// ══════════════════════════════════════════
+// SUPABASE CRUD
+// ══════════════════════════════════════════
+async function loadAllData(){
+  if(DEMO_MODE) return;
+  try{
+    var [d,c,n,i] = await Promise.all([
+      supabase.from('deals').select('*').order('created_at',{ascending:false}),
+      supabase.from('clients').select('*').order('created_at',{ascending:false}),
+      supabase.from('notes').select('*').order('created_at',{ascending:false}),
+      supabase.from('invoices').select('*').order('created_at',{ascending:false}),
+    ]);
+    if(d.data) DB.deals = d.data;
+    if(c.data) DB.clients = c.data;
+    if(n.data) DB.notes = n.data;
+    if(i.data) DB.invoices = i.data;
+    renderBoard(); renderClientsList(); renderNotesList(); renderInvoicesList(); renderDashboard(); updateSidebarStats();
+  } catch(e){ toast('Could not load data'); }
+}
+
+async function dbSave(table, obj, isNew){
+  if(DEMO_MODE){
+    if(isNew){ DB[table].unshift(obj); }
+    else{ var i=DB[table].findIndex(function(x){return x.id===obj.id;}); if(i>=0) DB[table][i]=obj; }
+    return {data:obj, error:null};
+  }
+  if(isNew){
+    var r = await supabase.from(table).insert([obj]).select().single();
+    if(r.data){ DB[table].unshift(r.data); }
+    return r;
+  } else {
+    var r2 = await supabase.from(table).update(obj).eq('id',obj.id).select().single();
+    if(r2.data){ var i2=DB[table].findIndex(function(x){return x.id===obj.id;}); if(i2>=0) DB[table][i2]=r2.data; }
+    return r2;
+  }
+}
+
+async function dbDelete(table, id){
+  if(DEMO_MODE){ DB[table]=DB[table].filter(function(x){return x.id!==id;}); return; }
+  await supabase.from(table).delete().eq('id',id);
+  DB[table]=DB[table].filter(function(x){return x.id!==id;});
+}
+
+// ══════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════
+function switchView(view){
+  document.querySelectorAll('.view-pane').forEach(function(p){ p.style.display='none'; });
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('on'); });
+  var target = document.getElementById('view-'+view);
+  if(target){ target.style.display = view==='pipeline' ? 'flex' : 'block'; }
+  var navEl = document.querySelector('[data-view="'+view+'"]');
+  if(navEl) navEl.classList.add('on');
+  if(view==='pipeline') renderBoard();
+  if(view==='clients')  renderClientsList();
+  if(view==='notes')    renderNotesList();
+  if(view==='invoices') renderInvoicesList();
+  if(view==='dashboard') renderDashboard();
+  if(view==='settings') { populateSettingsForm(); renderStagesList(); }
+}
+
+// ══════════════════════════════════════════
+// PIPELINE BOARD
+// ══════════════════════════════════════════
+function renderBoard(){
+  var filter = (document.getElementById('pipeFilter')||{}).value || '';
+  var cols = document.getElementById('boardCols');
+  if(!cols) return;
+  cols.innerHTML = '';
+  STAGES.forEach(function(stage){
+    var deals = DB.deals.filter(function(d){
+      if(d.stage !== stage.id) return false;
+      if(filter==='efa') return d.type==='efa';
+      if(filter==='mandate') return d.type&&d.type.startsWith('mandate');
+      return true;
+    });
+    var colEl = document.createElement('div');
+    colEl.className = 'col';
+    colEl.innerHTML = '<div class="col-hd"><div class="col-label" style="color:'+stage.color+'">'+stage.label+'</div><div class="col-count">'+deals.length+'</div></div><div class="col-body" data-stage="'+stage.id+'" id="col-'+stage.id+'"></div>';
+    cols.appendChild(colEl);
+    var body = colEl.querySelector('.col-body');
+    if(!deals.length){
+      var empty = document.createElement('div');
+      empty.style.cssText='padding:.5rem;font-family:var(--mono);font-size:8px;letter-spacing:.1em;color:var(--w4);text-align:center;margin-top:.5rem';
+      empty.textContent='No deals';
+      body.appendChild(empty);
+    }
+    deals.forEach(function(deal){ body.appendChild(makeDealCard(deal)); });
+    body.addEventListener('dragover',function(e){e.preventDefault();body.classList.add('drag-over');});
+    body.addEventListener('dragleave',function(){body.classList.remove('drag-over');});
+    body.addEventListener('drop',function(e){
+      e.preventDefault(); body.classList.remove('drag-over');
+      var id = e.dataTransfer.getData('text/plain');
+      moveDeal(id, stage.id);
+    });
+  });
+  updateSidebarStats();
+}
+
+function makeDealCard(deal){
+  var el = document.createElement('div');
+  el.className = 'deal-card';
+  el.draggable = true;
+  el.setAttribute('data-id', deal.id);
+  var stage = STAGES.find(function(s){return s.id===deal.stage;}) || {color:'#6e6860'};
+  el.innerHTML = '<div class="dc-bar" style="background:'+stage.color+'"></div>'
+    +'<div class="dc-name">'+esc(deal.name)+'</div>'
+    +'<div class="dc-company">'+esc(deal.company||'')+'</div>'
+    +'<div class="dc-value">'+fmtPKR(deal.value)+'</div>'
+    +'<div class="dc-tags"><span class="dc-tag '+stageTag(deal.stage)+'">'+deal.stage+'</span><span class="dc-tag '+typeTag(deal.type)+'">'+deal.type+'</span></div>'
+    +(deal.close_date ? '<div class="dc-date">Close: '+deal.close_date+'</div>' : '')
+    +'<div class="dc-actions">'
+    +'<button class="btn-icon" title="View" data-action="view" data-id="'+deal.id+'">⊕</button>'
+    +'<button class="btn-icon" title="Edit" data-action="edit" data-id="'+deal.id+'">✎</button>'
+    +'<button class="btn-icon" title="Delete" data-action="del" data-id="'+deal.id+'">✕</button>'
+    +'</div>';
+  el.addEventListener('dragstart',function(e){
+    e.dataTransfer.setData('text/plain', deal.id);
+    el.classList.add('dragging');
+  });
+  el.addEventListener('dragend',function(){el.classList.remove('dragging');});
+  el.addEventListener('click',function(e){
+    var btn = e.target.closest('[data-action]');
+    if(!btn){ openDealDetail(deal.id); return; }
+    var action = btn.getAttribute('data-action');
+    var id = btn.getAttribute('data-id');
+    e.stopPropagation();
+    if(action==='view') openDealDetail(id);
+    if(action==='edit') openEditDeal(id);
+    if(action==='del' && confirm('Delete this deal?')) deleteDeal(id);
+  });
+  return el;
+}
+
+async function moveDeal(id, newStage){
+  var deal = DB.deals.find(function(d){return d.id===id;});
+  if(!deal) return;
+  deal.stage = newStage;
+  await dbSave('deals', deal, false);
+  renderBoard();
+  toast('Moved to '+newStage);
+}
+
+// ══════════════════════════════════════════
+// DEAL MODAL
+// ══════════════════════════════════════════
+function openNewDeal(){
+  document.getElementById('dealModalTitle').textContent = 'New Deal';
+  document.getElementById('df-id').value = '';
+  ['df-name','df-company','df-email','df-phone','df-notes'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('df-stage').value = 'lead';
+  document.getElementById('df-type').value = 'efa';
+  document.getElementById('df-value').value = '150000';
+  document.getElementById('df-source').value = 'LinkedIn DM';
+  document.getElementById('df-close').value = '';
+  openModal('dealModal');
+}
+
+function openEditDeal(id){
+  var deal = DB.deals.find(function(d){return d.id===id;});
+  if(!deal) return;
+  document.getElementById('dealModalTitle').textContent = 'Edit Deal';
+  document.getElementById('df-id').value     = deal.id;
+  document.getElementById('df-name').value   = deal.name||'';
+  document.getElementById('df-company').value= deal.company||'';
+  document.getElementById('df-email').value  = deal.email||'';
+  document.getElementById('df-phone').value  = deal.phone||'';
+  document.getElementById('df-stage').value  = deal.stage||'lead';
+  document.getElementById('df-type').value   = deal.type||'efa';
+  document.getElementById('df-value').value  = deal.value||'';
+  document.getElementById('df-source').value = deal.source||'LinkedIn DM';
+  document.getElementById('df-close').value  = deal.close_date||'';
+  document.getElementById('df-notes').value  = deal.notes||'';
+  openModal('dealModal');
+}
+
+function editCurrentDeal(){ if(currentDeal){ closeModal('dealDetailModal'); openEditDeal(currentDeal.id); } }
+
+async function saveDeal(){
+  var id    = document.getElementById('df-id').value;
+  var isNew = !id;
+  var obj   = {
+    id:       isNew ? genId() : id,
+    name:     document.getElementById('df-name').value.trim(),
+    company:  document.getElementById('df-company').value.trim(),
+    email:    document.getElementById('df-email').value.trim(),
+    phone:    document.getElementById('df-phone').value.trim(),
+    stage:    document.getElementById('df-stage').value,
+    type:     document.getElementById('df-type').value,
+    value:    parseFloat(document.getElementById('df-value').value)||0,
+    source:   document.getElementById('df-source').value,
+    close_date: document.getElementById('df-close').value||null,
+    notes:    document.getElementById('df-notes').value.trim(),
+    created_at: isNew ? new Date().toISOString() : undefined,
+    updated_at: new Date().toISOString(),
+  };
+  if(!obj.name){toast('Name required');return;}
+  var r = await dbSave('deals', obj, isNew);
+  closeModal('dealModal'); renderBoard(); renderClientsList(); updateSidebarStats();
+  toast(isNew ? 'Deal created' : 'Deal updated');
+}
+
+async function deleteDeal(id){
+  await dbDelete('deals', id);
+  renderBoard(); updateSidebarStats(); toast('Deal deleted');
+}
+
+// ══════════════════════════════════════════
+// DEAL DETAIL
+// ══════════════════════════════════════════
+function openDealDetail(id){
+  var deal = DB.deals.find(function(d){return d.id===id;});
+  if(!deal) return;
+  currentDeal = deal;
+  document.getElementById('ddTitle').textContent = deal.name + (deal.company ? ' — '+deal.company : '');
+  var relNotes = DB.notes.filter(function(n){return n.deal_id===id;});
+  var relInv   = DB.invoices.filter(function(i){return i.deal_id===id;});
+  var stage = STAGES.find(function(s){return s.id===deal.stage;})||{label:deal.stage,color:'#6e6860'};
+  document.getElementById('dealDetailBody').innerHTML =
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">'
+    +'<div style="display:flex;flex-direction:column;gap:.75rem">'
+    +'<div class="panel"><div class="panel-hd">Contact</div><div style="padding:.85rem 1rem;font-family:var(--serif);font-size:13px;color:var(--w2);line-height:2">'
+    +(deal.email ? '<div><span style="color:var(--w3)">Email: </span><a href="mailto:'+deal.email+'" style="color:var(--gold)">'+deal.email+'</a></div>' : '')
+    +(deal.phone ? '<div><span style="color:var(--w3)">Phone: </span>'+deal.phone+'</div>' : '')
+    +(deal.source ? '<div><span style="color:var(--w3)">Source: </span>'+deal.source+'</div>' : '')
+    +'</div></div>'
+    +'<div class="panel"><div class="panel-hd">Deal Info</div><div style="padding:.85rem 1rem;font-family:var(--serif);font-size:13px;color:var(--w2);line-height:2">'
+    +'<div><span style="color:var(--w3)">Stage: </span><span style="color:'+stage.color+'">'+stage.label+'</span></div>'
+    +'<div><span style="color:var(--w3)">Value: </span><span style="color:var(--gold)">'+fmtPKR(deal.value)+'</span></div>'
+    +(deal.close_date ? '<div><span style="color:var(--w3)">Close: </span>'+deal.close_date+'</div>' : '')
+    +'<div><span style="color:var(--w3)">Type: </span>'+deal.type+'</div>'
+    +'</div></div>'
+    +(deal.notes ? '<div class="panel"><div class="panel-hd">Notes</div><div style="padding:.85rem 1rem;font-family:var(--serif);font-size:13px;color:var(--w2);line-height:1.75">'+esc(deal.notes)+'</div></div>' : '')
+    +'</div>'
+    +'<div style="display:flex;flex-direction:column;gap:.75rem">'
+    +'<div class="panel"><div class="panel-hd">Notes & Minutes ('+relNotes.length+')'
+    +' <button class="btn btn-ghost btn-sm" onclick="openNewNoteForDeal(\''+id+'\')">+ Add Note</button></div>'
+    +'<div style="padding:.75rem;max-height:180px;overflow-y:auto">'
+    +(relNotes.length ? relNotes.map(function(n){return '<div style="padding:.45rem 0;border-bottom:1px solid var(--br3);cursor:pointer;font-size:12px;color:var(--w2)" onclick="openNoteEdit(\''+n.id+'\')">'+esc(n.title)+'<div style="font-family:var(--mono);font-size:8px;color:var(--w4)">'+fmtDate(n.note_date)+'</div></div>';}).join('') : '<div style="font-family:var(--mono);font-size:9px;color:var(--w4)">No notes yet</div>')
+    +'</div></div>'
+    +'<div class="panel"><div class="panel-hd">Invoices ('+relInv.length+')'
+    +' <button class="btn btn-ghost btn-sm" onclick="openInvoiceForDeal()">+ Invoice</button></div>'
+    +'<div style="padding:.75rem;max-height:180px;overflow-y:auto">'
+    +(relInv.length ? relInv.map(function(i){return '<div style="padding:.45rem 0;border-bottom:1px solid var(--br3);cursor:pointer;font-size:12px;color:var(--w2)" onclick="openInvDetail(\''+i.id+'\')">'+esc(i.inv_number)+'<div style="font-family:var(--mono);font-size:8px;color:var(--w4)">'+fmtPKR(calcInvTotalVal(i))+' · '+i.inv_date+'</div></div>';}).join('') : '<div style="font-family:var(--mono);font-size:9px;color:var(--w4)">No invoices yet</div>')
+    +'</div></div>'
+    +'</div>'
+    +'</div>';
+  openModal('dealDetailModal');
+}
+
+function openEmailForDeal(){
+  if(!currentDeal) return;
+  closeModal('dealDetailModal');
+  switchView('email');
+  setTimeout(function(){
+    document.getElementById('emailTo').value = currentDeal.email||'';
+    document.getElementById('emailSubject').value = 'AV ASCENT — Follow-up: '+currentDeal.name;
+    document.getElementById('emailBody').innerHTML = '<p>Dear '+(currentDeal.name.split(' ')[0]||'')+'</p><p>Thank you for our conversation regarding the Executive Friction Audit (EFA&#8482;).</p><p>As discussed, the next step is to schedule your 90-minute session where we will calculate your firm\'s F-Score across Pipeline Gaps, Decision Lag, and System Misalignment.</p><p>Please use the link below to book at your earliest convenience:</p><p><a href="https://calendly.com/avascent/90min">https://calendly.com/avascent/90min</a></p><p>Looking forward to working with you.</p><p>Warm regards,<br><strong>Areeba Viqar</strong><br>System Architect &amp; Founder, AV ASCENT<br>+92 333 6076231</p>';
+  },100);
+}
+
+function openInvoiceForDeal(){
+  if(!currentDeal) return;
+  closeModal('dealDetailModal');
+  openNewInvoice(currentDeal);
+}
+
+function openNewNoteForDeal(dealId){
+  closeModal('dealDetailModal');
+  openNewNote(dealId);
+}
+
+// ══════════════════════════════════════════
+// CLIENTS
+// ══════════════════════════════════════════
+function renderClientsList(){
+  var el = document.getElementById('clientsList');
+  if(!el) return;
+  el.innerHTML = '';
+  if(!DB.clients.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">◉</div><div class="empty-title">No clients yet</div></div>';
+    return;
+  }
+  DB.clients.forEach(function(c){
+    var row = document.createElement('div');
+    row.className = 'client-row';
+    var deals = DB.deals.filter(function(d){return d.email===c.email||d.name===c.name;});
+    var latestDeal = deals[0];
+    var stage = latestDeal ? (STAGES.find(function(s){return s.id===latestDeal.stage;}) || {label:latestDeal.stage,color:'#6e6860'}) : null;
+    var totalVal = deals.reduce(function(a,d){return a+(d.value||0);},0);
+    var hasEfa = deals.some(function(d){return d.type==='efa';});
+    row.innerHTML = '<div><div class="cl-name">'+esc(c.name)+'</div><div class="cl-company">'+esc(c.company||c.sector||'')+'</div></div>'
+      +'<div>'+(stage ? '<span class="cl-stage-dot" style="background:'+stage.color+'"></span><span style="font-size:11px;color:var(--w2)">'+stage.label+'</span>' : '<span style="color:var(--w4);font-size:11px">—</span>')+'</div>'
+      +'<div class="cl-val">'+(totalVal ? fmtPKR(totalVal) : '—')+'</div>'
+      +'<div style="font-size:11px">'+(hasEfa ? '<span style="color:var(--gr)">✓</span>' : '<span style="color:var(--w4)">—</span>')+'</div>'
+      +'<div class="cl-actions">'
+      +'<button class="btn btn-ghost btn-sm" onclick="openEditClient(\''+c.id+'\');event.stopPropagation()">Edit</button>'
+      +'<button class="btn-icon" onclick="if(confirm(\'Delete client?\'))deleteClient(\''+c.id+'\');event.stopPropagation()" title="Delete">✕</button>'
+      +'</div>';
+    row.onclick = function(){ openClientDetail(c.id); };
+    el.appendChild(row);
+  });
+}
+
+function openNewClient(){
+  ['cf-id','cf-name','cf-company','cf-email','cf-phone','cf-city','cf-linkedin','cf-notes'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('cf-sector').value='Architecture';
+  document.getElementById('clientModalTitle').textContent='New Client';
+  openModal('clientModal');
+}
+
+function openEditClient(id){
+  var c = DB.clients.find(function(x){return x.id===id;});
+  if(!c) return;
+  document.getElementById('clientModalTitle').textContent='Edit Client';
+  document.getElementById('cf-id').value      = c.id;
+  document.getElementById('cf-name').value    = c.name||'';
+  document.getElementById('cf-company').value = c.company||'';
+  document.getElementById('cf-email').value   = c.email||'';
+  document.getElementById('cf-phone').value   = c.phone||'';
+  document.getElementById('cf-city').value    = c.city||'';
+  document.getElementById('cf-sector').value  = c.sector||'Architecture';
+  document.getElementById('cf-linkedin').value= c.linkedin||'';
+  document.getElementById('cf-notes').value   = c.notes||'';
+  openModal('clientModal');
+}
+
+async function saveClient(){
+  var id = document.getElementById('cf-id').value;
+  var isNew = !id;
+  var obj = {
+    id: isNew ? genId() : id,
+    name:     document.getElementById('cf-name').value.trim(),
+    company:  document.getElementById('cf-company').value.trim(),
+    email:    document.getElementById('cf-email').value.trim(),
+    phone:    document.getElementById('cf-phone').value.trim(),
+    city:     document.getElementById('cf-city').value.trim(),
+    sector:   document.getElementById('cf-sector').value,
+    linkedin: document.getElementById('cf-linkedin').value.trim(),
+    notes:    document.getElementById('cf-notes').value.trim(),
+    created_at: isNew ? new Date().toISOString() : undefined,
+  };
+  if(!obj.name){toast('Name required');return;}
+  await dbSave('clients', obj, isNew);
+  closeModal('clientModal'); renderClientsList(); updateSidebarStats();
+  toast(isNew ? 'Client added' : 'Client updated');
+}
+
+async function deleteClient(id){
+  await dbDelete('clients', id);
+  renderClientsList(); updateSidebarStats(); toast('Client deleted');
+}
+
+function openClientDetail(id){
+  var c = DB.clients.find(function(x){return x.id===id;});
+  if(c){ openEditClient(id); }
+}
+
+// ══════════════════════════════════════════
+// NOTES
+// ══════════════════════════════════════════
+function renderNotesList(){
+  var el = document.getElementById('notesList');
+  if(!el) return;
+  el.innerHTML = '';
+  if(!DB.notes.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">◧</div><div class="empty-title">No notes yet</div></div>';
+    return;
+  }
+  DB.notes.forEach(function(n){
+    var item = document.createElement('div');
+    item.className = 'note-item';
+    item.style.cursor='pointer';
+    item.innerHTML = '<div class="note-meta"><span class="dc-tag note-type '+noteTypeTag(n.type)+'">'+n.type+'</span><div style="display:flex;gap:.3rem"><button class="btn-icon note-actions" title="Edit" onclick="openNoteEdit(\''+n.id+'\');event.stopPropagation()">✎</button><button class="btn-icon note-actions" title="Export PDF" onclick="exportNotePdfById(\''+n.id+'\');event.stopPropagation()">⬇</button><button class="btn-icon note-actions" title="Delete" onclick="if(confirm(\'Delete?\'))deleteNote(\''+n.id+'\');event.stopPropagation()">✕</button></div></div>'
+      +'<div style="font-family:var(--cond);font-size:14px;font-weight:700;color:var(--w);margin-bottom:.2rem">'+esc(n.title)+'</div>'
+      +'<div class="note-date">'+fmtDate(n.note_date)+'</div>';
+    item.onclick = function(){ showNoteDetail(n.id); };
+    el.appendChild(item);
+  });
+}
+
+function showNoteDetail(id){
+  var note = DB.notes.find(function(n){return n.id===id;});
+  if(!note) return;
+  currentNote = note;
+  var deal = note.deal_id ? DB.deals.find(function(d){return d.id===note.deal_id;}) : null;
+  document.getElementById('noteDetail').innerHTML =
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">'
+    +'<div><div style="font-family:var(--cond);font-size:20px;font-weight:900;color:var(--w)">'+esc(note.title)+'</div>'
+    +(deal ? '<div style="font-family:var(--mono);font-size:9px;color:var(--gold);margin-top:2px">Related: '+esc(deal.name)+'</div>' : '')
+    +'<div style="font-family:var(--mono);font-size:8px;color:var(--w3);margin-top:2px">'+fmtDate(note.note_date)+'</div></div>'
+    +'<div style="display:flex;gap:.4rem">'
+    +'<button class="btn btn-ghost btn-sm" onclick="openNoteEdit(\''+note.id+'\')">Edit</button>'
+    +'<button class="btn btn-outline btn-sm" onclick="exportNotePdfById(\''+note.id+'\')">Export PDF</button>'
+    +'</div></div>'
+    +'<div style="background:var(--bg2);border:1px solid var(--br2);padding:1.5rem;font-family:var(--serif);font-size:14px;color:var(--w2);line-height:1.85;min-height:200px">'
+    +(note.content||'<em style="color:var(--w4)">No content</em>')
+    +'</div>';
+}
+
+function openNewNote(dealId){
+  document.getElementById('noteModalTitle').textContent = 'New Note / Minutes';
+  document.getElementById('nf-id').value = '';
+  document.getElementById('nf-title').value = '';
+  document.getElementById('nf-type').value = 'note';
+  document.getElementById('nf-date').value = new Date().toISOString().slice(0,16);
+  document.getElementById('noteEditor').innerHTML = '';
+  populateDealSelect('nf-deal', dealId||'');
+  openModal('noteModal');
+}
+
+function openNoteEdit(id){
+  var note = DB.notes.find(function(n){return n.id===id;});
+  if(!note) return;
+  document.getElementById('noteModalTitle').textContent = 'Edit Note';
+  document.getElementById('nf-id').value    = note.id;
+  document.getElementById('nf-title').value = note.title||'';
+  document.getElementById('nf-type').value  = note.type||'note';
+  document.getElementById('nf-date').value  = (note.note_date||new Date().toISOString()).slice(0,16);
+  document.getElementById('noteEditor').innerHTML = note.content||'';
+  populateDealSelect('nf-deal', note.deal_id||'');
+  closeModal('dealDetailModal');
+  openModal('noteModal');
+}
+
+async function saveNote(){
+  var id = document.getElementById('nf-id').value;
+  var isNew = !id;
+  var obj = {
+    id: isNew ? genId() : id,
+    title: document.getElementById('nf-title').value.trim(),
+    type:  document.getElementById('nf-type').value,
+    deal_id: document.getElementById('nf-deal').value||null,
+    content: document.getElementById('noteEditor').innerHTML,
+    note_date: document.getElementById('nf-date').value ? new Date(document.getElementById('nf-date').value).toISOString() : new Date().toISOString(),
+    created_at: isNew ? new Date().toISOString() : undefined,
+  };
+  if(!obj.title){toast('Title required');return;}
+  await dbSave('notes', obj, isNew);
+  closeModal('noteModal'); renderNotesList();
+  if(!isNew) showNoteDetail(obj.id);
+  toast(isNew?'Note created':'Note updated');
+}
+
+async function deleteNote(id){
+  await dbDelete('notes', id);
+  renderNotesList();
+  document.getElementById('noteDetail').innerHTML='<div class="empty"><div class="empty-icon">◧</div><div class="empty-title">Select a note</div></div>';
+  toast('Deleted');
+}
+
+function exportNotePdfById(id){
+  var note = DB.notes.find(function(n){return n.id===id;});
+  if(note){ currentNote=note; exportNotePdf(); }
+}
+
+function exportNotePdf(){
+  var note = currentNote || DB.notes[0];
+  if(!note){ toast('No note selected'); return; }
+  var {jsPDF} = window.jspdf;
+  var doc = new jsPDF({orientation:'p',unit:'mm',format:'a4'});
+  var margin=22, y=22, pw=doc.internal.pageSize.getWidth()-margin*2;
+
+  // Header
+  doc.setFillColor(7,9,14); doc.rect(0,0,210,28,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.setTextColor(240,237,230);
+  doc.text(DB.settings.biz, margin, 13);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(110,104,96);
+  doc.text(DB.settings.email+' · '+DB.settings.phone, margin, 19);
+  doc.setFontSize(8); doc.setTextColor(184,150,90);
+  doc.text('CONFIDENTIAL', 210-margin, 13, {align:'right'});
+
+  y=36;
+  // Gold rule
+  doc.setDrawColor(184,150,90); doc.setLineWidth(0.4); doc.line(margin,y,210-margin,y); y+=6;
+
+  // Note type badge
+  var typeMap = {note:'General Note',meeting:'Meeting Minutes',call:'Call Notes',action:'Action Items'};
+  doc.setFontSize(8); doc.setTextColor(184,150,90); doc.setFont('helvetica','bold');
+  doc.text((typeMap[note.type]||note.type).toUpperCase(), margin, y); y+=5;
+
+  // Title
+  doc.setFontSize(18); doc.setTextColor(30,35,50); doc.setFont('helvetica','bold');
+  var titleLines = doc.splitTextToSize(note.title||'Note', pw);
+  doc.text(titleLines, margin, y); y += titleLines.length*7+3;
+
+  // Date
+  doc.setFontSize(8); doc.setTextColor(110,104,96); doc.setFont('helvetica','normal');
+  doc.text('Date: '+fmtDate(note.note_date), margin, y);
+  var deal = note.deal_id ? DB.deals.find(function(d){return d.id===note.deal_id;}) : null;
+  if(deal) doc.text('Related: '+deal.name+(deal.company?' — '+deal.company:''), margin+60, y);
+  y+=6;
+
+  doc.setDrawColor(220,215,205); doc.setLineWidth(0.2); doc.line(margin,y,210-margin,y); y+=6;
+
+  // Content — strip HTML tags for plain PDF
+  var txt = (note.content||'').replace(/<h[1-3][^>]*>/gi,'\n').replace(/<li[^>]*>/gi,'• ').replace(/<br\s*\/?>/gi,'\n').replace(/<p[^>]*>/gi,'\n').replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&nbsp;/g,' ').replace(/&#8220;/g,'"').replace(/&#8221;/g,'"').trim();
+  doc.setFontSize(10.5); doc.setTextColor(40,40,50); doc.setFont('helvetica','normal');
+  var lines = doc.splitTextToSize(txt, pw);
+  var lineH=5.5;
+  lines.forEach(function(line){
+    if(y>270){ doc.addPage(); y=22; }
+    doc.text(line, margin, y); y+=lineH;
+  });
+
+  // Footer
+  var totalPages = doc.internal.getNumberOfPages();
+  for(var i=1;i<=totalPages;i++){
+    doc.setPage(i);
+    doc.setFillColor(7,9,14); doc.rect(0,285,210,12,'F');
+    doc.setFontSize(7); doc.setTextColor(110,104,96); doc.setFont('helvetica','normal');
+    doc.text('© 2026 AV ASCENT. Confidential. Methodology proprietary to Areeba Viqar.', margin, 291);
+    doc.text('Page '+i+' of '+totalPages, 210-margin, 291, {align:'right'});
+  }
+  doc.save((note.title||'note').replace(/[^a-z0-9]/gi,'_')+'.pdf');
+  toast('PDF exported');
+}
+
+// ══════════════════════════════════════════
+// INVOICES
+// ══════════════════════════════════════════
+var invLines = [];
+
+function renderInvoicesList(){
+  var el = document.getElementById('invoicesList');
+  if(!el) return;
+  el.innerHTML='';
+  if(!DB.invoices.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">◫</div><div class="empty-title">No invoices yet</div></div>';
+    return;
+  }
+  DB.invoices.forEach(function(inv){
+    var item = document.createElement('div');
+    item.className = 'note-item';
+    item.style.cursor='pointer';
+    item.innerHTML='<div class="note-meta"><span class="dc-tag '+typeTag('mandate')+'" style="font-size:8px">'+esc(inv.inv_number||'—')+'</span>'
+      +'<div style="display:flex;gap:.3rem"><button class="btn-icon note-actions" title="Edit" onclick="openInvEdit(\''+inv.id+'\');event.stopPropagation()">✎</button><button class="btn-icon note-actions" title="PDF" onclick="downloadInvoicePdf(\''+inv.id+'\');event.stopPropagation()">⬇</button><button class="btn-icon note-actions" title="Delete" onclick="if(confirm(\'Delete?\'))deleteInvoice(\''+inv.id+'\');event.stopPropagation()">✕</button></div></div>'
+      +'<div style="font-family:var(--cond);font-size:14px;font-weight:700;color:var(--w);margin:.2rem 0">'+esc(inv.client_name||'—')+'</div>'
+      +'<div style="font-family:var(--mono);font-size:9px;color:var(--gold)">'+fmtPKR(calcInvTotalVal(inv))+'</div>'
+      +'<div class="note-date">'+inv.inv_date+'</div>';
+    item.onclick = function(){ showInvoiceDetail(inv.id); };
+    el.appendChild(item);
+  });
+}
+
+function calcInvTotalVal(inv){
+  var lines = inv.lines||[];
+  var sub = lines.reduce(function(a,l){return a+(parseFloat(l.rate||0)*parseFloat(l.qty||1));},0);
+  return sub + sub*(parseFloat(inv.tax_pct||0)/100);
+}
+
+function openNewInvoice(deal){
+  document.getElementById('invModalTitle').textContent='New Invoice';
+  document.getElementById('inv-id').value='';
+  document.getElementById('inv-num').value='INV-'+new Date().getFullYear()+'-'+String(DB.invoices.length+1).padStart(3,'0');
+  document.getElementById('inv-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('inv-client').value = deal ? deal.name||'' : '';
+  document.getElementById('inv-email').value  = deal ? deal.email||'' : '';
+  document.getElementById('inv-addr').value='';
+  document.getElementById('inv-notes').value=DB.settings.terms||'';
+  document.getElementById('inv-tax').value='0';
+  invLines=[{desc:deal ? typeToDesc(deal.type) : 'Executive Friction Audit (EFA™)',qty:1,rate:deal?deal.value||150000:150000}];
+  renderInvLines(); calcInvTotal();
+  openModal('invoiceModal');
+}
+
+function openInvEdit(id){
+  var inv = DB.invoices.find(function(x){return x.id===id;});
+  if(!inv) return;
+  document.getElementById('invModalTitle').textContent='Edit Invoice';
+  document.getElementById('inv-id').value      = inv.id;
+  document.getElementById('inv-num').value     = inv.inv_number||'';
+  document.getElementById('inv-date').value    = inv.inv_date||'';
+  document.getElementById('inv-client').value  = inv.client_name||'';
+  document.getElementById('inv-email').value   = inv.client_email||'';
+  document.getElementById('inv-addr').value    = inv.client_addr||'';
+  document.getElementById('inv-notes').value   = inv.notes||'';
+  document.getElementById('inv-tax').value     = inv.tax_pct||0;
+  invLines = (inv.lines||[]).map(function(l){return Object.assign({},l);});
+  renderInvLines(); calcInvTotal();
+  openModal('invoiceModal');
+}
+
+function openInvDetail(id){
+  var inv = DB.invoices.find(function(x){return x.id===id;});
+  if(inv){ currentInvoice=inv; showInvoiceDetail(id); }
+}
+
+function typeToDesc(type){
+  var m={efa:'Executive Friction Audit (EFA™) — 90-minute session + F-Score Report',mandate1:'Mandate I — Operational Architecture Engagement',mandate2:'Mandate II — System Architecture Retainer (Monthly)',mandate3:'Mandate III — Fractional CGA Retainer (Monthly)',custom:'Consulting Services'};
+  return m[type]||'Consulting Services';
+}
+
+function addInvLine(){
+  invLines.push({desc:'',qty:1,rate:0});
+  renderInvLines(); calcInvTotal();
+}
+
+function removeInvLine(i){
+  invLines.splice(i,1);
+  renderInvLines(); calcInvTotal();
+}
+
+function renderInvLines(){
+  var el = document.getElementById('invLines');
+  if(!el) return;
+  el.innerHTML='';
+  invLines.forEach(function(line,i){
+    var row = document.createElement('div');
+    row.style.cssText='display:grid;grid-template-columns:1fr 60px 100px 28px;gap:.35rem;align-items:center;margin-bottom:.35rem';
+    row.innerHTML='<input class="finp" style="font-size:12px;padding:.35rem .55rem" placeholder="Description" value="'+esc(line.desc)+'" data-li="'+i+'" data-lf="desc">'
+      +'<input class="finp" type="number" style="font-size:12px;padding:.35rem .55rem" placeholder="Qty" value="'+line.qty+'" data-li="'+i+'" data-lf="qty" min="1">'
+      +'<input class="finp" type="number" style="font-size:12px;padding:.35rem .55rem" placeholder="Rate" value="'+line.rate+'" data-li="'+i+'" data-lf="rate" min="0">'
+      +'<button class="btn-icon" onclick="removeInvLine('+i+')">✕</button>';
+    row.querySelectorAll('[data-li]').forEach(function(inp){
+      inp.addEventListener('input',function(){
+        invLines[parseInt(inp.dataset.li)][inp.dataset.lf] = inp.value;
+        calcInvTotal();
+      });
+    });
+    el.appendChild(row);
+  });
+}
+
+function calcInvTotal(){
+  var sub = invLines.reduce(function(a,l){return a+(parseFloat(l.rate||0)*parseFloat(l.qty||1));},0);
+  var tax = sub*(parseFloat((document.getElementById('inv-tax')||{}).value||0)/100);
+  var total = sub+tax;
+  var cur = DB.settings.currency||'PKR';
+  var el1 = document.getElementById('inv-subtotal');
+  var el2 = document.getElementById('inv-total');
+  if(el1) el1.textContent = cur+' '+Math.round(sub).toLocaleString();
+  if(el2) el2.textContent = cur+' '+Math.round(total).toLocaleString();
+}
+
+async function saveInvoice(){
+  var id = document.getElementById('inv-id').value;
+  var isNew = !id;
+  var obj = {
+    id: isNew ? genId() : id,
+    inv_number:   document.getElementById('inv-num').value.trim(),
+    inv_date:     document.getElementById('inv-date').value,
+    client_name:  document.getElementById('inv-client').value.trim(),
+    client_email: document.getElementById('inv-email').value.trim(),
+    client_addr:  document.getElementById('inv-addr').value.trim(),
+    lines: invLines.map(function(l){return{desc:l.desc,qty:parseFloat(l.qty)||1,rate:parseFloat(l.rate)||0};}),
+    tax_pct: parseFloat(document.getElementById('inv-tax').value)||0,
+    notes: document.getElementById('inv-notes').value.trim(),
+    created_at: isNew ? new Date().toISOString() : undefined,
+  };
+  if(!obj.client_name){toast('Client name required');return;}
+  await dbSave('invoices', obj, isNew);
+  closeModal('invoiceModal'); renderInvoicesList();
+  showInvoiceDetail(obj.id);
+  toast(isNew?'Invoice created':'Invoice updated');
+}
+
+async function deleteInvoice(id){
+  await dbDelete('invoices', id);
+  renderInvoicesList();
+  document.getElementById('invoiceDetail').innerHTML='<div class="empty"><div class="empty-icon">◫</div><div class="empty-title">Select an invoice</div></div>';
+  toast('Deleted');
+}
+
+function showInvoiceDetail(id){
+  var inv = DB.invoices.find(function(x){return x.id===id;});
+  if(!inv) return;
+  currentInvoice = inv;
+  var total = calcInvTotalVal(inv);
+  document.getElementById('invoiceDetail').innerHTML =
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">'
+    +'<div><div style="font-family:var(--cond);font-size:18px;font-weight:900;color:var(--w)">'+esc(inv.inv_number||'—')+'</div>'
+    +'<div style="font-family:var(--mono);font-size:9px;color:var(--gold);margin-top:2px">'+fmtPKR(total)+' · '+inv.inv_date+'</div></div>'
+    +'<div style="display:flex;gap:.4rem">'
+    +'<button class="btn btn-ghost btn-sm" onclick="openInvEdit(\''+inv.id+'\')">Edit</button>'
+    +'<button class="btn btn-outline btn-sm" onclick="emailInvoiceById(\''+inv.id+'\')">Email Client</button>'
+    +'<button class="btn btn-gold btn-sm" onclick="downloadInvoicePdf(\''+inv.id+'\')">Download PDF</button>'
+    +'</div></div>'
+    +'<div style="background:#fff;border:1px solid #ddd;padding:1px">'+buildInvoiceHtml(inv)+'</div>';
+}
+
+function buildInvoiceHtml(inv){
+  var cur = DB.settings.currency||'PKR';
+  var sub = (inv.lines||[]).reduce(function(a,l){return a+(parseFloat(l.rate||0)*parseFloat(l.qty||1));},0);
+  var taxAmt = sub*(parseFloat(inv.tax_pct||0)/100);
+  var total = sub+taxAmt;
+  var rows = (inv.lines||[]).map(function(l,i){
+    return '<tr><td style="padding:.65rem .75rem;border-bottom:1px solid #eee;font-size:12px">'+(i+1)+'</td>'
+      +'<td style="padding:.65rem .75rem;border-bottom:1px solid #eee;font-size:12px">'+esc(l.desc||'')+'</td>'
+      +'<td style="padding:.65rem .75rem;border-bottom:1px solid #eee;font-size:12px;text-align:right">'+l.qty+'</td>'
+      +'<td style="padding:.65rem .75rem;border-bottom:1px solid #eee;font-size:12px;text-align:right">'+cur+' '+Math.round(parseFloat(l.rate||0)).toLocaleString()+'</td>'
+      +'<td style="padding:.65rem .75rem;border-bottom:1px solid #eee;font-size:12px;text-align:right;font-weight:600">'+cur+' '+Math.round(parseFloat(l.rate||0)*parseFloat(l.qty||1)).toLocaleString()+'</td></tr>';
+  }).join('');
+  return '<div style="font-family:Georgia,serif;color:#111;padding:32px;font-size:13px;line-height:1.6">'
+    +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;padding-bottom:16px;border-bottom:3px solid #b8965a">'
+    +'<div><div style="font-family:Arial Black,sans-serif;font-size:22px;font-weight:900;letter-spacing:.1em;color:#07090e">'+esc(DB.settings.biz)+'</div><div style="font-size:11px;color:#6e6860;margin-top:4px">'+esc(DB.settings.email)+' · '+esc(DB.settings.phone)+'</div><div style="font-size:11px;color:#6e6860">'+esc(DB.settings.addr)+'</div>'+(DB.settings.tax?'<div style="font-size:10px;color:#aaa">'+esc(DB.settings.tax)+'</div>':'')+'</div>'
+    +'<div style="text-align:right"><div style="font-size:26px;font-weight:900;letter-spacing:.06em;color:#07090e">INVOICE</div><div style="font-size:11px;color:#6e6860;margin-top:4px">#'+esc(inv.inv_number||'—')+'</div><div style="font-size:11px;color:#6e6860">Date: '+esc(inv.inv_date||'')+'</div></div></div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px">'
+    +'<div><div style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#b8965a;margin-bottom:6px">Billed To</div><div style="font-weight:700;font-size:14px;color:#07090e">'+esc(inv.client_name||'')+'</div><div style="font-size:12px;color:#555;white-space:pre-line">'+esc(inv.client_addr||'')+'</div>'+(inv.client_email?'<div style="font-size:11px;color:#777">'+esc(inv.client_email)+'</div>':'')+'</div>'
+    +'<div><div style="font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#b8965a;margin-bottom:6px">From</div><div style="font-weight:700;font-size:14px;color:#07090e">'+esc(DB.settings.biz)+'</div><div style="font-size:12px;color:#555">'+esc(DB.settings.addr)+'</div></div></div>'
+    +'<table style="width:100%;border-collapse:collapse;margin-bottom:20px"><thead><tr style="background:#f9f7f4"><th style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#6e6860;border-bottom:1px solid #ddd;padding:.5rem .75rem;text-align:left">#</th><th style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#6e6860;border-bottom:1px solid #ddd;padding:.5rem .75rem;text-align:left">Description</th><th style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#6e6860;border-bottom:1px solid #ddd;padding:.5rem .75rem;text-align:right">Qty</th><th style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#6e6860;border-bottom:1px solid #ddd;padding:.5rem .75rem;text-align:right">Rate</th><th style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#6e6860;border-bottom:1px solid #ddd;padding:.5rem .75rem;text-align:right">Amount</th></tr></thead><tbody>'+rows+'</tbody></table>'
+    +'<div style="display:flex;justify-content:flex-end"><div style="width:240px;border-top:2px solid #b8965a;padding-top:12px">'
+    +'<div style="display:flex;justify-content:space-between;font-size:12px;color:#555;padding:4px 0">Subtotal<span>'+cur+' '+Math.round(sub).toLocaleString()+'</span></div>'
+    +(inv.tax_pct>0?'<div style="display:flex;justify-content:space-between;font-size:12px;color:#555;padding:4px 0">Tax ('+inv.tax_pct+'%)<span>'+cur+' '+Math.round(taxAmt).toLocaleString()+'</span></div>':'')
+    +'<div style="display:flex;justify-content:space-between;font-size:16px;font-weight:700;color:#07090e;padding:8px 0 4px;border-top:1px solid #ddd;margin-top:4px">TOTAL <span style="color:#b8965a">'+cur+' '+Math.round(total).toLocaleString()+'</span></div>'
+    +'</div></div>'
+    +(DB.settings.terms?'<div style="margin-top:20px;padding:12px;background:#f9f7f4;font-size:11px;color:#555;line-height:1.6"><strong>Terms:</strong> '+esc(DB.settings.terms)+'</div>':'')
+    +(DB.settings.bank?'<div style="margin-top:10px;padding:12px;background:#f9f7f4;font-size:11px;color:#555;line-height:1.6;white-space:pre-line"><strong>Payment Details:</strong>\n'+esc(DB.settings.bank)+'</div>':'')
+    +(inv.notes?'<div style="margin-top:10px;font-size:12px;color:#555;font-style:italic">'+esc(inv.notes)+'</div>':'')
+    +'<div style="margin-top:24px;padding-top:12px;border-top:1px solid #eee;font-size:10px;color:#aaa;text-align:center">© 2026 AV ASCENT. Confidential. Methodology proprietary to Areeba Viqar.</div>'
+    +'</div>';
+}
+
+function previewInvoicePdf(){
+  // gather current form state
+  invLines.forEach(function(l,i){
+    var di=document.querySelector('[data-li="'+i+'"][data-lf="desc"]');
+    var qi=document.querySelector('[data-li="'+i+'"][data-lf="qty"]');
+    var ri=document.querySelector('[data-li="'+i+'"][data-lf="rate"]');
+    if(di)l.desc=di.value; if(qi)l.qty=parseFloat(qi.value)||1; if(ri)l.rate=parseFloat(ri.value)||0;
+  });
+  var tempInv={
+    inv_number: document.getElementById('inv-num').value,
+    inv_date: document.getElementById('inv-date').value,
+    client_name: document.getElementById('inv-client').value,
+    client_email: document.getElementById('inv-email').value,
+    client_addr: document.getElementById('inv-addr').value,
+    lines: invLines,
+    tax_pct: parseFloat(document.getElementById('inv-tax').value)||0,
+    notes: document.getElementById('inv-notes').value,
+  };
+  generateInvoicePdf(tempInv);
+}
+
+function downloadInvoicePdf(id){
+  var inv = DB.invoices.find(function(x){return x.id===id;});
+  if(inv) generateInvoicePdf(inv);
+}
+
+function generateInvoicePdf(inv){
+  var {jsPDF} = window.jspdf;
+  var doc = new jsPDF({orientation:'p',unit:'mm',format:'a4'});
+  var cur = DB.settings.currency||'PKR';
+  var margin=18, y=22, pw=210-margin*2;
+
+  // Header bar
+  doc.setFillColor(7,9,14); doc.rect(0,0,210,30,'F');
+  doc.setFillColor(184,150,90); doc.rect(0,30,210,1.2,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(240,237,230);
+  doc.text(DB.settings.biz, margin, 14);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(110,104,96);
+  doc.text(DB.settings.email+' · '+DB.settings.phone+' · '+DB.settings.addr, margin, 21);
+  doc.setFontSize(20); doc.setTextColor(184,150,90); doc.setFont('helvetica','bold');
+  doc.text('INVOICE', 210-margin, 14, {align:'right'});
+  doc.setFontSize(9); doc.setTextColor(200,192,174); doc.setFont('helvetica','normal');
+  doc.text('#'+esc(inv.inv_number||'—'), 210-margin, 21, {align:'right'});
+  doc.text('Date: '+esc(inv.inv_date||''), 210-margin, 26, {align:'right'});
+  y=38;
+
+  // Billed to / From
+  doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(184,150,90);
+  doc.text('BILLED TO', margin, y); doc.text('FROM', 130, y); y+=4;
+  doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(40,40,50);
+  doc.text(inv.client_name||'', margin, y);
+  doc.text(DB.settings.biz, 130, y); y+=5;
+  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(80,80,90);
+  var addrLines = (inv.client_addr||'').split('\n');
+  addrLines.forEach(function(l){ doc.text(l, margin, y); y+=4; });
+  doc.text(DB.settings.addr, 130, y); y+=4;
+  if(inv.client_email){ doc.text(inv.client_email, margin, y); }
+  if(DB.settings.tax){ doc.text(DB.settings.tax, 130, y); }
+  y+=8;
+
+  // Table header
+  doc.setFillColor(249,247,244); doc.rect(margin,y-4,pw,8,'F');
+  doc.setDrawColor(220,215,205); doc.rect(margin,y-4,pw,8,'S');
+  doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(110,104,96);
+  doc.text('DESCRIPTION', margin+2, y); doc.text('QTY', 155, y,{align:'right'}); doc.text('RATE', 175, y,{align:'right'}); doc.text('AMOUNT', 210-margin, y,{align:'right'});
+  y+=6;
+
+  // Lines
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(40,40,50);
+  var sub=0;
+  (inv.lines||[]).forEach(function(line,i){
+    var lineTotal = parseFloat(line.rate||0)*parseFloat(line.qty||1);
+    sub+=lineTotal;
+    if(y>268){ doc.addPage(); y=20; }
+    var desc = doc.splitTextToSize(line.desc||'', 118);
+    doc.text(desc, margin+2, y);
+    doc.text(String(line.qty||1), 155, y,{align:'right'});
+    doc.text(cur+' '+Math.round(parseFloat(line.rate||0)).toLocaleString(), 175, y,{align:'right'});
+    doc.text(cur+' '+Math.round(lineTotal).toLocaleString(), 210-margin, y,{align:'right'});
+    y+=desc.length*4.5+2;
+    doc.setDrawColor(238,235,228); doc.line(margin, y, 210-margin, y); y+=2;
+  });
+  y+=3;
+
+  // Totals
+  var taxAmt = sub*(parseFloat(inv.tax_pct||0)/100);
+  var total = sub+taxAmt;
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(90,90,90);
+  doc.text('Subtotal', 162, y); doc.text(cur+' '+Math.round(sub).toLocaleString(), 210-margin, y,{align:'right'}); y+=5;
+  if(inv.tax_pct>0){ doc.text('Tax ('+inv.tax_pct+'%)', 162, y); doc.text(cur+' '+Math.round(taxAmt).toLocaleString(), 210-margin, y,{align:'right'}); y+=5; }
+  doc.setFillColor(184,150,90); doc.rect(150,y-2,60-margin,7,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(7,9,14);
+  doc.text('TOTAL', 154, y+3.5); doc.text(cur+' '+Math.round(total).toLocaleString(), 210-margin, y+3.5,{align:'right'});
+  y+=12;
+
+  // Terms
+  if(DB.settings.terms||DB.settings.bank){
+    doc.setFillColor(249,247,244); doc.rect(margin,y,pw,24,'F');
+    y+=4;
+    doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(184,150,90);
+    doc.text('PAYMENT TERMS', margin+2, y); y+=4;
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(80,80,90);
+    if(DB.settings.terms){ doc.text(doc.splitTextToSize(DB.settings.terms,pw-4), margin+2, y); y+=5; }
+    if(DB.settings.bank){ var bLines=DB.settings.bank.split('\n'); bLines.forEach(function(l){doc.text(l,margin+2,y);y+=4;}); }
+  }
+
+  // Footer
+  var np = doc.internal.getNumberOfPages();
+  for(var i=1;i<=np;i++){
+    doc.setPage(i);
+    doc.setFillColor(7,9,14); doc.rect(0,285,210,12,'F');
+    doc.setFontSize(7); doc.setTextColor(110,104,96); doc.setFont('helvetica','normal');
+    doc.text('© 2026 AV ASCENT. Confidential. Methodology proprietary to Areeba Viqar.', margin, 291);
+    doc.text('Page '+i+' of '+np, 210-margin, 291,{align:'right'});
+  }
+  doc.save((inv.inv_number||'invoice').replace(/[^a-z0-9]/gi,'_')+'.pdf');
+  toast('Invoice PDF downloaded');
+}
+
+function emailInvoice(){
+  var inv = {
+    inv_number: document.getElementById('inv-num').value,
+    client_name: document.getElementById('inv-client').value,
+    client_email: document.getElementById('inv-email').value,
+  };
+  composeEmailForInvoice(inv);
+}
+
+function emailInvoiceById(id){
+  var inv = DB.invoices.find(function(x){return x.id===id;});
+  if(inv) composeEmailForInvoice(inv);
+}
+
+function composeEmailForInvoice(inv){
+  closeModal('invoiceModal');
+  switchView('email');
+  setTimeout(function(){
+    document.getElementById('emailTo').value = inv.client_email||'';
+    document.getElementById('emailSubject').value = 'AV ASCENT — Invoice '+esc(inv.inv_number||'');
+    document.getElementById('emailBody').innerHTML = '<p>Dear '+(inv.client_name||'').split(' ')[0]+'</p>'
+      +'<p>Please find attached Invoice <strong>'+esc(inv.inv_number||'')+'</strong> from AV ASCENT.</p>'
+      +'<p>Kindly process payment as per the terms mentioned in the invoice. If you have any questions, please feel free to reach out.</p>'
+      +'<p>Thank you for your continued trust in AV ASCENT.</p>'
+      +'<p>Warm regards,<br><strong>Areeba Viqar</strong><br>System Architect &amp; Founder, AV ASCENT<br>info.avascent@gmail.com · +92 333 6076231</p>';
+  },150);
+}
+
+// ══════════════════════════════════════════
+// EMAIL COMPOSER
+// ══════════════════════════════════════════
+var EMAIL_TEMPLATES = [
+  {label:'EFA Follow-up', subject:'AV ASCENT — Your Executive Friction Audit', body:'<p>Dear [Name]</p><p>Thank you for taking the time to connect. Based on our conversation, I believe your firm would benefit significantly from the <strong>Executive Friction Audit (EFA™)</strong>.</p><p>The EFA is a 90-minute session where we calculate your firm\'s F-Score — a precise number that tells you exactly where your operational friction lives: Pipeline Gaps, Decision Lag, or System Misalignment.</p><p>Book your session here:<br><a href="https://calendly.com/avascent/90min">https://calendly.com/avascent/90min</a></p><p>Looking forward to working with you.<br><br><strong>Areeba Viqar</strong><br>System Architect, AV ASCENT<br>+92 333 6076231</p>'},
+  {label:'Proposal Sent', subject:'AV ASCENT — Your Proposal', body:'<p>Dear [Name]</p><p>Please find attached the operational architecture proposal for [Company].</p><p>The proposal outlines a <strong>6-month mandate</strong> to position your firm for scalable, founder-independent growth.</p><p>I am available for a call at your convenience to walk through the details:<br><a href="https://calendly.com/avascent/90min">Book a call</a></p><p>Warm regards,<br><strong>Areeba Viqar</strong><br>AV ASCENT</p>'},
+  {label:'Mandate Welcome', subject:'Welcome to AV ASCENT — Mandate Kickoff', body:'<p>Dear [Name]</p><p>Welcome. This marks the beginning of what I expect will be a transformative 6 months for [Company].</p><p>As discussed, our first session will be the <strong>Executive Friction Audit</strong>. You will receive your F-Score and a written report within 48 hours.</p><p>Please confirm your preferred date for the kickoff session via:<br><a href="https://calendly.com/avascent/90min">https://calendly.com/avascent/90min</a></p><p>Warm regards,<br><strong>Areeba Viqar</strong><br>AV ASCENT</p>'},
+  {label:'Check-in', subject:'AV ASCENT — Monthly Check-in', body:'<p>Dear [Name]</p><p>A quick check-in to see how the systems installed last month are performing.</p><p>A few questions to reflect on before our next session:</p><ul><li>How many decisions required your personal sign-off this week?</li><li>Did the team use the Decision Authority Matrix?</li><li>What would you like to focus on in our next session?</li></ul><p>See you soon.<br><br><strong>Areeba Viqar</strong><br>AV ASCENT</p>'},
+];
+
+function buildEmailTemplates(){
+  var el = document.getElementById('emailTemplates');
+  if(!el) return;
+  EMAIL_TEMPLATES.forEach(function(tmpl){
+    var item = document.createElement('div');
+    item.style.cssText='padding:.55rem .7rem;cursor:pointer;border:1px solid var(--br2);margin-bottom:.35rem;transition:border-color .15s;background:var(--bg3)';
+    item.innerHTML='<div style="font-family:var(--cond);font-size:13px;font-weight:700;color:var(--w);margin-bottom:2px">'+esc(tmpl.label)+'</div>'
+      +'<div style="font-family:var(--mono);font-size:8px;color:var(--w3)">'+esc(tmpl.subject)+'</div>';
+    item.onmouseenter=function(){item.style.borderColor='rgba(184,150,90,.3)'};
+    item.onmouseleave=function(){item.style.borderColor='var(--br2)'};
+    item.onclick=function(){
+      document.getElementById('emailSubject').value = tmpl.subject;
+      document.getElementById('emailBody').innerHTML = tmpl.body;
+      toast('Template loaded');
+    };
+    el.appendChild(item);
+  });
+}
+
+function clearEmail(){
+  document.getElementById('emailTo').value='';
+  document.getElementById('emailSubject').value='';
+  document.getElementById('emailCc').value='';
+  document.getElementById('emailBody').innerHTML='';
+}
+
+function sendEmail(){
+  var to      = document.getElementById('emailTo').value.trim();
+  var subject = document.getElementById('emailSubject').value.trim();
+  var cc      = document.getElementById('emailCc').value.trim();
+  var body    = document.getElementById('emailBody').innerText||document.getElementById('emailBody').textContent;
+  if(!to){ toast('Add a recipient'); return; }
+  var params = 'from=info.avascent%40gmail.com';
+  params += '&to='+encodeURIComponent(to);
+  if(cc) params += '&cc='+encodeURIComponent(cc);
+  params += '&su='+encodeURIComponent(subject);
+  params += '&body='+encodeURIComponent(body);
+  window.open('https://mail.google.com/mail/?view=cm&fs=1&'+params, '_blank');
+  toast('Opening Gmail...');
+}
+
+// ══════════════════════════════════════════
+// RICH TEXT TOOLBAR
+// ══════════════════════════════════════════
+function buildRichToolbar(toolbarId, editorId){
+  var tb = document.getElementById(toolbarId);
+  if(!tb) return;
+  tb.innerHTML='';
+  var cmds=[
+    {label:'B',cmd:'bold',title:'Bold'},
+    {label:'I',cmd:'italic',title:'Italic',style:'font-style:italic'},
+    {label:'U',cmd:'underline',title:'Underline',style:'text-decoration:underline'},
+    {label:'S',cmd:'strikeThrough',title:'Strikethrough',style:'text-decoration:line-through'},
+    {sep:true},
+    {label:'H1',cmd:'formatBlock',val:'H1',title:'Heading 1',style:'font-weight:900;font-size:11px'},
+    {label:'H2',cmd:'formatBlock',val:'H2',title:'Heading 2',style:'font-weight:800;font-size:10px'},
+    {label:'H3',cmd:'formatBlock',val:'H3',title:'Heading 3',style:'font-weight:700;font-size:10px'},
+    {label:'P',cmd:'formatBlock',val:'P',title:'Paragraph'},
+    {sep:true},
+    {label:'UL',cmd:'insertUnorderedList',title:'Bullet list'},
+    {label:'OL',cmd:'insertOrderedList',title:'Numbered list'},
+    {label:'»',cmd:'indent',title:'Indent'},
+    {label:'«',cmd:'outdent',title:'Outdent'},
+    {sep:true},
+    {label:'❝',cmd:'formatBlock',val:'BLOCKQUOTE',title:'Blockquote'},
+    {label:'HR',cmd:'insertHorizontalRule',title:'Horizontal rule'},
+    {sep:true},
+    {label:'Clear',fn:function(){var ed=document.getElementById(editorId);ed.innerHTML='';},title:'Clear content'},
+  ];
+  cmds.forEach(function(c){
+    if(c.sep){ var s=document.createElement('div');s.className='rt-sep';tb.appendChild(s);return;}
+    var btn=document.createElement('button');
+    btn.className='rt-btn';btn.title=c.title||c.label;
+    btn.style.cssText=(c.style||'')+(c.label==='B'?'font-weight:900;':'');
+    btn.textContent=c.label;
+    btn.addEventListener('mousedown',function(e){
+      e.preventDefault();
+      var ed=document.getElementById(editorId);ed.focus();
+      if(c.fn){c.fn();return;}
+      if(c.val) document.execCommand(c.cmd,false,c.val);
+      else document.execCommand(c.cmd,false,null);
+    });
+    tb.appendChild(btn);
+  });
+}
+
+// ══════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════
+function renderDashboard(){
+  var grid = document.getElementById('statsGrid');
+  if(!grid) return;
+  var totalPipeline = DB.deals.filter(function(d){return d.stage!=='lost'&&d.stage!=='complete';}).reduce(function(a,d){return a+(d.value||0);},0);
+  var activeMandate = DB.deals.filter(function(d){return d.stage==='mandate';}).length;
+  var wonMonth = DB.deals.filter(function(d){return d.stage==='complete';}).reduce(function(a,d){return a+(d.value||0);},0);
+  var efaBooked = DB.deals.filter(function(d){return d.stage==='efa';}).length;
+  grid.innerHTML=
+    '<div class="stat-card s-gold"><div class="sc-label">Pipeline Value</div><div class="sc-val">'+fmtPKR(totalPipeline)+'</div><div class="sc-note">'+DB.deals.filter(function(d){return d.stage!=='lost'&&d.stage!=='complete';}).length+' active deals</div></div>'
+    +'<div class="stat-card s-gr"><div class="sc-label">Active Mandates</div><div class="sc-val">'+activeMandate+'</div><div class="sc-note">Recurring revenue</div></div>'
+    +'<div class="stat-card s-bl"><div class="sc-label">EFAs Booked</div><div class="sc-val">'+efaBooked+'</div><div class="sc-note">PKR 150K each</div></div>'
+    +'<div class="stat-card s-am"><div class="sc-label">Closed Won</div><div class="sc-val">'+fmtPKR(wonMonth)+'</div><div class="sc-note">Total complete</div></div>';
+
+  var sb = document.getElementById('stageBreakdown');
+  if(sb){
+    sb.innerHTML='';
+    STAGES.forEach(function(stage){
+      var count = DB.deals.filter(function(d){return d.stage===stage.id;}).length;
+      var val = DB.deals.filter(function(d){return d.stage===stage.id;}).reduce(function(a,d){return a+(d.value||0);},0);
+      var row = document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:.75rem;padding:.45rem 0;border-bottom:1px solid var(--br3)';
+      row.innerHTML='<div style="width:7px;height:7px;border-radius:50%;background:'+stage.color+';flex-shrink:0"></div>'
+        +'<div style="flex:1;font-size:12px;color:var(--w2)">'+stage.label+'</div>'
+        +'<div style="font-family:var(--mono);font-size:10px;color:var(--w3)">'+count+'</div>'
+        +'<div style="font-family:var(--mono);font-size:10px;color:var(--gold)">'+fmtPKR(val)+'</div>';
+      sb.appendChild(row);
+    });
+  }
+
+  var ra = document.getElementById('recentActivity');
+  if(ra){
+    ra.innerHTML='';
+    var recent = DB.deals.slice(0,8);
+    recent.forEach(function(d){
+      var stage = STAGES.find(function(s){return s.id===d.stage;})||{color:'#6e6860',label:d.stage};
+      var row = document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:.6rem;padding:.4rem 0;border-bottom:1px solid var(--br3);cursor:pointer';
+      row.innerHTML='<div style="width:6px;height:6px;border-radius:50%;background:'+stage.color+';flex-shrink:0"></div>'
+        +'<div style="flex:1"><div style="font-size:12px;color:var(--w2)">'+esc(d.name)+'</div><div style="font-family:var(--mono);font-size:8px;color:var(--w4)">'+esc(d.company||'')+'</div></div>'
+        +'<div style="font-family:var(--mono);font-size:9px;color:var(--gold)">'+fmtPKR(d.value)+'</div>';
+      row.onclick=function(){openDealDetail(d.id);};
+      ra.appendChild(row);
+    });
+  }
+}
+
+// ══════════════════════════════════════════
+// GLOBAL SEARCH
+// ══════════════════════════════════════════
+function globalSearchFn(){
+  var q = (document.getElementById('globalSearch').value||'').toLowerCase().trim();
+  if(!q) return;
+  var results = DB.deals.filter(function(d){
+    return (d.name||'').toLowerCase().includes(q)||(d.company||'').toLowerCase().includes(q)||(d.email||'').toLowerCase().includes(q);
+  });
+  if(results.length){ openDealDetail(results[0].id); }
+}
+
+// ══════════════════════════════════════════
+// UTILITIES
+// ══════════════════════════════════════════
+function populateDealSelect(elId, selectedId){
+  var sel = document.getElementById(elId);
+  if(!sel) return;
+  sel.innerHTML='<option value="">— No related deal —</option>';
+  DB.deals.forEach(function(d){
+    var opt=document.createElement('option');
+    opt.value=d.id; opt.textContent=d.name+(d.company?' — '+d.company:'');
+    if(d.id===selectedId) opt.selected=true;
+    sel.appendChild(opt);
+  });
+}
+
+function updateSidebarStats(){
+  var dc = document.getElementById('sbDealCount');
+  var cc = document.getElementById('sbClientCount');
+  if(dc) dc.textContent = DB.deals.filter(function(d){return d.stage!=='lost'&&d.stage!=='complete';}).length;
+  if(cc) cc.textContent = DB.clients.length;
+}
+
+function openModal(id){ document.getElementById(id).classList.remove('hide'); }
+function closeModal(id){ document.getElementById(id).classList.add('hide'); }
+
+function showSchema(){
+  document.getElementById('schemaSql').value = SCHEMA_SQL;
+  openModal('schemaModal');
+}
+function copySchema(){
+  navigator.clipboard.writeText(SCHEMA_SQL).then(function(){ toast('Schema SQL copied!'); });
+}
+
+function genId(){
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,function(c){
+    var r=Math.random()*16|0, v=c==='x'?r:(r&0x3|0x8);
+    return v.toString(16);
+  });
+}
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function fmtPKR(v){
+  if(!v&&v!==0) return '—';
+  var n=Math.round(parseFloat(v)||0);
+  if(n>=10000000) return 'PKR '+(n/10000000).toFixed(1)+'Cr';
+  if(n>=100000)   return 'PKR '+(n/100000).toFixed(1)+'L';
+  return 'PKR '+n.toLocaleString();
+}
+
+function fmtDate(s){
+  if(!s) return '—';
+  try{ return new Date(s).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }
+  catch(e){ return s; }
+}
+
+function stageTag(stage){
+  var map={lead:'tag-lead',discovery:'tag-discovery',efa:'tag-efa',proposal:'tag-proposal',mandate:'tag-mandate',complete:'tag-complete',lost:'tag-lost'};
+  return map[stage]||'tag-lead';
+}
+function typeTag(type){
+  if(type&&type.startsWith('mandate')) return 'tag-mandate';
+  return type==='efa'?'tag-efa':'tag-note';
+}
+function noteTypeTag(type){
+  var map={note:'tag-note',meeting:'tag-meeting',call:'tag-call',action:'tag-action'};
+  return map[type]||'tag-note';
+}
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(function(ov){
+  ov.addEventListener('click',function(e){
+    if(e.target===ov) ov.classList.add('hide');
+  });
+});
+
+// Keyboard: Escape closes modals
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){
+    document.querySelectorAll('.modal-overlay:not(.hide)').forEach(function(m){ m.classList.add('hide'); });
+  }
+});
+
+// Boot
+init();
+</script>
+</body>
+</html>
