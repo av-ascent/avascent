@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AV ASCENT — Command CRM</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Google Sheets backend — no SDK needed, uses fetch() -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Barlow+Condensed:wght@300;400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -277,17 +277,15 @@ body{font-family:var(--cond);background:var(--bg);color:var(--w);height:100vh;ov
   </div>
 </div>
 
-<!-- SCHEMA MODAL -->
+<!-- GS SETUP INFO MODAL (kept for structure; not actively used) -->
 <div class="modal-overlay hide" id="schemaModal">
   <div class="modal">
     <div class="modal-hd">
-      <div class="modal-title">Supabase Schema SQL</div>
+      <div class="modal-title">Google Sheets Setup</div>
       <button class="btn-icon" onclick="closeModal('schemaModal')">✕</button>
     </div>
     <div class="modal-body">
-      <div style="font-family:var(--serif);font-size:13px;color:var(--w3);font-style:italic;margin-bottom:.5rem">Copy this SQL and run it in your Supabase SQL Editor to create the required tables.</div>
-      <textarea class="fta" style="min-height:320px;font-family:var(--mono);font-size:11px;color:var(--w2)" readonly id="schemaSql"></textarea>
-      <button class="btn btn-gold btn-sm" onclick="copySchema()">Copy SQL</button>
+      <div style="font-family:var(--serif);font-size:13px;color:var(--w3);font-style:italic">Paste your Apps Script Web App URL in Settings → Database &amp; Access to connect your Google Sheet.</div>
     </div>
   </div>
 </div>
@@ -762,73 +760,16 @@ var STAGES = [
   {id:'lost',     label:'Lost',          color:'#c0312b'},
 ];
 
-var supabase = null;
 var currentDeal = null;
 var currentNote = null;
 var currentInvoice = null;
 var DEMO_MODE = false;
 
-const SCHEMA_SQL = `-- AV ASCENT Command CRM Schema
--- Run this in Supabase SQL Editor
-
-create table if not exists deals (
-  id uuid primary key default gen_random_uuid(),
-  name text not null,
-  company text,
-  email text,
-  phone text,
-  stage text default 'lead',
-  type text default 'efa',
-  value numeric default 0,
-  close_date date,
-  source text,
-  notes text,
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
-);
-
-create table if not exists clients (
-  id uuid primary key default gen_random_uuid(),
-  name text not null,
-  company text,
-  email text,
-  phone text,
-  city text,
-  sector text,
-  linkedin text,
-  notes text,
-  created_at timestamptz default now()
-);
-
-create table if not exists notes (
-  id uuid primary key default gen_random_uuid(),
-  title text not null,
-  type text default 'note',
-  deal_id uuid references deals(id) on delete set null,
-  content text,
-  note_date timestamptz default now(),
-  created_at timestamptz default now()
-);
-
-create table if not exists invoices (
-  id uuid primary key default gen_random_uuid(),
-  inv_number text,
-  inv_date date,
-  client_name text,
-  client_email text,
-  client_addr text,
-  lines jsonb default '[]',
-  tax_pct numeric default 0,
-  notes text,
-  deal_id uuid references deals(id) on delete set null,
-  created_at timestamptz default now()
-);
-
--- Enable RLS (optional but recommended)
--- alter table deals enable row level security;
--- alter table clients enable row level security;
--- alter table notes enable row level security;
--- alter table invoices enable row level security;`;
+// ══════════════════════════════════════════
+// GOOGLE SHEETS CONFIG
+// Paste your Apps Script Web App URL here (or enter it in Settings)
+// ══════════════════════════════════════════
+var GS_URL = localStorage.getItem('gs_url') || '';
 
 // ══════════════════════════════════════════
 // AUTH HELPERS
@@ -847,23 +788,17 @@ function changeAdminPwd(){
   ADMIN_PASSWORD = np;
   document.getElementById('newAdminPwd').value='';
   document.getElementById('confirmAdminPwd').value='';
-  toast('Password updated — note: resets on page reload unless hardcoded in SB_URL/SB_KEY block');
+  toast('Password updated — note: resets on page reload');
 }
 
 // ══════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════
-// ══════════════════════════════════════════════
-// SUPABASE CONFIG — paste your credentials here
-// ══════════════════════════════════════════════
-var SB_URL = 'https://asjgmnwhnbhuuzqanelg.supabase.co/rest/v1/';       // e.g. https://abcdefgh.supabase.co
-var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzamdtbndobmJodXV6cWFuZWxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0Mzg4MDgsImV4cCI6MjA5MzAxNDgwOH0.FE1fktOxsEfOKcfECDCgdVCq96Z9tIsdPIGLD9JD3gI';  // eyJhbGciOi...
 
 // Admin password — change this to your own password
 var ADMIN_PASSWORD = 'avascent2026';
 
 function init(){
-  document.getElementById('schemaSql').value = SCHEMA_SQL;
   loadLocalSettings();
   // Check if already logged in this session
   if(sessionStorage.getItem('crm_auth') === '1'){
@@ -896,20 +831,13 @@ function doLogin(){
 }
 
 function launchCRM(){
-  // Connect Supabase with hardcoded credentials
-  if(SB_URL && SB_URL !== 'YOUR_SUPABASE_URL'){
-    try{
-      supabase = window.supabase.createClient(SB_URL, SB_KEY);
-      DEMO_MODE = false;
-      loadAllData();
-    } catch(e){
-      console.warn('Supabase connection failed, using demo mode');
-      DEMO_MODE = true; seedDemo();
-    }
+  GS_URL = localStorage.getItem('gs_url') || GS_URL;
+  if(GS_URL){
+    DEMO_MODE = false;
+    loadAllData();
   } else {
-    // No credentials set — demo mode
     DEMO_MODE = true; seedDemo();
-    setTimeout(function(){ toast('Running in demo mode — add Supabase credentials to save data'); }, 600);
+    setTimeout(function(){ toast('Demo mode — paste your Apps Script URL in Settings to save data'); }, 600);
   }
   document.getElementById('mainApp').style.display='grid';
   switchView('pipeline');
@@ -942,7 +870,9 @@ function saveSettings(){
 
 function populateSettingsForm(){
   var sbEl = document.getElementById('sbStatus');
-  if(sbEl) sbEl.innerHTML = DEMO_MODE ? '<span style="color:var(--am)">● Demo mode — data not saved</span>' : '<span style="color:var(--gr)">● Connected to Supabase</span>';
+  if(sbEl) sbEl.innerHTML = DEMO_MODE
+    ? '<span style="color:var(--am)">● Demo mode — data not saved</span>'
+    : '<span style="color:var(--gr)">● Connected to Google Sheets</span>';
 
   document.getElementById('settingBiz').value   = DB.settings.biz;
   document.getElementById('settingEmail').value = DB.settings.email;
@@ -953,10 +883,18 @@ function populateSettingsForm(){
   document.getElementById('settingTerms').value = DB.settings.terms;
   document.getElementById('settingBank').value  = DB.settings.bank;
   document.getElementById('settingTax').value   = DB.settings.tax||'';
-  var urlEl = document.getElementById('settingUrl');
-  var keyEl = document.getElementById('settingKey');
-  if(urlEl) urlEl.value = localStorage.getItem('sb_url')||'';
-  if(keyEl) keyEl.value = localStorage.getItem('sb_key')||'';
+  var gsEl = document.getElementById('settingGsUrl');
+  if(gsEl) gsEl.value = localStorage.getItem('gs_url')||'';
+}
+
+function saveGsUrl(){
+  var url = (document.getElementById('settingGsUrl').value||'').trim();
+  if(!url){ toast('Paste your Apps Script Web App URL'); return; }
+  localStorage.setItem('gs_url', url);
+  GS_URL = url;
+  DEMO_MODE = false;
+  loadAllData();
+  toast('Google Sheets URL saved — loading data...');
 }
 
 function renderStagesList(){
@@ -974,12 +912,13 @@ function renderStagesList(){
 }
 
 function saveSetup(){
-  var url = document.getElementById('setupUrl').value.trim();
-  var key = document.getElementById('setupKey').value.trim();
-  if(!url || !key){ toast('Enter both URL and key'); return; }
-  localStorage.setItem('sb_url', url);
-  localStorage.setItem('sb_key', key);
-  initSupabase(url, key);
+  var url = (document.getElementById('setupGsUrl')||{}).value||'';
+  url = url.trim();
+  if(!url){ toast('Enter your Apps Script Web App URL'); return; }
+  localStorage.setItem('gs_url', url);
+  GS_URL = url;
+  DEMO_MODE = false;
+  launchCRM();
 }
 
 function useDemoMode(){
@@ -1009,74 +948,49 @@ function seedDemo(){
   ];
 }
 
-/* reconnectSupabase removed — credentials are hardcoded */
-
-function initSupabase(url, key){
-  try{
-    supabase = window.supabase.createClient(url, key);
-    toast('Connected to Supabase');
-    launchCRM();
-    loadAllData();
-  } catch(e){
-    toast('Connection failed — using demo mode');
-    DEMO_MODE = true; seedDemo(); launchCRM();
-  }
+// ══════════════════════════════════════════
+// GOOGLE SHEETS CRUD
+// ══════════════════════════════════════════
+async function gsRequest(payload){
+  var r = await fetch(GS_URL, {
+    method:'POST',
+    body: JSON.stringify(payload)
+  });
+  return r.json();
 }
 
-/* launchApp merged into launchCRM */
-function _deprecated_launchApp(){
-  document.getElementById('setupScreen').style.display='none';
-  document.getElementById('mainApp').style.display='grid';
-  switchView('pipeline');
-  buildRichToolbar('noteToolbar', 'noteEditor');
-  buildRichToolbar('emailToolbar', 'emailBody');
-  buildEmailTemplates();
-  populateSettingsForm();
-  renderStagesList();
-  updateSidebarStats();
-}
-
-// ══════════════════════════════════════════
-// SUPABASE CRUD
-// ══════════════════════════════════════════
 async function loadAllData(){
   if(DEMO_MODE) return;
   try{
-    var [d,c,n,i] = await Promise.all([
-      supabase.from('deals').select('*').order('created_at',{ascending:false}),
-      supabase.from('clients').select('*').order('created_at',{ascending:false}),
-      supabase.from('notes').select('*').order('created_at',{ascending:false}),
-      supabase.from('invoices').select('*').order('created_at',{ascending:false}),
-    ]);
-    if(d.data) DB.deals = d.data;
-    if(c.data) DB.clients = c.data;
-    if(n.data) DB.notes = n.data;
-    if(i.data) DB.invoices = i.data;
+    var res = await gsRequest({action:'getAll'});
+    if(res.deals)   DB.deals   = res.deals;
+    if(res.clients) DB.clients = res.clients;
+    if(res.notes)   DB.notes   = res.notes;
+    if(res.invoices)DB.invoices= res.invoices;
     renderBoard(); renderClientsList(); renderNotesList(); renderInvoicesList(); renderDashboard(); updateSidebarStats();
-  } catch(e){ toast('Could not load data'); }
+  } catch(e){ console.error(e); toast('Could not load data from Google Sheets'); }
 }
 
 async function dbSave(table, obj, isNew){
   if(DEMO_MODE){
     if(isNew){ DB[table].unshift(obj); }
     else{ var i=DB[table].findIndex(function(x){return x.id===obj.id;}); if(i>=0) DB[table][i]=obj; }
-    return {data:obj, error:null};
+    return {data:obj};
   }
-  if(isNew){
-    var r = await supabase.from(table).insert([obj]).select().single();
-    if(r.data){ DB[table].unshift(r.data); }
-    return r;
-  } else {
-    var r2 = await supabase.from(table).update(obj).eq('id',obj.id).select().single();
-    if(r2.data){ var i2=DB[table].findIndex(function(x){return x.id===obj.id;}); if(i2>=0) DB[table][i2]=r2.data; }
-    return r2;
-  }
+  try{
+    var res = await gsRequest({action: isNew ? 'insert' : 'update', table:table, row:obj});
+    if(isNew){ DB[table].unshift(obj); }
+    else{ var i2=DB[table].findIndex(function(x){return x.id===obj.id;}); if(i2>=0) DB[table][i2]=obj; }
+    return {data:obj};
+  } catch(e){ toast('Save failed'); return {error:e}; }
 }
 
 async function dbDelete(table, id){
   if(DEMO_MODE){ DB[table]=DB[table].filter(function(x){return x.id!==id;}); return; }
-  await supabase.from(table).delete().eq('id',id);
-  DB[table]=DB[table].filter(function(x){return x.id!==id;});
+  try{
+    await gsRequest({action:'delete', table:table, id:id});
+    DB[table]=DB[table].filter(function(x){return x.id!==id;});
+  } catch(e){ toast('Delete failed'); }
 }
 
 // ══════════════════════════════════════════
@@ -2079,12 +1993,9 @@ function openModal(id){ document.getElementById(id).classList.remove('hide'); }
 function closeModal(id){ document.getElementById(id).classList.add('hide'); }
 
 function showSchema(){
-  document.getElementById('schemaSql').value = SCHEMA_SQL;
-  openModal('schemaModal');
+  toast('No SQL schema needed — using Google Sheets');
 }
-function copySchema(){
-  navigator.clipboard.writeText(SCHEMA_SQL).then(function(){ toast('Schema SQL copied!'); });
-}
+function copySchema(){ toast('No SQL schema needed — using Google Sheets'); }
 
 function genId(){
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,function(c){
