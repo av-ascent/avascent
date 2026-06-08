@@ -491,6 +491,87 @@ a{color:var(--gold)}
 <div class="toast" id="toast"></div>
 
 <script>
+// ================================================================
+//  APPS SCRIPT URL — PASTE YOURS HERE AFTER DEPLOYING
+//  Steps: Apps Script → Deploy → New deployment → Web app → Copy URL
+//  Then replace the placeholder below with your actual URL
+// ================================================================
+const APPS_SCRIPT_URL = "YOUR_APPS_SCRIPT_URL_HERE";
+// ================================================================
+
+const IS_CONNECTED = APPS_SCRIPT_URL !== "YOUR_APPS_SCRIPT_URL_HERE" && APPS_SCRIPT_URL.startsWith("https://");
+
+// ── Google Sheets API calls ───────────────────────────────────
+async function gsCall(action, payload={}) {
+  const params = new URLSearchParams({ action, ...Object.fromEntries(
+    Object.entries(payload).map(([k,v]) => [k, typeof v === "object" ? JSON.stringify(v) : v])
+  )});
+  const res = await fetch(`${APPS_SCRIPT_URL}?${params}`);
+  return res.json();
+}
+
+async function loadFromSheets() {
+  try {
+    setSyncState("saving");
+    const [deliverables, digital, extras, pipeline, meta] = await Promise.all([
+      gsCall("getDeliverables"),
+      gsCall("getDigital"),
+      gsCall("getExtras"),
+      gsCall("getPipeline"),
+      gsCall("getNotes"),
+    ]);
+    // merge into state
+    if (Array.isArray(deliverables)) {
+      deliverables.forEach(item => {
+        for (const m of MONTHS) {
+          const local = (S.deliverables[m]||[]).find(x=>x.id===item.id);
+          if (local) { local.done=item.done; local.status=item.status; local.note=item.note; }
+        }
+      });
+    }
+    if (Array.isArray(digital)) {
+      digital.forEach(item => {
+        const local = S.digital.find(x=>x.id===item.id);
+        if (local) { local.done=item.done; local.status=item.status; local.note=item.note; }
+      });
+    }
+    if (Array.isArray(extras))  S.extras   = extras;
+    if (Array.isArray(pipeline)) S.pipeline = pipeline;
+    if (meta && meta.notes !== undefined) S.notes = meta.notes;
+    if (meta && meta.currentFscore)       S.fscore = meta.currentFscore;
+    setSyncState("live");
+    render();
+  } catch(e) {
+    setSyncState("err");
+    console.warn("Sheets load failed:", e);
+  }
+}
+
+async function pushToSheets(action, payload) {
+  if (!IS_CONNECTED) return;
+  try {
+    setSyncState("saving");
+    await gsCall(action, payload);
+    setSyncState("live");
+  } catch(e) {
+    setSyncState("err");
+    console.warn("Sheets push failed:", e);
+  }
+}
+
+function setSyncState(state) {
+  const dot = document.getElementById("syncDot");
+  const lbl = document.getElementById("syncLabel");
+  const map = {
+    live:   ["live",   IS_CONNECTED ? "Live · Google Sheets" : "Saved locally"],
+    saving: ["saving", "Syncing…"],
+    err:    ["err",    "Sync error"],
+  };
+  const [cls, text] = map[state] || ["",""];
+  dot.className = "dot " + cls;
+  lbl.textContent = text;
+}
+
 const DELIVERABLES_DEFAULT = {
   "Month 1":[
     {id:"d1",title:"Discovery Question Framework",output:"Laminated reference card + practice sessions",done:false,status:"pending",note:""},
@@ -524,6 +605,7 @@ let activeMonth="Month 1";
 let saveTimer=null;
 
 function load(){
+  // Always load local first for instant render
   try{
     const raw=localStorage.getItem(KEY);
     if(raw){
@@ -537,16 +619,20 @@ function load(){
     }
   }catch(e){}
   render();
+  // Then pull live data from Sheets if connected
+  if(IS_CONNECTED) loadFromSheets();
+  else setSyncState("live");
 }
 
 function persist(){
+  // Always save locally
   try{
     localStorage.setItem(KEY,JSON.stringify(S));
     const t=new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
     document.getElementById("lastSaved").textContent="Saved "+t;
   }catch(e){}
 }
-function saveAll(){persist();showToast("Saved ✓");}
+function saveAll(){persist();if(IS_CONNECTED)loadFromSheets();showToast("Saved ✓");}
 function autoSave(){clearTimeout(saveTimer);saveTimer=setTimeout(persist,600);}
 
 function render(){
