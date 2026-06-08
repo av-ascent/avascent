@@ -499,7 +499,7 @@ a{color:var(--gold)}
 const APPS_SCRIPT_URL = "YOUR_APPS_SCRIPT_URL_HERE";
 // ================================================================
 
-const IS_CONNECTED = APPS_SCRIPT_URL !== "YOUR_APPS_SCRIPT_URL_HERE" && APPS_SCRIPT_URL.startsWith("https://");
+const IS_CONNECTED = APPS_SCRIPT_URL !== "YOUR_APPS_SCRIPT_URL_HERE" && APPS_SCRIPT_URL.startsWith("https://script.google.com/macros/s/AKfycbzNvPvVjpSlz0MbTPQ-8d4bLMwimR39P291w88R4C7mfeZIl2xJQv6XH-x_Lg-agMHgfQ/exec");
 
 // ── Google Sheets API calls ───────────────────────────────────
 async function gsCall(action, payload={}) {
