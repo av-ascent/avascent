@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matrix Consultants · AV ASCENT Engagement</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Archivo:wght@300;400;500;600&family=Archivo+Narrow:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b1628; --bg2:#0f1e36; --bg3:#152544; --bg4:#1a2d52;
+  --border:rgba(255,255,255,0.08); --border2:rgba(255,255,255,0.16); --border3:rgba(255,255,255,0.26);
+  --t1:#f5f0e8; --t2:#c8bfae; --t3:#8fa0bc; --t4:#5c7299;
+  --gold:#d4a832; --gold-l:#ecc252; --gold-d:#a07820;
+  --gold-bg:rgba(212,168,50,0.12); --gold-border:rgba(212,168,50,0.30);
+  --green:#3ecf8e; --green-bg:rgba(62,207,142,0.14); --green-b:rgba(62,207,142,0.35);
+  --amber:#f59e0b; --amber-bg:rgba(245,158,11,0.12);
+  --red:#f87171; --red-bg:rgba(248,113,113,0.12);
+  --blue-accent:#60a5fa; --blue-bg:rgba(96,165,250,0.12); --blue-b:rgba(96,165,250,0.28);
+  --r:6px; --rl:10px;
+  --shadow:0 2px 8px rgba(0,0,0,0.35),0 1px 2px rgba(0,0,0,0.2);
+  --shadow-lg:0 6px 28px rgba(0,0,0,0.4),0 2px 6px rgba(0,0,0,0.25);
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--t1);font-family:'Archivo',sans-serif;font-size:16px;line-height:1.65;min-height:100vh}
+.page{max-width:1080px;margin:0 auto;padding:0 32px 100px}
+
+/* ── TOPBAR ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--border);margin-bottom:44px;gap:14px;flex-wrap:wrap}
+.topbar-left{display:flex;align-items:center;gap:14px}
+.logo-mark{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--gold-d),var(--gold));display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-mark span{font-family:'Playfair Display',serif;font-size:14px;color:#0b1628;font-style:italic;font-weight:600}
+.brand-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:400;color:var(--t1)}
+.brand-sub{font-size:13px;color:var(--t3);letter-spacing:.03em;margin-top:2px}
+.topbar-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sync-pill{display:flex;align-items:center;gap:7px;padding:6px 14px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);font-size:13px;color:var(--t3)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--t4)}
+.dot.live{background:var(--green);box-shadow:0 0 6px var(--green)}
+.dot.saving{background:var(--gold);animation:blink .9s infinite}
+.dot.err{background:var(--red)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.btn-top{font-size:13px;font-family:'Archivo Narrow',sans-serif;font-weight:600;padding:7px 16px;border-radius:var(--r);cursor:pointer;transition:all .15s;border:none;letter-spacing:.03em}
+.btn-save{background:var(--gold);color:#0b1628}
+.btn-save:hover{background:var(--gold-l)}
+.btn-pdf{background:var(--bg3);color:var(--t2);border:1px solid var(--border2)!important;border:none}
+.btn-pdf:hover{background:var(--bg4);color:var(--t1)}
+#lastSaved{font-size:12px;color:var(--t4)}
+code{background:var(--bg3);padding:2px 7px;border-radius:4px;font-size:12px;color:var(--gold-l);font-family:'Archivo Narrow',monospace}
+a{color:var(--gold)}
+
+/* ── MASTHEAD ── */
+.masthead{display:grid;grid-template-columns:1fr auto;gap:36px;align-items:start;margin-bottom:44px;padding-bottom:40px;border-bottom:1px solid var(--border)}
+.masthead-eyebrow{font-size:12px;font-family:'Archivo Narrow',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--t4);margin-bottom:12px}
+.masthead-title{font-family:'Playfair Display',serif;font-size:46px;font-weight:400;line-height:1.1;color:var(--t1)}
+.masthead-title em{font-style:italic;color:var(--gold)}
+.masthead-desc{margin-top:16px;font-size:15px;color:var(--t2);max-width:540px;line-height:1.75}
+.masthead-meta{display:flex;flex-direction:column;gap:10px;align-items:flex-end;padding-top:4px}
+.meta-chip{display:flex;flex-direction:column;align-items:flex-end;padding:12px 18px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);min-width:170px}
+.meta-chip-label{font-size:11px;color:var(--t4);letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px;font-family:'Archivo Narrow',sans-serif}
+.meta-chip-val{font-size:18px;font-weight:600;color:var(--gold)}
+.meta-chip-sub{font-size:12px;color:var(--t3);margin-top:2px}
+
+/* ── FSCORE BANNER ── */
+.fscore-banner{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-radius:var(--rl);overflow:hidden;margin-bottom:40px;border:1px solid var(--border);box-shadow:var(--shadow)}
+.fs-cell{background:var(--bg2);padding:20px 24px;display:flex;flex-direction:column;gap:5px}
+.fs-label{font-size:11px;font-family:'Archivo Narrow',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--t4)}
+.fs-val{font-size:32px;font-weight:600;color:var(--t1);line-height:1;font-family:'Playfair Display',serif}
+.fs-sub{font-size:13px;color:var(--t3)}
+.fs-bar{height:4px;background:var(--bg4);border-radius:2px;margin-top:10px;overflow:hidden}
+.fs-fill{height:100%;border-radius:2px;transition:width .6s ease}
+.fs-fill.baseline{background:linear-gradient(90deg,var(--gold-d),var(--gold))}
+.fs-fill.current{background:linear-gradient(90deg,var(--green),#7ef5c4)}
+.fs-fill.progress{background:linear-gradient(90deg,var(--blue-accent),#93c5fd)}
+.edit-fs{font-size:12px;color:var(--gold);cursor:pointer;text-decoration:underline;margin-top:5px;display:inline-block}
+.edit-fs:hover{color:var(--gold-l)}
+
+/* ── SECTION ── */
+.section{margin-bottom:48px}
+.sec-header{display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:22px;gap:14px}
+.sec-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:400;color:var(--t1)}
+.sec-title sup{font-size:12px;color:var(--t4);font-family:'Archivo',sans-serif;font-weight:400;margin-left:8px;vertical-align:super}
+.sec-hint{font-size:12px;color:var(--t4)}
+
+/* ── MONTH TABS ── */
+.month-tabs{display:flex;gap:0;margin-bottom:22px;border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;background:var(--bg3)}
+.mtab{flex:1;padding:12px 0;text-align:center;cursor:pointer;font-size:14px;font-family:'Archivo Narrow',sans-serif;font-weight:500;color:var(--t3);transition:all .15s;border:none;background:transparent;letter-spacing:.04em}
+.mtab:not(:last-child){border-right:1px solid var(--border)}
+.mtab:hover{background:var(--bg4);color:var(--t1)}
+.mtab.active{background:var(--gold);color:#0b1628;font-weight:700}
+.mtab .mtab-count{display:block;font-size:11px;margin-top:3px;opacity:.75}
+
+/* ── ITEM CARD ── */
+.items{display:flex;flex-direction:column;gap:10px}
+.item{
+  display:grid;grid-template-columns:28px 1fr auto;
+  align-items:start;gap:16px;padding:18px 20px;
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--rl);box-shadow:var(--shadow);transition:all .15s;
+}
+.item:hover{border-color:var(--border2)}
+/* done = green tint border, NOT faded, NOT struck */
+.item.is-done{border-color:var(--green-b);background:var(--bg2)}
+
+.chk{
+  width:24px;height:24px;border-radius:50%;
+  border:1.5px solid var(--border2);
+  cursor:pointer;flex-shrink:0;margin-top:2px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .18s;background:transparent;color:#0b1628;
+}
+.chk:hover{border-color:var(--green)}
+.chk.on{background:var(--green);border-color:var(--green)}
+
+.item-body{display:flex;flex-direction:column;gap:5px;min-width:0}
+
+/* VIEW MODE */
+.item-title{font-size:16px;font-weight:500;color:var(--t1);line-height:1.35}
+.item-title.done-style{color:var(--green)}   /* green text when done, no strikethrough */
+.item-output{font-size:13px;color:var(--t3);letter-spacing:.01em;margin-top:2px}
+.note-ta{font-size:14px;width:100%;border:none;background:transparent;color:var(--t2);font-family:'Archivo',sans-serif;resize:none;outline:none;padding:0;line-height:1.55;margin-top:7px}
+.note-ta::placeholder{color:var(--t4)}
+
+/* EDIT MODE fields */
+.edit-fields{display:none;flex-direction:column;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.item.editing .edit-fields{display:flex}
+.edit-in{
+  font-size:14px;padding:8px 12px;border:1px solid var(--border2);
+  border-radius:var(--r);background:var(--bg3);color:var(--t1);
+  font-family:'Archivo',sans-serif;outline:none;width:100%;transition:border-color .15s;
+}
+.edit-in:focus{border-color:var(--gold)}
+.edit-in::placeholder{color:var(--t4)}
+.edit-row{display:flex;gap:8px;flex-wrap:wrap}
+.edit-label{font-size:11px;color:var(--t4);font-family:'Archivo Narrow',sans-serif;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.edit-group{display:flex;flex-direction:column;flex:1;min-width:120px}
+.edit-actions{display:flex;gap:8px;margin-top:4px}
+.btn-edit-save{font-size:12px;padding:6px 14px;border-radius:var(--r);background:var(--gold);color:#0b1628;border:none;cursor:pointer;font-weight:600;font-family:'Archivo Narrow',sans-serif;transition:all .15s}
+.btn-edit-save:hover{background:var(--gold-l)}
+.btn-edit-cancel{font-size:12px;padding:6px 14px;border-radius:var(--r);background:transparent;color:var(--t3);border:1px solid var(--border2);cursor:pointer;font-family:'Archivo Narrow',sans-serif;transition:all .15s}
+.btn-edit-cancel:hover{color:var(--t1);border-color:var(--border3)}
+
+.item-right{display:flex;flex-direction:column;align-items:flex-end;gap:7px;padding-top:2px}
+.status-sel{font-size:12px;padding:5px 10px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg3);color:var(--t2);cursor:pointer;outline:none;transition:border-color .15s}
+.status-sel:focus{border-color:var(--border2)}
+.btn-edit-icon{background:transparent;border:1px solid var(--border);border-radius:var(--r);color:var(--t4);cursor:pointer;font-size:13px;padding:4px 9px;transition:all .15s;font-family:'Archivo Narrow',sans-serif}
+.btn-edit-icon:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ── BADGES ── */
+.badge{font-size:11px;padding:4px 11px;border-radius:20px;font-family:'Archivo Narrow',sans-serif;font-weight:500;letter-spacing:.05em;white-space:nowrap}
+.b-pending{background:var(--bg3);color:var(--t3);border:1px solid var(--border)}
+.b-progress{background:var(--blue-bg);color:var(--blue-accent);border:1px solid var(--blue-b)}
+.b-done{background:var(--green-bg);color:var(--green);border:1px solid var(--green-b)}
+.b-lost{background:var(--red-bg);color:var(--red);border:1px solid rgba(248,113,113,.3)}
+
+/* ── ADD FORM ── */
+.add-item-form{margin-top:14px;padding:20px;border:1.5px dashed var(--border2);border-radius:var(--rl);background:var(--bg3)}
+.add-form-title{font-size:13px;font-family:'Archivo Narrow',sans-serif;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px}
+.add-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.add-in{font-size:14px;padding:9px 13px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg2);color:var(--t1);font-family:'Archivo',sans-serif;outline:none;min-width:0;transition:border-color .15s}
+.add-in:focus{border-color:var(--border2)}
+.add-in::placeholder{color:var(--t4)}
+.add-in-full{width:100%;margin-bottom:10px}
+.btn-add{font-size:14px;font-family:'Archivo Narrow',sans-serif;font-weight:600;padding:9px 20px;border-radius:var(--r);cursor:pointer;transition:all .15s;background:transparent;color:var(--gold);border:1px solid var(--gold-border);white-space:nowrap}
+.btn-add:hover{background:var(--gold);color:#0b1628}
+
+/* ── PIPELINE ── */
+.pipe-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.pipe-row{
+  display:grid;grid-template-columns:1fr 140px 115px 1fr auto auto;
+  align-items:center;gap:12px;
+  padding:14px 18px;background:var(--bg2);
+  border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--shadow);
+}
+.deal-name{font-size:15px;font-weight:500;color:var(--t1)}
+.deal-val{font-size:14px;color:var(--gold);font-family:'Archivo Narrow',sans-serif;text-align:right;font-weight:600}
+.deal-note{font-size:13px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.del-btn{border:none;background:transparent;color:var(--t4);cursor:pointer;font-size:20px;line-height:1;padding:2px;transition:color .15s}
+.del-btn:hover{color:var(--red)}
+.edit-deal-btn{border:1px solid var(--border);border-radius:var(--r);background:transparent;color:var(--t4);cursor:pointer;font-size:12px;padding:4px 9px;font-family:'Archivo Narrow',sans-serif;transition:all .15s}
+.edit-deal-btn:hover{border-color:var(--gold);color:var(--gold)}
+.empty-msg{font-size:14px;color:var(--t4);padding:14px 0;font-style:italic}
+
+/* inline deal edit */
+.pipe-edit-row{
+  background:var(--bg3);border:1px solid var(--gold-border);border-radius:var(--rl);
+  padding:16px 18px;margin-bottom:8px;display:flex;flex-direction:column;gap:10px;
+}
+.pipe-edit-row .add-row{margin-bottom:0}
+
+/* ── NOTES ── */
+.notes-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:20px;box-shadow:var(--shadow)}
+#globalNotes{width:100%;border:none;background:transparent;color:var(--t2);font-family:'Archivo',sans-serif;font-size:15px;resize:vertical;outline:none;line-height:1.8;min-height:130px}
+#globalNotes::placeholder{color:var(--t4)}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:var(--border);margin:40px 0}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:28px;right:28px;background:var(--gold);color:#0b1628;font-size:14px;font-weight:700;padding:12px 22px;border-radius:var(--r);opacity:0;transition:opacity .2s;pointer-events:none;z-index:9999}
+.toast.show{opacity:1}
+
+/* ── PDF PRINT ── */
+@media print{
+  .topbar .btn-pdf,.topbar .btn-save,.topbar .sync-pill,#lastSaved,.btn-edit-icon,.edit-deal-btn,.del-btn,.add-item-form,.add-row.pipe-add,.status-sel,.btn-edit-icon{display:none!important}
+  body{background:#fff!important;color:#111!important;font-size:13px}
+  .page{padding:0 20px;max-width:100%}
+  :root{--bg:#fff;--bg2:#f8f8f8;--bg3:#f0f0f0;--t1:#111;--t2:#333;--t3:#555;--t4:#888;--border:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.2);--gold:#8a6500;--green:#1a7a4a;--green-bg:rgba(26,122,74,0.08);--green-b:rgba(26,122,74,0.2)}
+  .item{box-shadow:none;page-break-inside:avoid}
+  .fscore-banner{box-shadow:none}
+  .masthead-title{font-size:32px}
+  .month-tabs{display:none}
+  .items{display:flex!important}
+  /* show all months in print */
+  #delivGrid{display:flex!important}
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:720px){
+  .masthead{grid-template-columns:1fr}
+  .masthead-meta{align-items:flex-start;flex-direction:row;flex-wrap:wrap}
+  .masthead-title{font-size:30px}
+  .fscore-banner{grid-template-columns:1fr 1fr}
+  .pipe-row{grid-template-columns:1fr 90px auto auto}
+  .pipe-row .deal-val,.pipe-row .deal-note{display:none}
+  .page{padding:0 16px 80px}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="logo-mark"><span>AV</span></div>
+      <div>
+        <div class="brand-name">AV ASCENT × Matrix Consultants</div>
+        <div class="brand-sub">Jun – Aug 2026 · 3-Month Retainer Engagement</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="sync-pill">
+        <div class="dot live" id="syncDot"></div>
+        <span id="syncLabel">Saved locally</span>
+      </div>
+      <span id="lastSaved"></span>
+      <button class="btn-top btn-pdf" onclick="exportPDF()">⬇ Export PDF</button>
+      <button class="btn-top btn-save" onclick="saveAll()">Save</button>
+    </div>
+  </div>
+
+  <!-- MASTHEAD -->
+  <div class="masthead">
+    <div>
+      <div class="masthead-eyebrow">Engagement Dashboard · Active</div>
+      <h1 class="masthead-title">Matrix Consultants<br><em>Growth Mandate</em></h1>
+      <p class="masthead-desc">Close the closing gap. Price competition does not kill deals — poor value framing does. This engagement fixes the one thing standing between Matrix and consistent revenue growth.</p>
+    </div>
+    <div class="masthead-meta">
+      <div class="meta-chip">
+        <span class="meta-chip-label">Monthly Retainer</span>
+        <span class="meta-chip-val">PKR 250,000</span>
+        <span class="meta-chip-sub">End of month</span>
+      </div>
+      <div class="meta-chip">
+        <span class="meta-chip-label">Incentive Rate</span>
+        <span class="meta-chip-val">10%</span>
+        <span class="meta-chip-sub">Per project closed</span>
+      </div>
+      <div class="meta-chip">
+        <span class="meta-chip-label">Period</span>
+        <span class="meta-chip-val">3 Months</span>
+        <span class="meta-chip-sub">Jun – Aug 2026</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FSCORE BANNER -->
+  <div class="fscore-banner">
+    <div class="fs-cell">
+      <span class="fs-label">F-Score Baseline</span>
+      <span class="fs-val">43</span>
+      <span class="fs-sub">High Friction · Zone 31–60</span>
+      <div class="fs-bar"><div class="fs-fill baseline" style="width:43%"></div></div>
+    </div>
+    <div class="fs-cell">
+      <span class="fs-label">Current F-Score</span>
+      <span class="fs-val" id="mFscore">—</span>
+      <span class="fs-sub">Updated at reassessments</span>
+      <span class="edit-fs" id="editFscore">edit ↗</span>
+    </div>
+    <div class="fs-cell">
+      <span class="fs-label">Deliverables</span>
+      <span class="fs-val" id="mDone">0/12</span>
+      <span class="fs-sub"><span id="mPct">0%</span> complete</span>
+      <div class="fs-bar"><div class="fs-fill progress" id="mBar" style="width:0%"></div></div>
+    </div>
+    <div class="fs-cell">
+      <span class="fs-label">Deals Closed</span>
+      <span class="fs-val" id="mClosed">0</span>
+      <span class="fs-sub"><span id="mVal">—</span> total value</span>
+    </div>
+  </div>
+
+  <!-- MONTHLY DELIVERABLES -->
+  <div class="section">
+    <div class="sec-header">
+      <span class="sec-title">Monthly Deliverables<sup>Core scope</sup></span>
+      <span class="sec-hint">check · edit · set status · add notes</span>
+    </div>
+    <div class="month-tabs" id="monthTabs"></div>
+    <div class="items" id="delivGrid"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- DIGITAL SCOPE -->
+  <div class="section">
+    <div class="sec-header">
+      <span class="sec-title">Digital & Social Media Scope<sup>Included in retainer</sup></span>
+      <span class="sec-hint">landing page · linkedin · subdomain</span>
+    </div>
+    <div class="items" id="digitalGrid"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- PIPELINE -->
+  <div class="section">
+    <div class="sec-header">
+      <span class="sec-title">Live Deal Pipeline<sup id="pipeCount">0 deals</sup></span>
+      <span class="sec-hint">every active deal tracked · edit inline</span>
+    </div>
+    <div class="pipe-grid" id="pipelineList"></div>
+    <div class="add-item-form add-row pipe-add">
+      <div class="add-form-title">Add new deal</div>
+      <div class="add-row">
+        <input class="add-in" id="dName"  placeholder="Client / project name" style="flex:2;min-width:130px">
+        <input class="add-in" id="dVal"   placeholder="Value (PKR)" style="flex:1;min-width:90px" type="number">
+        <select class="add-in" id="dStage" style="flex:1;min-width:120px">
+          <option>Prospecting</option><option>Proposal sent</option>
+          <option>Negotiation</option><option>Verbal yes</option>
+          <option>Signed</option><option>Lost</option>
+        </select>
+      </div>
+      <div class="add-row">
+        <input class="add-in" id="dContact" placeholder="Contact person" style="flex:1;min-width:120px">
+        <input class="add-in" id="dDate"    placeholder="Expected close date" style="flex:1;min-width:130px" type="date">
+        <input class="add-in" id="dNote"    placeholder="Notes" style="flex:2;min-width:130px">
+        <button class="btn-add" onclick="addDeal()">+ Add deal</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ADDITIONAL DELIVERABLES -->
+  <div class="section">
+    <div class="sec-header">
+      <span class="sec-title">Additional Deliverables<sup>Anything else provided</sup></span>
+      <span class="sec-hint">log any extra work, initiatives, or ideas delivered</span>
+    </div>
+    <div class="items" id="extraGrid"></div>
+    <div class="add-item-form" style="margin-top:12px">
+      <div class="add-form-title">Add extra deliverable</div>
+      <input class="add-in add-in-full" id="extraTitle"  placeholder="Deliverable / initiative title">
+      <input class="add-in add-in-full" id="extraOutput" placeholder="Output / description (what was produced)">
+      <div class="add-row">
+        <select class="add-in" id="extraMonth" style="flex:1;min-width:105px">
+          <option value="Month 1">Month 1</option>
+          <option value="Month 2">Month 2</option>
+          <option value="Month 3">Month 3</option>
+          <option value="Ongoing">Ongoing</option>
+        </select>
+        <select class="add-in" id="extraCat" style="flex:1;min-width:130px">
+          <option value="Strategy">Strategy</option>
+          <option value="Digital">Digital</option>
+          <option value="Coaching">Coaching</option>
+          <option value="Research">Research</option>
+          <option value="Content">Content</option>
+          <option value="Admin">Admin</option>
+          <option value="Other">Other</option>
+        </select>
+        <input class="add-in" id="extraDate" placeholder="Date / deadline" style="flex:1;min-width:120px" type="date">
+        <button class="btn-add" onclick="addExtra()">+ Add</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SESSION LOG -->
+  <div class="section">
+    <div class="sec-header">
+      <span class="sec-title">Session Log<sup>Meeting records</sup></span>
+      <span class="sec-hint">log every session · track actions</span>
+    </div>
+    <div id="sessionList" style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px"></div>
+    <div class="add-item-form">
+      <div class="add-form-title">Log new session</div>
+      <div class="add-row">
+        <input class="add-in" id="sesDate" type="date" style="flex:1;min-width:130px">
+        <select class="add-in" id="sesType" style="flex:1;min-width:130px">
+          <option>Strategy Session</option>
+          <option>Deal Coaching</option>
+          <option>Deliverable Review</option>
+          <option>Client Meeting</option>
+          <option>Site Visit</option>
+          <option>WhatsApp / Call</option>
+        </select>
+        <input class="add-in" id="sesDuration" placeholder="Duration (e.g. 3 hrs)" style="flex:1;min-width:110px">
+      </div>
+      <input class="add-in add-in-full" id="sesSummary" placeholder="Session summary — what was covered, decisions made…">
+      <div class="add-row">
+        <input class="add-in" id="sesActions" placeholder="Action items (comma separated)" style="flex:2;min-width:200px">
+        <button class="btn-add" onclick="addSession()">+ Log session</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- NOTES -->
+  <div class="section">
+    <div class="sec-header">
+      <span class="sec-title">Notes & Weekly Updates</span>
+      <span class="sec-hint">auto-saves as you type</span>
+    </div>
+    <div class="notes-box">
+      <textarea id="globalNotes" placeholder="Weekly progress · client feedback · wins · blockers · ideas · anything worth capturing for the record…"></textarea>
+    </div>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ================================================================
+//  STEP 1 — Paste your deployed Apps Script Web App URL below
+//  How to get it:
+//    → Open your Google Sheet → Extensions → Apps Script
+//    → Paste Code.gs → Deploy → New deployment → Web app
+//    → Execute as: Me · Who has access: Anyone → Deploy → Copy URL
+// ================================================================
+const APPS_SCRIPT_URL = "YOUR_APPS_SCRIPT_URL_HERE";
+// ================================================================
+
+const IS_CONNECTED = APPS_SCRIPT_URL !== "YOUR_APPS_SCRIPT_URL_HERE" && APPS_SCRIPT_URL.startsWith("https://");
+
+// ── Google Sheets API layer ───────────────────────────────────
+// All reads and writes go through this single function.
+// Uses no-cors fetch with URL params — works from any host (GitHub Pages, local file, etc.)
+async function gs(action, payload={}) {
+  const params = new URLSearchParams({ action });
+  Object.entries(payload).forEach(([k,v]) => {
+    params.append(k, typeof v === "object" ? JSON.stringify(v) : String(v));
+  });
+  try {
+    const res = await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`);
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    return await res.json();
+  } catch(e) {
+    console.warn("Sheets error:", e);
+    throw e;
+  }
+}
+
+// ── Pull all data from Sheets → merge into S ─────────────────
+async function pullFromSheets() {
+  setSyncState("saving");
+  try {
+    const data = await gs("getAll");
+    if (data.deliverables) {
+      // Merge — preserve default structure, update live fields
+      MONTHS.forEach(m => {
+        (S.deliverables[m]||[]).forEach(local => {
+          const live = (data.deliverables[m]||[]).find(x=>x.id===local.id);
+          if (live) Object.assign(local, live);
+        });
+        // Add any new extras that came from Sheets
+        (data.deliverables[m]||[]).forEach(live => {
+          if (!(S.deliverables[m]||[]).find(x=>x.id===live.id)) {
+            S.deliverables[m] = S.deliverables[m]||[];
+            S.deliverables[m].push(live);
+          }
+        });
+      });
+    }
+    if (data.digital) {
+      S.digital.forEach(local => {
+        const live = data.digital.find(x=>x.id===local.id);
+        if (live) Object.assign(local, live);
+      });
+    }
+    if (Array.isArray(data.extras))    S.extras    = data.extras;
+    if (Array.isArray(data.pipeline))  S.pipeline  = data.pipeline;
+    if (Array.isArray(data.sessions))  S.sessions  = data.sessions;
+    if (data.notes   !== undefined)    S.notes     = data.notes;
+    if (data.fscore  !== undefined)    S.fscore    = data.fscore;
+    if (data.lastUpdated) {
+      document.getElementById("lastSaved").textContent = "Updated " + data.lastUpdated;
+    }
+    persist(); // cache locally
+    setSyncState("live");
+    render();
+  } catch(e) {
+    setSyncState("err");
+  }
+}
+
+// ── Push a single change to Sheets ───────────────────────────
+async function pushChange(action, payload) {
+  if (!IS_CONNECTED) return;
+  setSyncState("saving");
+  try {
+    await gs(action, payload);
+    setSyncState("live");
+    const t = new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+    document.getElementById("lastSaved").textContent = "Synced " + t;
+  } catch(e) {
+    setSyncState("err");
+    showToast("Sync failed — saved locally");
+  }
+}
+
+// ── Default data ─────────────────────────────────────────────
+const DELIVERABLES_DEFAULT = {
+  "Month 1":[
+    {id:"d1",title:"Discovery Question Framework",output:"Laminated reference card + practice sessions",done:false,status:"pending",note:"",dueDate:"",priority:""},
+    {id:"d2",title:"Objection-Handling Playbook",output:"Printed playbook · role-play rehearsed in session",done:false,status:"pending",note:"",dueDate:"",priority:""},
+  ],
+  "Month 2":[
+    {id:"d3",title:"Proposal Template with ROI Calculator",output:"Editable Word/Google Doc template",done:false,status:"pending",note:"",dueDate:"",priority:""},
+    {id:"d4",title:"Follow-Up Architecture",output:"Follow-up sequence document · 5-step cadence",done:false,status:"pending",note:"",dueDate:"",priority:""},
+    {id:"d5",title:"Pipeline Tracker System",output:"Google Sheet · weekly review protocol",done:false,status:"pending",note:"",dueDate:"",priority:""},
+  ],
+  "Month 3":[
+    {id:"d6",title:"F-Score Reassessment",output:"Written F-Score report · Month 4–6 plan adjusted",done:false,status:"pending",note:"",dueDate:"",priority:""},
+    {id:"d7",title:"Value Positioning Document",output:"PDF + editable Word version",done:false,status:"pending",note:"",dueDate:"",priority:""},
+    {id:"d8",title:"Clientele Feedback Collection",output:"Feedback template · testimonials",done:false,status:"pending",note:"",dueDate:"",priority:""},
+  ],
+};
+const DIGITAL_DEFAULT=[
+  {id:"dig1",title:"Landing Page",output:"Focused landing page for Matrix Consultants",done:false,status:"pending",note:"",dueDate:"",priority:""},
+  {id:"dig2",title:"Subdomain Setup",output:"Professional subdomain structure & management",done:false,status:"pending",note:"",dueDate:"",priority:""},
+  {id:"dig3",title:"LinkedIn Company Page",output:"Profile copy · banner · about · service listings · initial content",done:false,status:"pending",note:"",dueDate:"",priority:""},
+  {id:"dig4",title:"LinkedIn Content Strategy",output:"Content plan · authority building · inbound pipeline support",done:false,status:"pending",note:"",dueDate:"",priority:""},
+];
+
+const MONTHS=["Month 1","Month 2","Month 3"];
+const KEY="avascent_matrix_v5";
+let S={
+  deliverables:JSON.parse(JSON.stringify(DELIVERABLES_DEFAULT)),
+  digital:JSON.parse(JSON.stringify(DIGITAL_DEFAULT)),
+  extras:[],pipeline:[],sessions:[],notes:"",fscore:null
+};
+let activeMonth="Month 1";
+let saveTimer=null;
+let editingDeal=null; // index of deal being edited
+
+// ── Persistence ───────────────────────────────────────────────
+function load(){
+  // 1. Render from localStorage immediately (instant UI)
+  try{
+    const raw=localStorage.getItem(KEY);
+    if(raw){
+      const sv=JSON.parse(raw);
+      if(sv.deliverables)S.deliverables=sv.deliverables;
+      if(sv.digital)S.digital=sv.digital;
+      if(sv.extras)S.extras=sv.extras;
+      if(sv.pipeline)S.pipeline=sv.pipeline;
+      if(sv.sessions)S.sessions=sv.sessions;
+      if(sv.notes!==undefined)S.notes=sv.notes;
+      if(sv.fscore!==undefined)S.fscore=sv.fscore;
+    }
+  }catch(e){}
+  render();
+  // 2. Then pull live data from Sheets (overwrites with freshest data)
+  if(IS_CONNECTED){
+    pullFromSheets();
+    // Auto-refresh every 30 seconds so both users stay in sync
+    setInterval(pullFromSheets, 30000);
+  } else {
+    setSyncState("live");
+  }
+}
+
+function persist(){
+  // Always save to localStorage as offline cache
+  try{
+    localStorage.setItem(KEY,JSON.stringify(S));
+    if(!IS_CONNECTED){
+      const t=new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+      document.getElementById("lastSaved").textContent="Saved locally "+t;
+    }
+  }catch(e){}
+}
+
+function saveAll(){
+  persist();
+  if(IS_CONNECTED){
+    // Push full state snapshot to Sheets
+    pushChange("saveAll", {
+      deliverables: S.deliverables,
+      digital:      S.digital,
+      extras:       S.extras,
+      pipeline:     S.pipeline,
+      sessions:     S.sessions,
+      notes:        S.notes,
+      fscore:       S.fscore,
+    }).then(()=>showToast("Synced to Google Sheets ✓"));
+  } else {
+    showToast("Saved locally ✓");
+  }
+}
+
+function autoSave(){
+  persist(); // always cache locally
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{
+    if(IS_CONNECTED){
+      pushChange("saveAll",{
+        deliverables:S.deliverables,
+        digital:S.digital,
+        extras:S.extras,
+        pipeline:S.pipeline,
+        sessions:S.sessions,
+        notes:S.notes,
+        fscore:S.fscore,
+      });
+    }
+  }, 1500); // debounce 1.5s before pushing to Sheets
+}
+
+// ── Render ────────────────────────────────────────────────────
+function render(){
+  renderTabs();renderDeliverables();renderDigital();renderExtras();renderPipeline();renderSessions();updateMetrics();
+  const n=document.getElementById("globalNotes");
+  if(document.activeElement!==n)n.value=S.notes||"";
+  document.getElementById("mFscore").textContent=S.fscore!==null?S.fscore:"—";
+}
+
+function renderTabs(){
+  document.getElementById("monthTabs").innerHTML=MONTHS.map(m=>{
+    const items=S.deliverables[m]||[];
+    const done=items.filter(i=>i.done).length;
+    return`<button class="mtab ${m===activeMonth?'active':''}" onclick="switchMonth('${m}')">${m}<span class="mtab-count">${done}/${items.length}</span></button>`;
+  }).join("");
+}
+
+function renderDeliverables(){
+  const el=document.getElementById("delivGrid");
+  el.innerHTML=(S.deliverables[activeMonth]||[]).map(i=>itemHTML(i,"deliv")).join("");
+  attachEvents(el,"deliv");
+}
+function renderDigital(){
+  const el=document.getElementById("digitalGrid");
+  el.innerHTML=S.digital.map(i=>itemHTML(i,"dig")).join("");
+  attachEvents(el,"dig");
+}
+function renderExtras(){
+  const el=document.getElementById("extraGrid");
+  if(!S.extras.length){
+    el.innerHTML=`<p class="empty-msg">Nothing added yet — use the form below to log any additional work, ideas, or initiatives you've delivered.</p>`;
+    return;
+  }
+  el.innerHTML=S.extras.map(i=>itemHTML(i,"extra")).join("");
+  attachEvents(el,"extra");
+}
+
+function priorityBadge(p){
+  if(!p)return"";
+  const map={High:"color:var(--red)",Medium:"color:var(--amber)",Low:"color:var(--t3)"};
+  return`<span style="font-size:10px;font-family:'Archivo Narrow',sans-serif;${map[p]||''};margin-left:6px">▲ ${p}</span>`;
+}
+
+function itemHTML(item,type){
+  const s=item.status||(item.done?"done":"pending");
+  const sL={pending:"Pending",inprogress:"In Progress",done:"Done"}[s]||s;
+  const sC={pending:"b-pending",inprogress:"b-progress",done:"b-done"}[s]||"b-pending";
+  const monthTag=item.month?`<span class="badge b-pending" style="font-size:10px;margin-right:5px;padding:2px 8px">${item.month}</span>`:"";
+  const catTag=item.category?`<span class="badge b-pending" style="font-size:10px;margin-right:5px;padding:2px 8px;color:var(--blue-accent)">${item.category}</span>`:"";
+  const dueTag=item.dueDate?`<span style="font-size:11px;color:var(--t4);margin-left:6px">Due ${item.dueDate}</span>`:"";
+  const delBtn=type==="extra"?`<button class="del-btn" data-action="delete" title="Remove">×</button>`:"";
+  const titleClass=item.done?"done-style":"";  // green, no strikethrough
+
+  return`<div class="item ${item.done?"is-done":""}" data-id="${item.id}" data-type="${type}">
+    <div class="chk ${item.done?"on":""}" data-action="toggle">
+      ${item.done?`<svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="#0b1628" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`:""}
+    </div>
+    <div class="item-body">
+      <span class="item-title ${titleClass}">${item.title}${priorityBadge(item.priority)}${dueTag}</span>
+      <span class="item-output">${monthTag}${catTag}${item.output}</span>
+      <textarea class="note-ta" data-action="note" placeholder="Notes, file links, updates…" rows="1">${item.note||""}</textarea>
+      <!-- EDIT FIELDS -->
+      <div class="edit-fields" id="ef-${item.id}">
+        <div class="edit-row">
+          <div class="edit-group" style="flex:2">
+            <span class="edit-label">Title</span>
+            <input class="edit-in" data-ef="title" value="${item.title.replace(/"/g,'&quot;')}" placeholder="Title">
+          </div>
+        </div>
+        <div class="edit-row">
+          <div class="edit-group" style="flex:3">
+            <span class="edit-label">Output / description</span>
+            <input class="edit-in" data-ef="output" value="${(item.output||'').replace(/"/g,'&quot;')}" placeholder="Output / description">
+          </div>
+        </div>
+        <div class="edit-row">
+          <div class="edit-group">
+            <span class="edit-label">Due date</span>
+            <input class="edit-in" data-ef="dueDate" type="date" value="${item.dueDate||''}">
+          </div>
+          <div class="edit-group">
+            <span class="edit-label">Priority</span>
+            <select class="edit-in" data-ef="priority">
+              <option value="" ${!item.priority?'selected':''}>No priority</option>
+              <option value="High" ${item.priority==='High'?'selected':''}>High</option>
+              <option value="Medium" ${item.priority==='Medium'?'selected':''}>Medium</option>
+              <option value="Low" ${item.priority==='Low'?'selected':''}>Low</option>
+            </select>
+          </div>
+        </div>
+        <div class="edit-actions">
+          <button class="btn-edit-save" data-action="edit-save">Save changes</button>
+          <button class="btn-edit-cancel" data-action="edit-cancel">Cancel</button>
+        </div>
+      </div>
+    </div>
+    <div class="item-right">
+      <span class="badge ${sC}">${sL}</span>
+      <select class="status-sel" data-action="status">
+        <option value="pending" ${s==="pending"?"selected":""}>Pending</option>
+        <option value="inprogress" ${s==="inprogress"?"selected":""}>In Progress</option>
+        <option value="done" ${s==="done"?"selected":""}>Done</option>
+      </select>
+      <button class="btn-edit-icon" data-action="edit-toggle">✏ Edit</button>
+      ${delBtn}
+    </div>
+  </div>`;
+}
+
+function attachEvents(container,type){
+  container.querySelectorAll(".item").forEach(el=>{
+    const id=el.dataset.id;
+
+    // toggle done
+    el.querySelector('[data-action="toggle"]').addEventListener("click",()=>{
+      const item=findItem(id,type);if(!item)return;
+      item.done=!item.done;item.status=item.done?"done":"pending";
+      autoSave();render();
+    });
+
+    // note
+    let nt=null;
+    el.querySelector('[data-action="note"]').addEventListener("input",e=>{
+      const item=findItem(id,type);if(item)item.note=e.target.value;
+      clearTimeout(nt);nt=setTimeout(autoSave,500);
+    });
+
+    // status dropdown
+    el.querySelector('[data-action="status"]').addEventListener("change",e=>{
+      const item=findItem(id,type);if(!item)return;
+      item.status=e.target.value;item.done=e.target.value==="done";
+      autoSave();render();
+    });
+
+    // edit toggle
+    el.querySelector('[data-action="edit-toggle"]').addEventListener("click",()=>{
+      const ef=document.getElementById("ef-"+id);
+      const isOpen=el.classList.contains("editing");
+      // close all others
+      container.querySelectorAll(".item.editing").forEach(x=>x.classList.remove("editing"));
+      if(!isOpen)el.classList.add("editing");
+    });
+
+    // edit save
+    el.querySelector('[data-action="edit-save"]').addEventListener("click",()=>{
+      const item=findItem(id,type);if(!item)return;
+      const ef=document.getElementById("ef-"+id);
+      item.title   = ef.querySelector('[data-ef="title"]').value.trim()||item.title;
+      item.output  = ef.querySelector('[data-ef="output"]').value.trim();
+      item.dueDate = ef.querySelector('[data-ef="dueDate"]').value;
+      item.priority= ef.querySelector('[data-ef="priority"]').value;
+      el.classList.remove("editing");
+      autoSave();render();showToast("Updated ✓");
+    });
+
+    // edit cancel
+    el.querySelector('[data-action="edit-cancel"]').addEventListener("click",()=>{
+      el.classList.remove("editing");
+    });
+
+    // delete (extras only)
+    const db=el.querySelector('[data-action="delete"]');
+    if(db)db.addEventListener("click",()=>{
+      S.extras=S.extras.filter(i=>i.id!==id);
+      autoSave();renderExtras();updateMetrics();
+    });
+  });
+}
+
+function findItem(id,type){
+  if(type==="deliv"){for(const m of MONTHS){const i=(S.deliverables[m]||[]).find(x=>x.id===id);if(i)return i;}}
+  else if(type==="dig")return S.digital.find(x=>x.id===id);
+  else if(type==="extra")return S.extras.find(x=>x.id===id);
+}
+function switchMonth(m){activeMonth=m;renderTabs();renderDeliverables();}
+
+// ── Pipeline ──────────────────────────────────────────────────
+function renderPipeline(){
+  const el=document.getElementById("pipelineList");
+  if(!S.pipeline.length){el.innerHTML=`<p class="empty-msg">No deals tracked yet — add your first deal below.</p>`;updateMetrics();return;}
+  const sc=s=>({Signed:"b-done",Lost:"b-lost",Negotiation:"b-progress","Verbal yes":"b-progress"}[s]||"b-pending");
+  el.innerHTML=S.pipeline.map((d,i)=>{
+    if(editingDeal===i) return dealEditHTML(d,i);
+    return`<div class="pipe-row">
+      <span class="deal-name">${d.name}${d.contact?`<span style="font-size:12px;color:var(--t4);margin-left:8px">· ${d.contact}</span>`:''}</span>
+      <span class="deal-val">${d.value?"PKR "+Number(d.value).toLocaleString():"—"}</span>
+      <span class="badge ${sc(d.stage)}">${d.stage}</span>
+      <span class="deal-note">${d.note||""}${d.closeDate?`<span style="color:var(--t4);margin-left:6px">· ${d.closeDate}</span>`:''}</span>
+      <button class="edit-deal-btn" onclick="startEditDeal(${i})">✏ Edit</button>
+      <button class="del-btn" onclick="removeDeal(${i})">×</button>
+    </div>`;
+  }).join("");
+  updateMetrics();
+}
+
+function dealEditHTML(d,i){
+  return`<div class="pipe-edit-row">
+    <div class="add-form-title" style="color:var(--gold)">Editing deal</div>
+    <div class="add-row">
+      <input class="add-in" id="de-name"    value="${d.name.replace(/"/g,'&quot;')}" placeholder="Client / project name" style="flex:2;min-width:130px">
+      <input class="add-in" id="de-val"     value="${d.value||''}" placeholder="Value (PKR)" style="flex:1;min-width:90px" type="number">
+      <select class="add-in" id="de-stage"  style="flex:1;min-width:120px">
+        ${["Prospecting","Proposal sent","Negotiation","Verbal yes","Signed","Lost"].map(s=>`<option ${d.stage===s?"selected":""}>${s}</option>`).join("")}
+      </select>
+    </div>
+    <div class="add-row">
+      <input class="add-in" id="de-contact" value="${d.contact||''}" placeholder="Contact person" style="flex:1;min-width:120px">
+      <input class="add-in" id="de-date"    value="${d.closeDate||''}" placeholder="Expected close" type="date" style="flex:1;min-width:130px">
+      <input class="add-in" id="de-note"    value="${(d.note||'').replace(/"/g,'&quot;')}" placeholder="Notes" style="flex:2;min-width:130px">
+    </div>
+    <div class="edit-actions">
+      <button class="btn-edit-save" onclick="saveDealEdit(${i})">Save deal</button>
+      <button class="btn-edit-cancel" onclick="cancelDealEdit()">Cancel</button>
+    </div>
+  </div>`;
+}
+
+function startEditDeal(i){editingDeal=i;renderPipeline();}
+function cancelDealEdit(){editingDeal=null;renderPipeline();}
+function saveDealEdit(i){
+  S.pipeline[i].name     = document.getElementById("de-name").value.trim()||S.pipeline[i].name;
+  S.pipeline[i].value    = document.getElementById("de-val").value.trim();
+  S.pipeline[i].stage    = document.getElementById("de-stage").value;
+  S.pipeline[i].contact  = document.getElementById("de-contact").value.trim();
+  S.pipeline[i].closeDate= document.getElementById("de-date").value;
+  S.pipeline[i].note     = document.getElementById("de-note").value.trim();
+  editingDeal=null;autoSave();renderPipeline();showToast("Deal updated ✓");
+}
+
+function addDeal(){
+  const name=document.getElementById("dName").value.trim();
+  if(!name){showToast("Enter a client name");return;}
+  S.pipeline.push({
+    name,
+    value:   document.getElementById("dVal").value.trim(),
+    stage:   document.getElementById("dStage").value,
+    contact: document.getElementById("dContact").value.trim(),
+    closeDate:document.getElementById("dDate").value,
+    note:    document.getElementById("dNote").value.trim(),
+  });
+  ["dName","dVal","dContact","dDate","dNote"].forEach(id=>document.getElementById(id).value="");
+  autoSave();renderPipeline();showToast("Deal added ✓");
+}
+function removeDeal(i){if(editingDeal===i)editingDeal=null;S.pipeline.splice(i,1);autoSave();renderPipeline();}
+
+// ── Extras ────────────────────────────────────────────────────
+function addExtra(){
+  const title=document.getElementById("extraTitle").value.trim();
+  if(!title){showToast("Enter a title");return;}
+  S.extras.push({
+    id:"ex_"+Date.now(),title,
+    output:  document.getElementById("extraOutput").value.trim()||"—",
+    month:   document.getElementById("extraMonth").value,
+    category:document.getElementById("extraCat").value,
+    dueDate: document.getElementById("extraDate").value,
+    done:false,status:"pending",note:"",priority:""
+  });
+  ["extraTitle","extraOutput","extraDate"].forEach(id=>document.getElementById(id).value="");
+  autoSave();renderExtras();updateMetrics();showToast("Added ✓");
+}
+
+// ── Sessions ──────────────────────────────────────────────────
+function renderSessions(){
+  const el=document.getElementById("sessionList");
+  if(!S.sessions||!S.sessions.length){
+    el.innerHTML=`<p class="empty-msg">No sessions logged yet — use the form below to record each session.</p>`;
+    return;
+  }
+  el.innerHTML=[...S.sessions].reverse().map((s,ri)=>{
+    const i=S.sessions.length-1-ri;
+    return`<div class="item" style="grid-template-columns:1fr auto">
+      <div class="item-body">
+        <span class="item-title" style="font-size:15px">${s.date||"—"} · <span style="color:var(--gold)">${s.type}</span> <span style="font-size:12px;color:var(--t4)">${s.duration||""}</span></span>
+        <span class="item-output" style="margin-top:4px">${s.summary||""}</span>
+        ${s.actions?`<div style="margin-top:8px;font-size:13px;color:var(--t3)"><strong style="color:var(--t4);font-size:11px;letter-spacing:.08em;text-transform:uppercase">Actions:</strong> ${s.actions}</div>`:""}
+      </div>
+      <div class="item-right">
+        <button class="del-btn" onclick="removeSession(${i})" title="Remove">×</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function addSession(){
+  const summary=document.getElementById("sesSummary").value.trim();
+  if(!summary){showToast("Enter a session summary");return;}
+  S.sessions=S.sessions||[];
+  S.sessions.push({
+    date:    document.getElementById("sesDate").value,
+    type:    document.getElementById("sesType").value,
+    duration:document.getElementById("sesDuration").value.trim(),
+    summary,
+    actions: document.getElementById("sesActions").value.trim(),
+  });
+  ["sesDate","sesDuration","sesSummary","sesActions"].forEach(id=>document.getElementById(id).value="");
+  autoSave();renderSessions();showToast("Session logged ✓");
+}
+function removeSession(i){S.sessions.splice(i,1);autoSave();renderSessions();}
+
+// ── Metrics ───────────────────────────────────────────────────
+function updateMetrics(){
+  const core=Object.values(S.deliverables).flat();
+  const all=[...core,...S.digital,...S.extras];
+  const done=all.filter(i=>i.done).length;
+  const pct=all.length?Math.round(done/all.length*100):0;
+  document.getElementById("mDone").textContent=`${done}/${all.length}`;
+  document.getElementById("mPct").textContent=pct+"%";
+  document.getElementById("mBar").style.width=pct+"%";
+  const closed=S.pipeline.filter(d=>d.stage==="Signed");
+  const tv=closed.reduce((a,d)=>a+(Number(d.value)||0),0);
+  document.getElementById("mClosed").textContent=closed.length;
+  document.getElementById("mVal").textContent=tv?"PKR "+tv.toLocaleString():"—";
+  document.getElementById("pipeCount").textContent=S.pipeline.length+" deal"+(S.pipeline.length!==1?"s":"");
+  document.getElementById("mFscore").textContent=S.fscore!==null?S.fscore:"—";
+  renderTabs();
+}
+
+// ── PDF Export ────────────────────────────────────────────────
+function exportPDF(){
+  // Show all months before printing
+  const allDelivHTML=MONTHS.map(m=>{
+    const items=S.deliverables[m]||[];
+    return`<div style="margin-bottom:16px">
+      <div style="font-size:13px;font-weight:600;color:var(--gold);margin-bottom:8px;letter-spacing:.06em;text-transform:uppercase">${m}</div>
+      ${items.map(i=>{
+        const s=i.status||(i.done?"done":"pending");
+        const sL={pending:"Pending",inprogress:"In Progress",done:"Done"}[s]||s;
+        return`<div style="padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;display:grid;grid-template-columns:20px 1fr auto;gap:12px;align-items:start">
+          <div style="width:18px;height:18px;border-radius:50%;${i.done?'background:var(--green)':'border:1.5px solid var(--border2)'};display:flex;align-items:center;justify-content:center;margin-top:2px;flex-shrink:0">
+            ${i.done?'<svg width="10" height="8" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="#0b1628" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}
+          </div>
+          <div>
+            <div style="font-size:14px;font-weight:500;color:${i.done?'var(--green)':'var(--t1)'}">${i.title}</div>
+            <div style="font-size:11px;color:var(--t3);margin-top:2px">${i.output}</div>
+            ${i.note?`<div style="font-size:12px;color:var(--t2);margin-top:5px">${i.note}</div>`:''}
+          </div>
+          <div style="font-size:10px;padding:3px 9px;border-radius:20px;white-space:nowrap;${
+            s==='done'?'background:var(--green-bg);color:var(--green);border:1px solid var(--green-b)':
+            s==='inprogress'?'background:var(--blue-bg);color:var(--blue-accent)':'background:var(--bg3);color:var(--t3)'
+          }">${sL}</div>
+        </div>`;
+      }).join("")}
+    </div>`;
+  }).join("");
+
+  // Override delivGrid with all months for print
+  const origGrid=document.getElementById("delivGrid").innerHTML;
+  const origTabs=document.getElementById("monthTabs").innerHTML;
+  document.getElementById("delivGrid").innerHTML=allDelivHTML;
+  document.getElementById("monthTabs").style.display="none";
+
+  window.print();
+
+  // Restore after print
+  setTimeout(()=>{
+    document.getElementById("delivGrid").innerHTML=origGrid;
+    document.getElementById("monthTabs").style.display="";
+    attachEvents(document.getElementById("delivGrid"),"deliv");
+    renderTabs();
+  },1000);
+}
+
+// ── Global events ─────────────────────────────────────────────
+document.getElementById("globalNotes").addEventListener("input",e=>{
+  S.notes=e.target.value;clearTimeout(saveTimer);saveTimer=setTimeout(autoSave,600);
+});
+document.getElementById("editFscore").addEventListener("click",()=>{
+  const v=prompt("Enter current F-Score (0–100):",S.fscore||"");
+  if(v!==null&&!isNaN(parseInt(v))){S.fscore=parseInt(v);autoSave();updateMetrics();showToast("F-Score updated ✓");}
+});
+document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key==="s"){e.preventDefault();saveAll();}});
+
+function showToast(msg){
+  const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),2200);
+}
+function setSyncState(state){
+  const dot=document.getElementById("syncDot"),lbl=document.getElementById("syncLabel");
+  const map={live:["live",IS_CONNECTED?"Live · Google Sheets":"Saved locally"],saving:["saving","Syncing…"],err:["err","Sync error"]};
+  const[cls,text]=map[state]||["",""];
+  dot.className="dot "+cls;lbl.textContent=text;
+}
+
+load();
+setSyncState("live");
+</script>
+</body>
+</html>
