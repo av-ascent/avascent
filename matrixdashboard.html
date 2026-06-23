@@ -1405,6 +1405,17 @@ function makeDraggable(el,note){
   el.addEventListener("touchstart",onStart,{passive:false});
 }
 
+  fetch("https://script.google.com/macros/s/AKfycbyksk7Y7_vg4y7cGR-p92bl3Iw_RLMtF6y1mmrhXs61Ekb5zcC2hDt7vRml-OWn75qj/exec", {
+  method: "POST",
+  body: JSON.stringify({
+    name: name,
+    company: company,
+    email: email,
+    phone: phone,
+    stage: stage
+  })
+});
+
 function ensureBoardHeight(){
   const board=document.getElementById("stickyBoard");if(!board)return;
   const maxY=Math.max(...S.stickies.map(s=>s.y+240),window.innerHeight-120);
