@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AV Ascent · LeadGen Engine</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&display=swap');
+
+  :root {
+    --ink:     #1a1a2e;
+    --gold:    #c9a84c;
+    --gold-lt: #e8d5a3;
+    --cream:   #faf8f3;
+    --paper:   #f3efe6;
+    --smoke:   #e8e4dc;
+    --muted:   #7a7268;
+    --green:   #2d6a4f;
+    --red:     #8b2a2a;
+    --blue:    #1a3a5c;
+    --radius:  8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--ink);
+    color: var(--cream);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, #0d0d1f 0%, #1a1a2e 60%, #12122a 100%);
+    border-bottom: 1px solid rgba(201,168,76,0.25);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 14px;
+  }
+  .monogram {
+    width: 40px; height: 40px;
+    background: var(--gold);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px; color: var(--ink); font-weight: 400;
+    letter-spacing: -1px;
+  }
+  .brand-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px; color: var(--cream);
+    letter-spacing: 0.02em;
+  }
+  .brand-sub {
+    font-size: 10px; color: var(--gold); letter-spacing: 0.12em;
+    text-transform: uppercase; margin-top: 1px;
+  }
+  .header-right { display: flex; align-items: center; gap: 16px; }
+  .status-pill {
+    font-size: 11px; padding: 4px 12px; border-radius: 20px;
+    border: 1px solid rgba(201,168,76,0.3);
+    color: var(--gold-lt); letter-spacing: 0.06em;
+  }
+  #sync-status {
+    font-size: 11px; color: var(--muted);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+  .dot.active { background: #4ade80; box-shadow: 0 0 6px #4ade80; }
+
+  /* ── LAYOUT ── */
+  .app { display: grid; grid-template-columns: 280px 1fr; min-height: calc(100vh - 61px); }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    background: #12122a;
+    border-right: 1px solid rgba(201,168,76,0.12);
+    padding: 24px 0;
+    overflow-y: auto;
+  }
+  .sidebar-section { padding: 0 20px; margin-bottom: 28px; }
+  .sidebar-label {
+    font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 12px; font-weight: 600;
+  }
+
+  .form-group { margin-bottom: 14px; }
+  .form-group label {
+    display: block; font-size: 11px; color: var(--muted);
+    margin-bottom: 5px; letter-spacing: 0.04em;
+  }
+  .form-group select, .form-group input {
+    width: 100%; background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--cream); border-radius: var(--radius);
+    padding: 8px 10px; font-size: 12px; font-family: 'Inter', sans-serif;
+    outline: none; transition: border 0.2s;
+  }
+  .form-group select:focus, .form-group input:focus {
+    border-color: var(--gold);
+  }
+  .form-group select option { background: #1a1a2e; }
+
+  .btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 16px; border-radius: var(--radius);
+    font-size: 12px; font-family: 'Inter', sans-serif;
+    font-weight: 600; cursor: pointer; border: none;
+    transition: all 0.2s; letter-spacing: 0.04em;
+    width: 100%;
+  }
+  .btn-gold {
+    background: var(--gold); color: var(--ink);
+  }
+  .btn-gold:hover { background: #d4b05a; transform: translateY(-1px); }
+  .btn-gold:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .btn-outline {
+    background: transparent; color: var(--gold);
+    border: 1px solid rgba(201,168,76,0.4);
+    margin-top: 8px;
+  }
+  .btn-outline:hover { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+  .btn-green {
+    background: var(--green); color: #fff;
+    margin-top: 8px;
+  }
+  .btn-green:hover { background: #3a8a65; }
+  .btn-green:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .city-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .city-tag {
+    font-size: 10px; padding: 3px 8px; border-radius: 12px;
+    background: rgba(201,168,76,0.12); color: var(--gold-lt);
+    border: 1px solid rgba(201,168,76,0.2);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .city-tag:hover, .city-tag.active { background: rgba(201,168,76,0.25); border-color: var(--gold); }
+
+  .divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 4px 0; }
+
+  /* CRM CONFIG */
+  .crm-config { padding: 16px 20px; background: rgba(201,168,76,0.06); margin: 0 8px; border-radius: var(--radius); border: 1px solid rgba(201,168,76,0.15); }
+  .crm-config-title { font-size: 10px; color: var(--gold); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; }
+
+  /* ── MAIN ── */
+  .main { display: flex; flex-direction: column; overflow: hidden; }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.02);
+  }
+  .stat {
+    padding: 20px 24px;
+    border-right: 1px solid rgba(255,255,255,0.06);
+  }
+  .stat:last-child { border-right: none; }
+  .stat-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px; color: var(--cream); line-height: 1;
+  }
+  .stat-value.gold { color: var(--gold); }
+  .stat-label { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 4px; }
+
+  /* PROGRESS */
+  .progress-bar-wrap {
+    padding: 12px 24px;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center; gap: 14px;
+  }
+  .progress-bar-track {
+    flex: 1; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%; background: var(--gold); border-radius: 2px;
+    transition: width 0.4s ease; width: 0%;
+  }
+  .progress-text { font-size: 11px; color: var(--muted); min-width: 120px; text-align: right; }
+
+  /* TABLE AREA */
+  .table-wrap { flex: 1; overflow: auto; padding: 24px; }
+
+  .table-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .table-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px; color: var(--cream);
+  }
+  .table-actions { display: flex; gap: 8px; }
+  .action-btn {
+    font-size: 11px; padding: 6px 14px; border-radius: 6px;
+    cursor: pointer; border: 1px solid rgba(255,255,255,0.12);
+    background: transparent; color: var(--cream);
+    font-family: 'Inter', sans-serif; transition: all 0.15s;
+  }
+  .action-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .action-btn.active { border-color: var(--gold); background: rgba(201,168,76,0.12); color: var(--gold); }
+
+  /* FILTER ROW */
+  .filter-row {
+    display: flex; gap: 10px; margin-bottom: 16px; align-items: center;
+  }
+  .filter-row input {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    color: var(--cream); border-radius: 6px; padding: 7px 12px;
+    font-size: 12px; font-family: 'Inter', sans-serif; outline: none;
+    flex: 1; transition: border 0.2s;
+  }
+  .filter-row input:focus { border-color: var(--gold); }
+  .filter-row select {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    color: var(--cream); border-radius: 6px; padding: 7px 10px;
+    font-size: 12px; font-family: 'Inter', sans-serif; outline: none;
+  }
+  .filter-row select option { background: #1a1a2e; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  thead th {
+    text-align: left; padding: 10px 12px;
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); font-weight: 500;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    white-space: nowrap;
+  }
+  tbody tr {
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: background 0.1s; cursor: pointer;
+  }
+  tbody tr:hover { background: rgba(201,168,76,0.05); }
+  tbody td { padding: 11px 12px; vertical-align: middle; }
+
+  .lead-name { font-weight: 500; color: var(--cream); }
+  .lead-type {
+    font-size: 10px; padding: 2px 8px; border-radius: 10px;
+    background: rgba(201,168,76,0.1); color: var(--gold-lt);
+    border: 1px solid rgba(201,168,76,0.2); white-space: nowrap;
+  }
+  .lead-address { color: var(--muted); font-size: 11px; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lead-phone { color: var(--cream); }
+  .lead-website a { color: #60a5fa; text-decoration: none; font-size: 11px; }
+  .lead-website a:hover { text-decoration: underline; }
+
+  .status-badge {
+    font-size: 10px; padding: 3px 8px; border-radius: 10px;
+    font-weight: 500; letter-spacing: 0.04em;
+  }
+  .status-new { background: rgba(26,58,92,0.6); color: #93c5fd; border: 1px solid rgba(147,197,253,0.2); }
+  .status-contacted { background: rgba(201,168,76,0.15); color: var(--gold-lt); border: 1px solid rgba(201,168,76,0.2); }
+  .status-qualified { background: rgba(45,106,79,0.3); color: #86efac; border: 1px solid rgba(134,239,172,0.2); }
+  .status-disqualified { background: rgba(139,42,42,0.3); color: #fca5a5; border: 1px solid rgba(252,165,165,0.2); }
+
+  .row-action {
+    background: transparent; border: 1px solid rgba(255,255,255,0.1);
+    color: var(--muted); padding: 4px 8px; border-radius: 4px;
+    cursor: pointer; font-size: 10px; font-family: 'Inter', sans-serif;
+    transition: all 0.15s;
+  }
+  .row-action:hover { border-color: var(--gold); color: var(--gold); }
+
+  .empty-state {
+    text-align: center; padding: 80px 0; color: var(--muted);
+  }
+  .empty-icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: rgba(255,255,255,0.3); margin-bottom: 8px; }
+  .empty-sub { font-size: 12px; }
+
+  /* LOG */
+  .log-panel {
+    background: #0a0a1a; border-top: 1px solid rgba(201,168,76,0.15);
+    padding: 12px 24px; max-height: 140px; overflow-y: auto;
+    font-family: 'Courier New', monospace; font-size: 11px;
+  }
+  .log-entry { padding: 2px 0; display: flex; gap: 12px; }
+  .log-time { color: var(--muted); min-width: 60px; }
+  .log-msg { color: #a0e4b0; }
+  .log-msg.warn { color: var(--gold-lt); }
+  .log-msg.error { color: #fca5a5; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200;
+    display: none; align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #1a1a2e; border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 12px; width: 480px; max-height: 80vh; overflow-y: auto;
+    padding: 28px;
+  }
+  .modal-title { font-family: 'DM Serif Display', serif; font-size: 20px; margin-bottom: 20px; }
+  .modal-field { margin-bottom: 14px; }
+  .modal-field label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 5px; }
+  .modal-field input, .modal-field select, .modal-field textarea {
+    width: 100%; background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12); border-radius: 6px;
+    color: var(--cream); padding: 8px 10px; font-size: 12px;
+    font-family: 'Inter', sans-serif; outline: none; resize: vertical;
+  }
+  .modal-field input:focus, .modal-field select:focus, .modal-field textarea:focus { border-color: var(--gold); }
+  .modal-field select option { background: #1a1a2e; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+  .modal-actions .btn { flex: 1; }
+  .btn-cancel { background: rgba(255,255,255,0.06); color: var(--muted); }
+  .btn-cancel:hover { background: rgba(255,255,255,0.1); }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: #12122a; border: 1px solid var(--gold);
+    color: var(--cream); padding: 12px 18px; border-radius: 8px;
+    font-size: 12px; z-index: 300; opacity: 0;
+    transform: translateY(10px); transition: all 0.3s;
+    max-width: 320px;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* Checkbox col */
+  .check-col input[type=checkbox] { accent-color: var(--gold); width: 14px; height: 14px; cursor: pointer; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.2); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="monogram">AV</div>
+    <div>
+      <div class="brand-name">AV Ascent</div>
+      <div class="brand-sub">LeadGen Engine</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div id="sync-status">
+      <div class="dot" id="sync-dot"></div>
+      <span id="sync-label">CRM not connected</span>
+    </div>
+    <div class="status-pill">OSM · Free Tier</div>
+  </div>
+</header>
+
+<div class="app">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Query Builder</div>
+
+      <div class="form-group">
+        <label>City / Region</label>
+        <input id="city-input" type="text" value="Karachi" placeholder="e.g. Karachi, Lahore, Dubai">
+      </div>
+      <div class="city-tags">
+        <span class="city-tag active" onclick="setCity(this,'Karachi')">Karachi</span>
+        <span class="city-tag" onclick="setCity(this,'Lahore')">Lahore</span>
+        <span class="city-tag" onclick="setCity(this,'Islamabad')">Islamabad</span>
+        <span class="city-tag" onclick="setCity(this,'Dubai')">Dubai</span>
+        <span class="city-tag" onclick="setCity(this,'Rawalpindi')">Rawalpindi</span>
+      </div>
+
+      <div class="form-group" style="margin-top:14px">
+        <label>Business Category</label>
+        <select id="category-select">
+          <optgroup label="Architecture / Construction">
+            <option value="office=architecture">Architecture Firms</option>
+            <option value="office=engineering">Engineering Firms</option>
+            <option value="office=construction_company">Construction Companies</option>
+            <option value="craft=construction">Contractors</option>
+          </optgroup>
+          <optgroup label="Real Estate">
+            <option value="office=real_estate">Real Estate Agencies</option>
+            <option value="shop=real_estate">Real Estate Shops</option>
+          </optgroup>
+          <optgroup label="Professional Services">
+            <option value="office=it">IT / Tech Companies</option>
+            <option value="office=marketing">Marketing Agencies</option>
+            <option value="office=accountant">Accounting Firms</option>
+            <option value="office=lawyer">Law Firms</option>
+            <option value="office=consulting">Consulting Firms</option>
+          </optgroup>
+          <optgroup label="Hospitality / Healthcare">
+            <option value="tourism=hotel">Hotels</option>
+            <option value="amenity=hospital">Hospitals</option>
+            <option value="amenity=clinic">Clinics</option>
+          </optgroup>
+          <optgroup label="Education">
+            <option value="amenity=school">Schools</option>
+            <option value="amenity=university">Universities</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Max Results</label>
+        <select id="limit-select">
+          <option value="200">200 leads</option>
+          <option value="500" selected>500 leads</option>
+          <option value="1000">1,000 leads</option>
+          <option value="2000">2,000 leads</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Radius (km from city center)</label>
+        <select id="radius-select">
+          <option value="10">10 km</option>
+          <option value="25" selected>25 km</option>
+          <option value="50">50 km</option>
+          <option value="100">100 km</option>
+        </select>
+      </div>
+
+      <button class="btn btn-gold" id="fetch-btn" onclick="fetchLeads()">
+        ⚡ Fetch Leads
+      </button>
+      <button class="btn btn-outline" onclick="fetchLeads(true)">
+        + Append to Existing
+      </button>
+    </div>
+
+    <hr class="divider">
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">CRM Sync</div>
+      <div class="crm-config">
+        <div class="crm-config-title">Google Sheets Apps Script</div>
+        <div class="form-group">
+          <label>Web App URL</label>
+          <input id="apps-script-url" type="text"
+            placeholder="https://script.google.com/macros/s/..."
+            value="">
+        </div>
+        <button class="btn btn-green" id="sync-btn" onclick="syncToCRM()" disabled>
+          ↑ Push to CRM
+        </button>
+        <button class="btn btn-outline" onclick="testCRMConnection()" style="margin-top:6px;">
+          Test Connection
+        </button>
+      </div>
+    </div>
+
+    <hr class="divider" style="margin:12px 0">
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Export</div>
+      <button class="btn btn-outline" onclick="exportCSV()">↓ Export CSV</button>
+      <button class="btn btn-outline" onclick="exportJSON()" style="margin-top:6px">↓ Export JSON</button>
+    </div>
+
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <div class="main">
+
+    <!-- STATS -->
+    <div class="stats-bar">
+      <div class="stat">
+        <div class="stat-value gold" id="stat-total">0</div>
+        <div class="stat-label">Leads Fetched</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="stat-with-phone">0</div>
+        <div class="stat-label">With Phone</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="stat-with-web">0</div>
+        <div class="stat-label">With Website</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="stat-synced">0</div>
+        <div class="stat-label">Synced to CRM</div>
+      </div>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progress-fill"></div>
+      </div>
+      <div class="progress-text" id="progress-text">Ready to fetch</div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-wrap">
+      <div class="table-header">
+        <div class="table-title">Lead Pipeline</div>
+        <div class="table-actions">
+          <button class="action-btn" id="btn-filter-all" onclick="filterStatus('all')" style="border-color:rgba(201,168,76,0.4);color:var(--gold)">All</button>
+          <button class="action-btn" onclick="filterStatus('New')">New</button>
+          <button class="action-btn" onclick="filterStatus('Contacted')">Contacted</button>
+          <button class="action-btn" onclick="filterStatus('Qualified')">Qualified</button>
+          <button class="action-btn" onclick="selectAll()">☐ Select All</button>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <input type="text" id="search-input" placeholder="Search by name, address, phone…" oninput="renderTable()">
+        <select id="type-filter" onchange="renderTable()">
+          <option value="">All Types</option>
+        </select>
+        <select id="city-filter" onchange="renderTable()">
+          <option value="">All Cities</option>
+        </select>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th class="check-col" style="width:36px"><input type="checkbox" id="master-check" onchange="toggleAllChecks(this)"></th>
+            <th>Business Name</th>
+            <th>Type</th>
+            <th>Address</th>
+            <th>Phone</th>
+            <th>Website</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="leads-tbody"></tbody>
+      </table>
+
+      <div id="empty-state" class="empty-state">
+        <div class="empty-icon">🗺️</div>
+        <div class="empty-title">No leads yet</div>
+        <div class="empty-sub">Configure your query and click Fetch Leads to pull from OpenStreetMap</div>
+      </div>
+
+    </div>
+
+    <!-- LOG -->
+    <div class="log-panel" id="log-panel"></div>
+
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-title">Edit Lead</div>
+    <div class="modal-field">
+      <label>Business Name</label>
+      <input type="text" id="modal-name">
+    </div>
+    <div class="modal-field">
+      <label>Phone</label>
+      <input type="text" id="modal-phone">
+    </div>
+    <div class="modal-field">
+      <label>Email</label>
+      <input type="text" id="modal-email">
+    </div>
+    <div class="modal-field">
+      <label>Website</label>
+      <input type="text" id="modal-website">
+    </div>
+    <div class="modal-field">
+      <label>Notes</label>
+      <textarea id="modal-notes" rows="3"></textarea>
+    </div>
+    <div class="modal-field">
+      <label>Status</label>
+      <select id="modal-status">
+        <option>New</option>
+        <option>Contacted</option>
+        <option>Qualified</option>
+        <option>Disqualified</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-gold" onclick="saveModal()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════
+let leads = JSON.parse(localStorage.getItem('av_leads') || '[]');
+let filteredLeads = [];
+let currentEditIdx = null;
+let activeStatusFilter = 'all';
+let syncedCount = parseInt(localStorage.getItem('av_synced') || '0');
+
+// ═══════════════════════════════════════════════════════
+//  OSM / OVERPASS
+// ═══════════════════════════════════════════════════════
+const OVERPASS_ENDPOINTS = [
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.kumi.systems/api/interpreter',
+  'https://overpass.openstreetmap.fr/api/interpreter',
+];
+let endpointIdx = 0;
+
+function buildOverpassQuery(city, categoryKV, radius) {
+  const [key, val] = categoryKV.split('=');
+  const radiusM = radius * 1000;
+  return `
+[out:json][timeout:60];
+(
+  node["${key}"="${val}"](area.searchArea);
+  way["${key}"="${val}"](area.searchArea);
+  relation["${key}"="${val}"](area.searchArea);
+);
+out center ${parseInt(document.getElementById('limit-select').value)};
+  `.trim().replace('area.searchArea', `area.searchArea`).replace(
+    '[out:json][timeout:60];',
+    `[out:json][timeout:60];
+area["name"~"${city}",i]->.searchArea;`
+  );
+}
+
+async function fetchLeads(append = false) {
+  const city = document.getElementById('city-input').value.trim();
+  const category = document.getElementById('category-select').value;
+  const radius = document.getElementById('radius-select').value;
+  const limit = document.getElementById('limit-select').value;
+
+  if (!city) { showToast('Please enter a city name'); return; }
+
+  const btn = document.getElementById('fetch-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Fetching…';
+  setProgress(5, `Connecting to OpenStreetMap…`);
+  log(`Querying ${category} in ${city} (radius ${radius}km, max ${limit})…`);
+
+  const [key, val] = category.split('=');
+
+  // Build proper area + radius query
+  const query = `[out:json][timeout:90];
+area["name"~"${city}",i]->.searchArea;
+(
+  node["${key}"="${val}"](area.searchArea);
+  way["${key}"="${val}"](area.searchArea);
+  relation["${key}"="${val}"](area.searchArea);
+);
+out center ${limit};`;
+
+  let data = null;
+  for (let i = 0; i < OVERPASS_ENDPOINTS.length; i++) {
+    const ep = OVERPASS_ENDPOINTS[(endpointIdx + i) % OVERPASS_ENDPOINTS.length];
+    try {
+      setProgress(20 + i * 15, `Trying endpoint ${i + 1}/${OVERPASS_ENDPOINTS.length}…`);
+      log(`→ ${ep}`);
+      const resp = await fetch(ep, {
+        method: 'POST',
+        body: 'data=' + encodeURIComponent(query),
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      data = await resp.json();
+      endpointIdx = (endpointIdx + i) % OVERPASS_ENDPOINTS.length;
+      break;
+    } catch (e) {
+      log(`✗ Endpoint failed: ${e.message}`, 'warn');
+    }
+  }
+
+  if (!data || !data.elements) {
+    log('All endpoints failed. Try again in a moment or reduce scope.', 'error');
+    setProgress(0, 'Fetch failed');
+    btn.disabled = false; btn.textContent = '⚡ Fetch Leads';
+    showToast('Fetch failed — Overpass API busy. Retry in 30s.');
+    return;
+  }
+
+  setProgress(70, `Processing ${data.elements.length} raw results…`);
+  log(`✓ Got ${data.elements.length} elements from OSM`);
+
+  const newLeads = data.elements.map(el => {
+    const tags = el.tags || {};
+    const lat = el.lat || el.center?.lat;
+    const lon = el.lon || el.center?.lon;
+    return {
+      id: `osm_${el.type}_${el.id}`,
+      name:    tags.name || tags['name:en'] || 'Unnamed',
+      type:    formatType(category),
+      city:    city,
+      address: buildAddress(tags),
+      phone:   tags.phone || tags['contact:phone'] || tags['contact:mobile'] || '',
+      website: cleanUrl(tags.website || tags['contact:website'] || tags.url || ''),
+      email:   tags.email || tags['contact:email'] || '',
+      lat, lon,
+      status:  'New',
+      notes:   '',
+      fetchedAt: new Date().toISOString(),
+      synced:  false,
+    };
+  }).filter(l => l.name !== 'Unnamed' || l.phone || l.website);
+
+  // Deduplicate
+  const existingIds = new Set((append ? leads : []).map(l => l.id));
+  const uniqueNew = newLeads.filter(l => !existingIds.has(l.id));
+
+  leads = append ? [...leads, ...uniqueNew] : uniqueNew;
+  saveLeads();
+  setProgress(100, `Done — ${uniqueNew.length} leads added`);
+  log(`✓ ${uniqueNew.length} unique leads added (${newLeads.length - uniqueNew.length} duplicates skipped)`);
+  updateStats();
+  renderTable();
+  updateFilters();
+
+  btn.disabled = false; btn.textContent = '⚡ Fetch Leads';
+  document.getElementById('sync-btn').disabled = leads.length === 0;
+  showToast(`✓ ${uniqueNew.length} leads fetched from OpenStreetMap`);
+}
+
+function buildAddress(tags) {
+  const parts = [
+    tags['addr:housenumber'],
+    tags['addr:street'],
+    tags['addr:suburb'],
+    tags['addr:city'] || tags['addr:town'],
+  ].filter(Boolean);
+  return parts.join(', ') || tags['addr:full'] || '';
+}
+
+function cleanUrl(url) {
+  if (!url) return '';
+  if (!url.startsWith('http')) url = 'https://' + url;
+  return url;
+}
+
+function formatType(kv) {
+  const map = {
+    'office=architecture': 'Architecture',
+    'office=engineering': 'Engineering',
+    'office=construction_company': 'Construction',
+    'craft=construction': 'Contractor',
+    'office=real_estate': 'Real Estate',
+    'shop=real_estate': 'Real Estate',
+    'office=it': 'IT / Tech',
+    'office=marketing': 'Marketing',
+    'office=accountant': 'Accounting',
+    'office=lawyer': 'Law Firm',
+    'office=consulting': 'Consulting',
+    'tourism=hotel': 'Hotel',
+    'amenity=hospital': 'Hospital',
+    'amenity=clinic': 'Clinic',
+    'amenity=school': 'School',
+    'amenity=university': 'University',
+  };
+  return map[kv] || kv;
+}
+
+// ═══════════════════════════════════════════════════════
+//  TABLE
+// ═══════════════════════════════════════════════════════
+function renderTable() {
+  const tbody = document.getElementById('leads-tbody');
+  const q = document.getElementById('search-input').value.toLowerCase();
+  const typeF = document.getElementById('type-filter').value;
+  const cityF = document.getElementById('city-filter').value;
+
+  filteredLeads = leads.filter(l => {
+    const matchQ = !q || l.name.toLowerCase().includes(q) || l.address.toLowerCase().includes(q) || l.phone.includes(q);
+    const matchType = !typeF || l.type === typeF;
+    const matchCity = !cityF || l.city === cityF;
+    const matchStatus = activeStatusFilter === 'all' || l.status === activeStatusFilter;
+    return matchQ && matchType && matchCity && matchStatus;
+  });
+
+  document.getElementById('empty-state').style.display = filteredLeads.length ? 'none' : 'block';
+  tbody.innerHTML = '';
+
+  filteredLeads.forEach((lead, fi) => {
+    const realIdx = leads.indexOf(lead);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="check-col"><input type="checkbox" class="row-check" data-idx="${realIdx}"></td>
+      <td><span class="lead-name">${esc(lead.name)}</span>${lead.synced ? ' <span style="color:var(--green);font-size:9px">✓</span>' : ''}</td>
+      <td><span class="lead-type">${esc(lead.type)}</span></td>
+      <td><span class="lead-address" title="${esc(lead.address)}">${esc(lead.address) || '—'}</span></td>
+      <td class="lead-phone">${esc(lead.phone) || '—'}</td>
+      <td class="lead-website">${lead.website ? `<a href="${esc(lead.website)}" target="_blank" rel="noopener">↗ Visit</a>` : '—'}</td>
+      <td>
+        <select class="status-badge status-${lead.status.toLowerCase()}" data-idx="${realIdx}" onchange="changeStatus(this)">
+          <option ${lead.status==='New'?'selected':''}>New</option>
+          <option ${lead.status==='Contacted'?'selected':''}>Contacted</option>
+          <option ${lead.status==='Qualified'?'selected':''}>Qualified</option>
+          <option ${lead.status==='Disqualified'?'selected':''}>Disqualified</option>
+        </select>
+      </td>
+      <td>
+        <button class="row-action" onclick="openModal(${realIdx})">Edit</button>
+        <button class="row-action" onclick="deleteLead(${realIdx})" style="margin-left:4px">Del</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function changeStatus(sel) {
+  const idx = parseInt(sel.dataset.idx);
+  leads[idx].status = sel.value;
+  sel.className = `status-badge status-${sel.value.toLowerCase()}`;
+  saveLeads(); updateStats();
+}
+
+function filterStatus(s) {
+  activeStatusFilter = s;
+  renderTable();
+}
+
+function selectAll() {
+  const mc = document.getElementById('master-check');
+  mc.checked = !mc.checked;
+  toggleAllChecks(mc);
+}
+function toggleAllChecks(cb) {
+  document.querySelectorAll('.row-check').forEach(c => c.checked = cb.checked);
+}
+
+function deleteLead(idx) {
+  leads.splice(idx, 1);
+  saveLeads(); updateStats(); renderTable(); updateFilters();
+}
+
+// ═══════════════════════════════════════════════════════
+//  MODAL
+// ═══════════════════════════════════════════════════════
+function openModal(idx) {
+  currentEditIdx = idx;
+  const l = leads[idx];
+  document.getElementById('modal-name').value = l.name;
+  document.getElementById('modal-phone').value = l.phone;
+  document.getElementById('modal-email').value = l.email;
+  document.getElementById('modal-website').value = l.website;
+  document.getElementById('modal-notes').value = l.notes;
+  document.getElementById('modal-status').value = l.status;
+  document.getElementById('edit-modal').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('edit-modal').classList.remove('open');
+  currentEditIdx = null;
+}
+function saveModal() {
+  if (currentEditIdx === null) return;
+  const l = leads[currentEditIdx];
+  l.name    = document.getElementById('modal-name').value;
+  l.phone   = document.getElementById('modal-phone').value;
+  l.email   = document.getElementById('modal-email').value;
+  l.website = document.getElementById('modal-website').value;
+  l.notes   = document.getElementById('modal-notes').value;
+  l.status  = document.getElementById('modal-status').value;
+  saveLeads(); renderTable(); updateStats();
+  closeModal();
+  showToast('Lead updated');
+}
+
+// ═══════════════════════════════════════════════════════
+//  CRM SYNC (Google Apps Script)
+// ═══════════════════════════════════════════════════════
+async function testCRMConnection() {
+  const url = document.getElementById('apps-script-url').value.trim();
+  if (!url) { showToast('Paste your Apps Script Web App URL first'); return; }
+  try {
+    const resp = await fetch(url + '?action=ping');
+    const txt = await resp.text();
+    if (txt.includes('pong') || resp.ok) {
+      setSyncStatus(true, 'CRM connected');
+      showToast('✓ CRM connection successful!');
+      log('✓ Apps Script endpoint reachable');
+    } else {
+      throw new Error(txt);
+    }
+  } catch(e) {
+    setSyncStatus(false, 'Connection failed');
+    log(`CRM test failed: ${e.message}`, 'error');
+    showToast('Connection failed — check URL');
+  }
+}
+
+async function syncToCRM() {
+  const url = document.getElementById('apps-script-url').value.trim();
+  if (!url) { showToast('Paste your Apps Script Web App URL first'); return; }
+
+  // Get selected or all unsynced
+  const selected = [...document.querySelectorAll('.row-check:checked')].map(c => parseInt(c.dataset.idx));
+  const toSync = selected.length > 0
+    ? selected.map(i => leads[i])
+    : leads.filter(l => !l.synced);
+
+  if (toSync.length === 0) { showToast('No unsynced leads to push'); return; }
+
+  const btn = document.getElementById('sync-btn');
+  btn.disabled = true; btn.textContent = '⏳ Syncing…';
+  log(`Pushing ${toSync.length} leads to CRM…`);
+
+  try {
+    const resp = await fetch(url, {
+      method: 'POST',
+      mode: 'no-cors', // Apps Script requires no-cors
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'upsert', leads: toSync }),
+    });
+
+    // no-cors = opaque response, assume success
+    toSync.forEach(l => { l.synced = true; });
+    syncedCount += toSync.length;
+    localStorage.setItem('av_synced', syncedCount);
+    saveLeads();
+    updateStats();
+    renderTable();
+    setSyncStatus(true, `${syncedCount} leads synced`);
+    log(`✓ ${toSync.length} leads pushed to Google Sheets`);
+    showToast(`✓ ${toSync.length} leads synced to CRM`);
+  } catch(e) {
+    log(`Sync error: ${e.message}`, 'error');
+    showToast('Sync failed — check console');
+  }
+
+  btn.disabled = false; btn.textContent = '↑ Push to CRM';
+}
+
+// ═══════════════════════════════════════════════════════
+//  EXPORT
+// ═══════════════════════════════════════════════════════
+function exportCSV() {
+  if (!leads.length) { showToast('No leads to export'); return; }
+  const headers = ['Name','Type','City','Address','Phone','Email','Website','Status','Notes','Fetched At'];
+  const rows = leads.map(l => [
+    l.name, l.type, l.city, l.address, l.phone, l.email, l.website, l.status, l.notes, l.fetchedAt
+  ].map(v => `"${(v||'').replace(/"/g,'""')}"`).join(','));
+  const csv = [headers.join(','), ...rows].join('\n');
+  download('av_ascent_leads.csv', csv, 'text/csv');
+  log(`✓ Exported ${leads.length} leads to CSV`);
+}
+
+function exportJSON() {
+  download('av_ascent_leads.json', JSON.stringify(leads, null, 2), 'application/json');
+}
+
+function download(filename, content, type) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], { type }));
+  a.download = filename; a.click();
+}
+
+// ═══════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════
+function saveLeads() { localStorage.setItem('av_leads', JSON.stringify(leads)); }
+
+function updateStats() {
+  document.getElementById('stat-total').textContent = leads.length.toLocaleString();
+  document.getElementById('stat-with-phone').textContent = leads.filter(l => l.phone).length.toLocaleString();
+  document.getElementById('stat-with-web').textContent = leads.filter(l => l.website).length.toLocaleString();
+  document.getElementById('stat-synced').textContent = leads.filter(l => l.synced).length.toLocaleString();
+}
+
+function updateFilters() {
+  const types = [...new Set(leads.map(l => l.type))].sort();
+  const cities = [...new Set(leads.map(l => l.city))].sort();
+  const tf = document.getElementById('type-filter');
+  const cf = document.getElementById('city-filter');
+  tf.innerHTML = '<option value="">All Types</option>' + types.map(t => `<option>${t}</option>`).join('');
+  cf.innerHTML = '<option value="">All Cities</option>' + cities.map(c => `<option>${c}</option>`).join('');
+}
+
+function setProgress(pct, msg) {
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = msg;
+}
+
+function setSyncStatus(active, label) {
+  document.getElementById('sync-dot').className = 'dot' + (active ? ' active' : '');
+  document.getElementById('sync-label').textContent = label;
+}
+
+function setCity(el, city) {
+  document.querySelectorAll('.city-tag').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('city-input').value = city;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function log(msg, type = '') {
+  const panel = document.getElementById('log-panel');
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  const now = new Date();
+  const time = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+  entry.innerHTML = `<span class="log-time">${time}</span><span class="log-msg ${type}">${msg}</span>`;
+  panel.appendChild(entry);
+  panel.scrollTop = panel.scrollHeight;
+}
+
+function esc(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ═══════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════
+window.addEventListener('load', () => {
+  updateStats();
+  renderTable();
+  updateFilters();
+  if (leads.length) {
+    document.getElementById('sync-btn').disabled = false;
+    setProgress(100, `${leads.length} leads in memory`);
+    log(`Restored ${leads.length} leads from local storage`);
+  }
+
+  // Check if URL is saved
+  const savedUrl = localStorage.getItem('av_apps_script_url');
+  if (savedUrl) document.getElementById('apps-script-url').value = savedUrl;
+
+  // Save URL when typed
+  document.getElementById('apps-script-url').addEventListener('input', function() {
+    localStorage.setItem('av_apps_script_url', this.value);
+    document.getElementById('sync-btn').disabled = !this.value.trim() || !leads.length;
+  });
+
+  log('AV Ascent LeadGen Engine initialized. OSM + Overpass API ready.');
+});
+</script>
+</body>
+</html>
