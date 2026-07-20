@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AV ASCENT — Executive Friction Audit</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+:root{
+  --ink:#07090f;--navy:#0e1520;--navy2:#141e30;--panel:rgba(255,255,255,.032);
+  --gold:#b8965a;--gold2:#d4b07a;--goldhi:#e8c98a;
+  --red:#8b1c1c;--red2:#b02b2b;
+  --w:#ede8df;--w2:#c8c0b0;--w3:#8a8275;
+  --br:rgba(184,150,90,.18);--br2:rgba(255,255,255,.07);
+  --sans:'DM Sans',sans-serif;--serif:'Playfair Display',serif;--mono:'DM Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--ink);color:var(--w);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+::selection{background:var(--gold);color:var(--ink)}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--navy)}::-webkit-scrollbar-thumb{background:var(--gold)}
+
+/* SCREENS */
+.scr{display:none;min-height:100vh;flex-direction:column;animation:fadeIn .45s ease both}
+.scr.on{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* PARTICLES */
+#pc{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.22}
+
+/* ─── SCREEN 0 ENTRY ─── */
+#s0{align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden}
+.s0-photo{position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1600&q=80') center/cover;filter:brightness(.14) saturate(.4);transform:scale(1.04);animation:drift 22s ease-in-out infinite alternate}
+@keyframes drift{from{transform:scale(1.04) translate(0,0)}to{transform:scale(1.07) translate(-1%,.5%)}}
+.s0-veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,9,15,.3) 0%,rgba(7,9,15,.6) 55%,var(--ink) 100%)}
+.s0-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(184,150,90,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(184,150,90,.025) 1px,transparent 1px);background-size:54px 54px}
+.s0-cnt{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:2rem;padding:3rem 2rem;max-width:760px}
+.s0-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);opacity:0;animation:up .6s .3s both;display:flex;align-items:center;gap:12px}
+.s0-eyebrow span{width:32px;height:1px;background:var(--gold);opacity:.5;display:block}
+.s0-brand{opacity:0;animation:up .6s .5s both}
+.s0-name{font-family:var(--serif);font-size:clamp(52px,9vw,100px);font-weight:400;line-height:.92;color:var(--w);letter-spacing:.02em}
+.s0-name em{color:var(--gold);font-style:normal}
+.s0-tagline{font-family:var(--mono);font-size:10px;letter-spacing:.38em;text-transform:uppercase;color:var(--w3);margin-top:8px}
+.s0-rule{width:1px;height:48px;background:linear-gradient(var(--gold),transparent);opacity:0;animation:up .6s .7s both}
+.s0-headline{font-family:var(--serif);font-size:clamp(18px,2.8vw,30px);font-weight:400;font-style:italic;color:var(--w2);line-height:1.45;max-width:580px;opacity:0;animation:up .6s .9s both}
+.s0-body{font-size:13px;font-weight:300;color:var(--w3);line-height:1.85;max-width:440px;opacity:0;animation:up .6s 1.1s both}
+.s0-cta{opacity:0;animation:up .6s 1.3s both;display:flex;flex-direction:column;align-items:center;gap:10px}
+.btn-enter{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink);background:var(--gold);border:none;padding:14px 48px;cursor:pointer;position:relative;overflow:hidden;transition:all .3s}
+.btn-enter::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);transform:translateX(-100%);transition:.5s}
+.btn-enter:hover{background:var(--gold2);transform:translateY(-2px);box-shadow:0 8px 30px rgba(184,150,90,.25)}
+.btn-enter:hover::after{transform:translateX(100%)}
+.s0-note{font-family:var(--mono);font-size:10px;color:var(--w3);letter-spacing:.08em}
+.corner-mark{position:absolute;width:20px;height:20px}
+.corner-mark svg{width:100%;height:100%}
+.cm-tl{top:20px;left:20px}.cm-tr{top:20px;right:20px}.cm-bl{bottom:20px;left:20px}.cm-br{bottom:20px;right:20px}
+@keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── APP BAR ─── */
+.appbar{position:sticky;top:0;z-index:100;background:rgba(7,9,15,.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--br);padding:.7rem 2rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.bar-brand{font-family:var(--serif);font-size:17px;font-weight:400;color:var(--w);letter-spacing:.03em}
+.bar-brand em{color:var(--gold);font-style:italic}
+.bar-label{font-family:var(--mono);font-size:10px;color:var(--w3);letter-spacing:.14em;text-transform:uppercase}
+.bar-dots{display:flex;gap:5px}
+.bd{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);transition:all .3s}
+.bd.done{background:var(--gold);border-color:var(--gold)}
+.bd.now{background:var(--goldhi);border-color:var(--goldhi);box-shadow:0 0 6px rgba(184,150,90,.5)}
+
+/* ─── PHASE SHELL ─── */
+.phase-shell{flex:1;position:relative;overflow:hidden}
+.side-photo{position:absolute;right:0;top:0;bottom:0;width:34%;background-size:cover;background-position:center;opacity:.13;mask-image:linear-gradient(to left,rgba(0,0,0,.6),transparent);-webkit-mask-image:linear-gradient(to left,rgba(0,0,0,.6),transparent)}
+.phase-body{max-width:1060px;margin:0 auto;padding:2.5rem 2rem 2rem;position:relative;z-index:2}
+
+/* PHASE TITLE */
+.phase-head{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--br2)}
+.ph-badge{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:8px;margin-bottom:.6rem}
+.ph-badge::after{content:'';width:32px;height:1px;background:var(--gold);opacity:.4}
+.ph-title{font-family:var(--serif);font-size:clamp(30px,4.5vw,52px);font-weight:400;line-height:.95;color:var(--w);margin-bottom:.6rem}
+.ph-title em{color:var(--gold2);font-style:italic}
+.ph-sub{font-family:var(--serif);font-size:15px;font-style:italic;color:var(--w3);line-height:1.55;max-width:480px}
+
+/* ─── CLIENT FORM ─── */
+.form-layout{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start}
+.form-visual{background:url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80') center/cover;border-radius:2px;min-height:300px;position:relative;overflow:hidden}
+.form-visual::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(7,9,15,.55),rgba(14,21,32,.38))}
+.form-visual-text{position:absolute;bottom:0;left:0;right:0;padding:1.4rem;z-index:1}
+.fvt-q{font-family:var(--serif);font-size:17px;font-style:italic;color:var(--w);line-height:1.45}
+.fvt-a{font-family:var(--mono);font-size:10px;color:var(--gold);margin-top:.4rem;letter-spacing:.08em}
+.form-stack{display:flex;flex-direction:column;gap:1rem}
+.field{display:flex;flex-direction:column;gap:.4rem}
+.field label{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--w3)}
+.field input,.field select,.field textarea{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);padding:10px 13px;color:var(--w);font-family:var(--sans);font-size:13px;font-weight:300;outline:none;transition:border-color .2s,background .2s;width:100%;border-radius:1px}
+.field input::placeholder,.field textarea::placeholder{color:var(--w3);opacity:.5}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold);background:rgba(184,150,90,.04)}
+.field select option{background:var(--navy)}
+.field textarea{resize:vertical;min-height:66px;line-height:1.65}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+
+/* ─── DIAL ─── */
+.dial-panel{background:var(--panel);border:1px solid var(--br);padding:1.4rem;display:flex;align-items:center;gap:1.5rem;margin-bottom:1.2rem}
+.dial-ring{position:relative;flex-shrink:0}
+.dial-ring svg{width:108px;height:108px;transform:rotate(-90deg)}
+.dr-bg{fill:none;stroke:rgba(255,255,255,.06);stroke-width:7}
+.dr-fill{fill:none;stroke:var(--gold);stroke-width:7;stroke-linecap:round;stroke-dasharray:314;stroke-dashoffset:251;transition:stroke-dashoffset .4s ease,stroke .3s}
+.dial-num{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--serif);font-size:32px;font-weight:400;color:var(--gold);line-height:1;pointer-events:none;transition:color .3s}
+.dial-info{flex:1}
+.dial-title{font-family:var(--serif);font-size:18px;font-weight:400;color:var(--w);margin-bottom:3px}
+.dial-desc{font-family:var(--mono);font-size:10px;color:var(--w3);letter-spacing:.06em;margin-bottom:12px;line-height:1.6}
+.dial-slider{-webkit-appearance:none;width:100%;height:2px;border-radius:1px;outline:none;border:none;padding:0;cursor:pointer;background:rgba(255,255,255,.1)}
+.dial-slider::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--gold);border:3px solid var(--ink);cursor:pointer;box-shadow:0 0 8px rgba(184,150,90,.35);transition:transform .15s}
+.dial-slider::-webkit-slider-thumb:hover{transform:scale(1.2)}
+.dial-ticks{display:flex;justify-content:space-between;margin-top:5px}
+.dial-ticks span{font-family:var(--mono);font-size:9px;color:var(--w3);letter-spacing:.06em}
+
+/* SCORE GUIDE */
+.score-guide{border-left:2px solid var(--gold);padding:.7rem 1rem;background:rgba(184,150,90,.04);font-size:12px;color:var(--w3);line-height:1.75;margin-bottom:1.2rem}
+.score-guide strong{color:var(--gold2)}
+
+/* QUESTION CARDS */
+.q-cards{display:flex;flex-direction:column;gap:.75rem;margin-bottom:.75rem}
+.q-card{background:var(--panel);border:1px solid var(--br2);padding:1rem 1.2rem;position:relative;transition:border-color .2s}
+.q-card:hover{border-color:rgba(184,150,90,.2)}
+.q-card::before{content:attr(data-n);position:absolute;top:.9rem;right:1rem;font-family:var(--serif);font-size:24px;font-style:italic;color:rgba(255,255,255,.04);line-height:1}
+.q-badge{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem}
+.q-title{font-size:13px;font-weight:500;color:var(--w);margin-bottom:.5rem;line-height:1.4}
+.q-quote{font-family:var(--serif);font-size:14px;font-style:italic;color:var(--gold2);padding:.6rem .9rem;background:rgba(184,150,90,.06);margin-bottom:.7rem;line-height:1.55}
+.q-input{width:100%;background:transparent;border:none;border-top:1px solid rgba(255,255,255,.06);padding:.7rem 0 0;color:rgba(255,255,255,.55);font-family:var(--sans);font-size:12px;font-weight:300;outline:none;resize:none;min-height:46px;line-height:1.65}
+.notes-card{background:rgba(255,255,255,.015);border:1px dashed rgba(255,255,255,.07);padding:.9rem 1.1rem}
+.notes-card .q-badge{color:var(--w3)}
+
+/* DIAG LAYOUT */
+.diag-grid{display:grid;grid-template-columns:1fr 340px;gap:2rem;align-items:start}
+.diag-left{display:flex;flex-direction:column;gap:.75rem}
+.diag-right{display:flex;flex-direction:column;gap:.75rem;position:sticky;top:74px}
+.insight-card{overflow:hidden}
+.insight-img{height:180px;background-size:cover;background-position:center}
+.insight-body{background:rgba(14,21,32,.96);padding:1rem;border:1px solid var(--br);border-top:none}
+.insight-tag{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem}
+.insight-quote{font-family:var(--serif);font-size:15px;font-style:italic;color:var(--w2);line-height:1.55}
+.insight-attr{font-family:var(--mono);font-size:10px;color:var(--w3);margin-top:.5rem}
+.stat-list{display:flex;flex-direction:column;gap:.5rem}
+.stat-item{background:var(--panel);border:1px solid var(--br2);padding:.65rem 1rem;display:flex;align-items:center;justify-content:space-between}
+.stat-val{font-family:var(--serif);font-size:22px;font-weight:400;color:var(--gold)}
+.stat-label{font-family:var(--mono);font-size:10px;color:var(--w3);letter-spacing:.04em;max-width:150px;text-align:right;line-height:1.45}
+
+/* ─── F-SCORE SCREEN ─── */
+.fscore-layout{display:grid;grid-template-columns:1fr;gap:1.3rem;max-width:820px;margin:0 auto}
+.cf-label{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--w3);margin-bottom:.7rem}
+.cf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}
+.cf-card{border:1px solid rgba(255,255,255,.08);padding:.9rem;cursor:pointer;text-align:center;transition:all .2s;background:var(--panel)}
+.cf-card:hover{border-color:rgba(184,150,90,.3)}
+.cf-card.on{border-color:var(--gold);background:rgba(184,150,90,.06)}
+.cf-val{font-family:var(--serif);font-size:24px;color:var(--gold);margin-bottom:4px}
+.cf-desc{font-family:var(--mono);font-size:10px;color:var(--w3);line-height:1.5}
+.score-breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}
+.sb-box{background:var(--navy2);border:1px solid var(--br2);padding:1rem;text-align:center}
+.sb-var{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--w3);margin-bottom:.4rem}
+.sb-num{font-family:var(--serif);font-size:28px;font-weight:400;color:var(--w)}
+.sb-wt{font-family:var(--mono);font-size:10px;color:var(--w3);margin-top:2px}
+.formula-bar{background:var(--navy2);border:1px solid var(--br);padding:.85rem 1.2rem;font-family:var(--mono);font-size:13px;color:var(--gold);letter-spacing:.03em}
+.fscore-display{text-align:center;padding:2rem 0}
+.fs-number{font-family:var(--serif);font-size:clamp(72px,12vw,112px);font-weight:400;line-height:1;color:var(--gold)}
+.fs-zone-pill{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;padding:5px 18px;margin-top:.6rem}
+.z-low{background:rgba(26,122,74,.15);color:#4ecf8a;border:1px solid rgba(26,122,74,.3)}
+.z-high{background:rgba(184,150,90,.12);color:var(--gold);border:1px solid rgba(184,150,90,.3)}
+.z-crit{background:rgba(192,57,43,.12);color:#e74c3c;border:1px solid rgba(192,57,43,.28)}
+.z-fail{background:rgba(139,28,28,.18);color:#ff8080;border:1px solid rgba(192,57,43,.35)}
+
+/* ─── VERDICT ─── */
+#s6{align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden}
+.v-photo{position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=1600&q=80') center/cover;filter:brightness(.1) saturate(.3)}
+.v-veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,9,15,.35) 0%,rgba(7,9,15,.65) 60%,var(--ink) 100%)}
+.v-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:1.3rem;padding:3rem 2rem;max-width:700px}
+.v-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:12px}
+.v-eyebrow span{width:40px;height:1px;background:var(--gold);opacity:.4;display:block}
+.v-client{font-family:var(--serif);font-size:18px;font-style:italic;color:var(--w3)}
+.v-score{font-family:var(--serif);font-size:clamp(88px,15vw,155px);font-weight:400;line-height:.88;color:var(--w);opacity:0;transition:opacity .7s .2s}
+.v-score.show{opacity:1}
+.v-zone{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;padding:5px 18px;display:inline-block;opacity:0;transition:opacity .5s .7s}
+.v-zone.show{opacity:1}
+.v-desc{font-family:var(--serif);font-size:18px;font-style:italic;font-weight:400;color:var(--w2);line-height:1.5;max-width:500px;opacity:0;transition:opacity .5s 1s}
+.v-desc.show{opacity:1}
+.v-breakdown{display:flex;gap:1.8rem;opacity:0;transition:opacity .5s 1.3s}
+.v-breakdown.show{opacity:1}
+.vb-item{text-align:center}
+.vb-num{font-family:var(--serif);font-size:26px;font-weight:400;color:var(--gold)}
+.vb-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--w3);margin-top:2px}
+.v-impl{font-family:var(--serif);font-size:14px;font-style:italic;color:var(--w3);max-width:440px;text-align:center;opacity:0;transition:opacity .5s 1.6s}
+.v-impl.show{opacity:1}
+
+/* ─── MANDATE ─── */
+.mandate-grid{display:grid;grid-template-columns:1fr 1fr;gap:.85rem;margin-top:.5rem}
+.m-card{background:var(--panel);border:1px solid rgba(255,255,255,.08);padding:1.3rem;cursor:pointer;position:relative;overflow:hidden;transition:all .25s}
+.m-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .25s}
+.m-card:hover{border-color:rgba(184,150,90,.22);background:rgba(184,150,90,.03)}
+.m-card:hover::before,.m-card.sel::before{transform:scaleX(1)}
+.m-card.sel{border-color:var(--gold);background:rgba(184,150,90,.06)}
+.m-card.sel-r{border-color:var(--red2);background:rgba(176,43,43,.06)}
+.m-card.sel-r::before{background:var(--red2);transform:scaleX(1)}
+.m-label{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem}
+.m-label.rl{color:var(--red2)}
+.m-title{font-family:var(--serif);font-size:17px;font-weight:400;color:var(--w);margin-bottom:.3rem;line-height:1.2}
+.m-sub{font-family:var(--serif);font-size:13px;font-style:italic;color:var(--w3);margin-bottom:.8rem}
+.m-list{list-style:none;display:flex;flex-direction:column;gap:.3rem}
+.m-list li{font-family:var(--mono);font-size:11px;color:var(--w3);padding-left:14px;position:relative;line-height:1.55}
+.m-list li::before{content:'—';position:absolute;left:0;color:var(--gold);font-size:10px}
+.m-badge{position:absolute;top:.9rem;right:.9rem;font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;background:rgba(184,150,90,.1);color:var(--gold);padding:2px 8px;border:1px solid rgba(184,150,90,.22)}
+.m-badge.rb{background:rgba(176,43,43,.1);color:var(--red2);border-color:rgba(176,43,43,.22)}
+
+/* ─── BUTTONS ─── */
+.btn-row{display:flex;gap:.75rem;margin-top:1.3rem;flex-wrap:wrap;align-items:center}
+.btn{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:10px 22px;cursor:pointer;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:var(--w);transition:all .2s}
+.btn:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.22)}
+.btn-g{background:var(--gold);color:var(--ink);border-color:var(--gold);font-weight:500}
+.btn-g:hover{background:var(--gold2);box-shadow:0 6px 22px rgba(184,150,90,.22);transform:translateY(-1px)}
+
+/* ─── AI GATE ─── */
+.ai-gate{display:none;position:fixed;inset:0;background:rgba(7,9,15,.96);z-index:1000;align-items:center;justify-content:center;flex-direction:column;gap:1.2rem;text-align:center}
+.ai-gate.on{display:flex}
+.ai-ring{width:52px;height:52px;border:1.5px solid rgba(184,150,90,.12);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ai-txt{font-family:var(--serif);font-size:16px;font-style:italic;color:var(--gold)}
+.ai-sub{font-family:var(--mono);font-size:10px;color:var(--w3);letter-spacing:.08em;margin-top:2px}
+
+/* ─── REPORT ─── */
+#s8{background:var(--ink)}
+.report-doc{background:var(--navy);border:1px solid var(--br);overflow:hidden;margin-bottom:1.5rem}
+
+/* Cover */
+.r-cover{min-height:420px;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;padding:2.5rem}
+.r-cov-photo{position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1200&q=80') center/cover;filter:brightness(.2) saturate(.4)}
+.r-cov-veil{position:absolute;inset:0;background:linear-gradient(135deg,rgba(7,9,15,.62),rgba(14,21,32,.42))}
+.r-cov-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(184,150,90,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(184,150,90,.022) 1px,transparent 1px);background-size:36px 36px}
+.r-cov-inner{position:relative;z-index:1}
+.r-cov-brand{position:absolute;top:1.6rem;right:1.8rem;font-family:var(--serif);font-size:13px;font-style:italic;color:var(--gold);text-align:right;z-index:2}
+.r-cov-eye{font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:8px;margin-bottom:1.3rem}
+.r-cov-eye::after{content:'';flex:1;height:1px;background:linear-gradient(to right,rgba(184,150,90,.32),transparent)}
+.r-cov-stack{margin-bottom:1.5rem}
+.r-cov-ghost{font-family:var(--serif);font-size:clamp(22px,4vw,46px);font-weight:400;line-height:.88;color:rgba(255,255,255,.06);letter-spacing:.02em}
+.r-cov-solid{font-family:var(--serif);font-size:clamp(30px,5.2vw,62px);font-weight:400;line-height:.88;color:var(--w);letter-spacing:.02em}
+.r-cov-meta{display:flex;gap:2rem;padding-top:1.3rem;border-top:1px solid rgba(255,255,255,.08);flex-wrap:wrap}
+.rcm-item label{font-family:var(--mono);font-size:9px;color:var(--w3);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:3px}
+.rcm-item span{font-family:var(--serif);font-size:15px;color:var(--w)}
+
+/* Report sections */
+.r-sec{padding:1.8rem 2.2rem;border-top:1px solid rgba(255,255,255,.05)}
+.r-sec:first-of-type{border-top:none}
+.r-sec-eye{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem;display:flex;align-items:center;gap:7px}
+.r-sec-eye::after{content:'';flex:1;height:1px;background:linear-gradient(to right,rgba(184,150,90,.22),transparent)}
+.r-sec-title{font-family:var(--serif);font-size:clamp(20px,3.2vw,34px);font-weight:400;color:var(--w);margin-bottom:.9rem;line-height:1.05}
+.r-sec-title em{color:rgba(255,255,255,.1);font-style:normal}
+.r-body{font-size:13px;font-weight:300;line-height:1.85;color:rgba(255,255,255,.65);white-space:pre-wrap}
+.r-body strong{color:var(--w);font-weight:400}
+.r-body em{color:var(--gold2);font-style:italic;font-family:var(--serif)}
+.r-2col{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+.score-pair{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin:1rem 0}
+.score-box{background:rgba(255,255,255,.03);border:1px solid var(--br2);padding:1.1rem}
+.sb-label{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--w3);margin-bottom:.4rem}
+.sb-big{font-family:var(--serif);font-size:46px;font-weight:400;color:var(--red2);line-height:1}
+.sb-text{font-family:var(--serif);font-size:16px;color:var(--w);line-height:1.25}
+.r-table{width:100%;border-collapse:collapse;margin:.85rem 0;font-size:12px}
+.r-table th{background:rgba(255,255,255,.04);color:var(--w3);font-family:var(--mono);font-size:9px;letter-spacing:.09em;text-transform:uppercase;padding:8px 12px;text-align:left;font-weight:400}
+.r-table td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.04);color:rgba(255,255,255,.65);vertical-align:top;font-weight:300}
+.r-table tr:last-child td{border-bottom:none}
+.r-score-n{font-family:var(--serif);font-size:20px;font-weight:400;color:var(--gold)}
+.tppe-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin:1rem 0}
+.tppe-card{background:rgba(255,255,255,.025);border:1px solid var(--br2);border-left:1px solid var(--gold);padding:1rem}
+.tppe-letter{font-family:var(--serif);font-size:34px;color:var(--gold);line-height:1;margin-bottom:2px}
+.tppe-name{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--w3);margin-bottom:.5rem}
+.tppe-items{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.55);line-height:1.75}
+.mandate-result{background:linear-gradient(135deg,rgba(139,28,28,.08),rgba(14,21,32,.35));border:1px solid rgba(176,43,43,.22);padding:1.2rem 1.4rem;margin:.85rem 0}
+.mr-title{font-family:var(--serif);font-size:19px;color:var(--w);margin-bottom:3px}
+.mr-sub{font-family:var(--mono);font-size:10px;color:var(--w3);letter-spacing:.06em}
+.r-editable{background:transparent;border:none;border-bottom:1px dashed rgba(255,255,255,.1);color:rgba(255,255,255,.65);font-family:var(--sans);font-size:13px;font-weight:300;line-height:1.85;width:100%;outline:none;resize:vertical;min-height:72px;padding:0 0 3px;transition:border-color .2s}
+.r-editable:focus{border-bottom-color:var(--gold);background:rgba(184,150,90,.02);padding:0 6px 3px}
+.red-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin:.85rem 0}
+.red-card{background:rgba(255,255,255,.02);border:1px solid var(--br2);padding:.9rem}
+.red-head{font-family:var(--serif);font-size:14px;color:var(--gold);margin-bottom:.5rem}
+.red-body{font-family:var(--mono);font-size:10px;color:var(--w3);line-height:1.75}
+.red-body strong{color:var(--w2);display:block;margin:5px 0 1px;font-weight:400}
+.state-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.85rem}
+.state-box{border:1px solid rgba(255,255,255,.07);padding:.9rem;font-family:var(--mono);font-size:11px;line-height:1.75}
+.state-box.current{border-color:rgba(192,57,43,.18);background:rgba(192,57,43,.04)}
+.state-box.target{border-color:rgba(26,122,74,.18);background:rgba(26,122,74,.04)}
+.state-label{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem}
+.state-label.tl{color:#4ecf8a}
+.state-items{color:var(--w3)}
+.transition-box{background:rgba(184,150,90,.04);border:1px solid var(--br);padding:1rem;font-size:13px;font-weight:300;color:var(--w2);line-height:1.85}
+.r-close{background:var(--navy2);padding:2rem 2.2rem;text-align:center}
+.r-close-q{font-family:var(--serif);font-size:clamp(16px,2.4vw,24px);font-style:italic;color:var(--w2);line-height:1.45;max-width:540px;margin:0 auto 1rem}
+.r-close-rule{width:48px;height:1px;background:var(--gold);margin:.7rem auto;opacity:.4}
+.r-close-sig{font-family:var(--mono);font-size:10px;color:var(--w3);letter-spacing:.06em}
+.r-close-sig strong{font-family:var(--serif);font-size:15px;color:var(--gold);display:block;margin-bottom:2px;font-weight:400}
+.r-footer{text-align:center;padding:.9rem;font-family:var(--mono);font-size:10px;color:var(--w3);letter-spacing:.05em;border-top:1px solid var(--br2)}
+.r-footer a{color:var(--gold);text-decoration:none}
+
+/* IMMEDIATE ACTIONS */
+.action-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-top:1rem}
+.action-item{background:rgba(255,255,255,.025);border:1px solid var(--br2);padding:.8rem}
+.action-day{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.3rem}
+.action-txt{font-family:var(--mono);font-size:11px;color:var(--w3);line-height:1.6}
+
+@media(max-width:768px){
+  .form-layout,.diag-grid,.mandate-grid,.tppe-grid,.score-pair,.r-2col,.red-grid,.state-grid,.cf-grid,.action-grid,.score-breakdown{grid-template-columns:1fr}
+  .diag-right,.side-photo,.form-visual{display:none}
+  .r-cov-meta{gap:.8rem}
+}
+@media print{
+  body{background:white}
+  .appbar,.btn-row,.ai-gate,.scr:not(#s8){display:none!important}
+  #s8{display:block!important}
+  .r-cov-photo{filter:brightness(.28)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<canvas id="pc"></canvas>
+<div class="ai-gate" id="aiGate">
+  <div class="ai-ring"></div>
+  <div class="ai-txt">Synthesising Your EFA Report</div>
+  <div class="ai-sub">Running the AV ASCENT framework through your session data</div>
+</div>
+
+<!-- ════ SGATE ACCESS ════ -->
+<div class="scr on" id="sGate">
+  <div class="s0-photo"></div><div class="s0-veil"></div><div class="s0-grid"></div>
+  <div class="corner-mark cm-tl"><svg viewBox="0 0 20 20"><path d="M20 0H0v20" fill="none" stroke="#b8965a" stroke-width="1" opacity=".45"/></svg></div>
+  <div class="corner-mark cm-tr"><svg viewBox="0 0 20 20"><path d="M0 0h20v20" fill="none" stroke="#b8965a" stroke-width="1" opacity=".45"/></svg></div>
+  <div class="corner-mark cm-bl"><svg viewBox="0 0 20 20"><path d="M0 0v20h20" fill="none" stroke="#b8965a" stroke-width="1" opacity=".45"/></svg></div>
+  <div class="corner-mark cm-br"><svg viewBox="0 0 20 20"><path d="M20 0v20H0" fill="none" stroke="#b8965a" stroke-width="1" opacity=".45"/></svg></div>
+  <div class="s0-cnt">
+    <div class="s0-eyebrow"><span></span>Restricted Access<span></span></div>
+    <div class="s0-brand">
+      <div class="s0-name">AV <em>ASCENT</em></div>
+      <div class="s0-tagline">EFA Universe &nbsp;·&nbsp; Private Portal</div>
+    </div>
+    <div class="s0-rule"></div>
+    <div class="s0-headline">This diagnostic environment is credentialed.</div>
+    <div class="s0-body">Enter the access code provided by AV ASCENT to continue into the Executive Friction Audit.</div>
+    <div class="s0-cta" style="width:100%;max-width:320px">
+      <input type="password" id="gatePass" placeholder="ACCESS CODE" autocomplete="off"
+        style="font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--w);background:rgba(255,255,255,.04);border:1px solid var(--br);padding:13px 16px;width:100%;text-align:center;outline:none">
+      <button class="btn-enter" onclick="checkGate()">UNLOCK →</button>
+      <div class="s0-note" id="gateErr" style="color:var(--red2);min-height:14px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ S0 ENTRY ════ -->
+<div class="scr" id="s0">
+  <div class="s0-photo"></div><div class="s0-veil"></div><div class="s0-grid"></div>
+  <div class="corner-mark cm-tl"><svg viewBox="0 0 20 20"><path d="M20 0H0v20" fill="none" stroke="#b8965a" stroke-width="1" opacity=".45"/></svg></div>
+  <div class="corner-mark cm-tr"><svg viewBox="0 0 20 20"><path d="M0 0h20v20" fill="none" stroke="#b8965a" stroke-width="1" opacity=".45"/></svg></div>
+  <div class="corner-mark cm-bl"><svg viewBox="0 0 20 20"><path d="M0 0v20h20" fill="none" stroke="#b8965a" stroke-width="1" opacity=".45"/></svg></div>
+  <div class="corner-mark cm-br"><svg viewBox="0 0 20 20"><path d="M20 0v20H0" fill="none" stroke="#b8965a" stroke-width="1" opacity=".45"/></svg></div>
+  <div class="s0-cnt">
+    <div class="s0-eyebrow"><span></span>Operational Architecture<span></span></div>
+    <div class="s0-brand">
+      <div class="s0-name">AV <em>ASCENT</em></div>
+      <div class="s0-tagline">System Architects &nbsp;·&nbsp; A.C.E. Sector</div>
+    </div>
+    <div class="s0-rule"></div>
+    <div class="s0-headline">"The true risk in scaling is not competition.<br>It is <em>Systemic Drift.</em>"</div>
+    <div class="s0-body">You are about to enter a precision diagnostic environment designed exclusively for A.C.E. sector leaders. In the next 90 minutes, we will measure the exact cost of friction in your organisation — and architect the path to Non-Resistant Scale.</div>
+    <div class="s0-cta">
+      <button class="btn-enter" onclick="go(0,1)">ENTER THE DIAGNOSTIC →</button>
+      <div class="s0-note">Confidential &nbsp;·&nbsp; 90-Minute Session &nbsp;·&nbsp; AV ASCENT Framework™</div>
+      <div class="s0-note" style="margin-top:10px"><a href="#" onclick="openDashboard();return false;" style="color:var(--gold2);text-decoration:none;letter-spacing:.14em">VIEW DASHBOARD →</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ S1 CLIENT PROFILE ════ -->
+<div class="scr" id="s1">
+  <div class="appbar"><div class="bar-brand">AV <em>Ascent</em></div><div class="bar-label">Session Setup</div><div class="bar-dots" id="d1"></div></div>
+  <div class="phase-shell">
+    <div class="phase-body">
+      <div class="phase-head">
+        <div class="ph-badge">Session Initialisation</div>
+        <div class="ph-title">Client <em>Profile</em></div>
+        <div class="ph-sub">Establish the context of this engagement before the diagnostic begins.</div>
+      </div>
+      <div class="form-layout">
+        <div class="form-stack">
+          <div class="frow"><div class="field"><label>Client / Firm Name</label><input type="text" id="f-client" placeholder="e.g. The Meridian Group"></div><div class="field"><label>Date</label><input type="date" id="f-date"></div></div>
+          <div class="frow"><div class="field"><label>Principal / CEO Name</label><input type="text" id="f-principal" placeholder="Founder or CEO name"></div><div class="field"><label>Sector</label><select id="f-sector"><option value="">Select sector</option><option>Architecture</option><option>Engineering</option><option>Construction</option><option>A.C.E. (Multi-vertical)</option><option>Other</option></select></div></div>
+          <div class="frow"><div class="field"><label>Team Size</label><select id="f-team"><option value="">Select range</option><option value="small">Under 10</option><option value="mid">10–50</option><option value="large">50+</option></select></div><div class="field"><label>Revenue Stage</label><select id="f-stage"><option value="">Select stage</option><option>Early-stage / Founder-led</option><option>Growth (scaling up)</option><option>Established / Plateaued</option><option>High-growth / Bottlenecked</option></select></div></div>
+          <div class="field"><label>Primary Challenge</label><textarea id="f-context" placeholder="e.g. 20-person structural engineering firm. Principal handles every proposal personally. Revenue growth has plateaued despite strong technical delivery."></textarea></div>
+          <div class="btn-row"><button class="btn" onclick="go(1,0)">← Back</button><button class="btn btn-g" onclick="go(1,2)">Begin Phase 1 — Pipeline Gaps →</button></div>
+        </div>
+        <div class="form-visual">
+          <div class="form-visual-text">
+            <div class="fvt-q">"Your greatest luxury as a Principal is Non-Delegable Time. We are here to give it back to you."</div>
+            <div class="fvt-a">— Areeba Viqar, System Architect &amp; Founder</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ S2 PIPELINE GAPS ════ -->
+<div class="scr" id="s2">
+  <div class="appbar"><div class="bar-brand">AV <em>Ascent</em></div><div class="bar-label">Phase 1 · Pipeline Gaps · 30 min</div><div class="bar-dots" id="d2"></div></div>
+  <div class="phase-shell">
+    <div class="side-photo" style="background-image:url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80')"></div>
+    <div class="phase-body">
+      <div class="phase-head">
+        <div class="ph-badge">Phase 1 of 3 · Weight ×5</div>
+        <div class="ph-title">Pipeline <em>Gaps</em></div>
+        <div class="ph-sub">Diagnosing where revenue is leaking through architectural failures in the BD system.</div>
+      </div>
+      <div class="diag-grid">
+        <div class="diag-left">
+          <div class="dial-panel">
+            <div class="dial-ring"><svg viewBox="0 0 100 100"><circle class="dr-bg" cx="50" cy="50" r="42"/><circle class="dr-fill" id="pg-c" cx="50" cy="50" r="42"/></svg><div class="dial-num" id="pg-n">—</div></div>
+            <div class="dial-info"><div class="dial-title">PG Score <span style="font-size:9px;color:var(--w3);font-weight:400">(auto)</span></div><div class="dial-desc">Rubric v2 — average of Q1–Q4 band scores below, rounded to nearest 0.5</div></div>
+          </div>
+          <div class="score-guide">Per Rubric v2: score each question strictly from its band table — no eyeballing. The PG score above is calculated automatically as you select a band for each question.</div>
+          <div class="q-cards">
+            <div class="q-card" data-n="I"><div class="q-badge">Q1 · The Lead Leak</div><div class="q-title">Proposal Velocity Under Pressure</div><div class="q-quote">"If 10 qualified prospects expressed interest today, how many would receive a formal, high-quality proposal within 48 hours — without you personally pushing it?"</div><textarea class="q-input" id="pg-q1" placeholder="Note the client's exact answer and live observations…"></textarea></div>
+            <div class="q-card" data-n="II"><div class="q-badge">Q2 · Standardisation</div><div class="q-title">Protocol vs. Gut Feeling</div><div class="q-quote">"Is there a written, non-negotiable protocol from first 'Hello' to 'Signed Contract' — or handled differently every time based on gut feeling?"</div><textarea class="q-input" id="pg-q2" placeholder="Note the client's answer…"></textarea></div>
+            <div class="q-card" data-n="III"><div class="q-badge">Q3 · Data Visibility</div><div class="q-title">The Dashboard Test</div><div class="q-quote">"Can you show me a dashboard right now displaying exactly where every lead is in the funnel — or does that information live in your head or scattered emails?"</div><textarea class="q-input" id="pg-q3" placeholder="Note the client's answer…"></textarea></div>
+            <div class="q-card" data-n="IV"><div class="q-badge">Q4 · Outreach ROI</div><div class="q-title">Machine vs. Personality</div><div class="q-quote">"What percentage of your revenue comes from a repeatable outreach machine versus personal networking and referrals?"</div><textarea class="q-input" id="pg-q4" placeholder="Note the client's answer…"></textarea></div>
+          </div>
+          <div class="notes-card"><div class="q-badge">Architect's Notes — Phase 1</div><textarea class="q-input" id="pg-n1" style="min-height:70px" placeholder="Summarise dominant patterns, red flags, and what is fundamentally driving the PG score…"></textarea></div>
+          <div class="btn-row"><button class="btn" onclick="go(2,1)">← Back</button><button class="btn" onclick="sendPhaseToWhatsApp('pg')">Send Answers to WhatsApp ↗</button><button class="btn btn-g" onclick="go(2,3)">Phase 2 — Decision Lag →</button></div>
+        </div>
+        <div class="diag-right">
+          <div class="insight-card"><div class="insight-img" style="background-image:url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&q=80')"></div><div class="insight-body"><div class="insight-tag">The Architecture Principle</div><div class="insight-quote">"Revenue is not a result of talent. It is a result of System Architecture. Every unprocessed lead is a structural failure — not a sales failure."</div><div class="insight-attr">— AV ASCENT EFA Framework™</div></div></div>
+          <div class="stat-list">
+            <div class="stat-item"><div><div class="stat-val">$2.4M</div></div><div class="stat-label">Average annual cost of pipeline leakage in mid-size A.C.E. firms</div></div>
+            <div class="stat-item"><div><div class="stat-val">67%</div></div><div class="stat-label">Of A.C.E. firm revenue comes from personal referrals, not systems</div></div>
+            <div class="stat-item"><div><div class="stat-val">×5</div></div><div class="stat-label">Pipeline Gaps carries the highest weight in the F-Score formula</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ S3 DECISION LAG ════ -->
+<div class="scr" id="s3">
+  <div class="appbar"><div class="bar-brand">AV <em>Ascent</em></div><div class="bar-label">Phase 2 · Decision Lag · 25 min</div><div class="bar-dots" id="d3"></div></div>
+  <div class="phase-shell">
+    <div class="side-photo" style="background-image:url('https://images.unsplash.com/photo-1434626881859-194d67b2b86f?w=800&q=80')"></div>
+    <div class="phase-body">
+      <div class="phase-head">
+        <div class="ph-badge">Phase 2 of 3 · Weight ×3</div>
+        <div class="ph-title">Decision <em>Lag</em></div>
+        <div class="ph-sub">Measuring the velocity of executive action and the true cost of the Consensus Trap.</div>
+      </div>
+      <div class="diag-grid">
+        <div class="diag-left">
+          <div class="dial-panel">
+            <div class="dial-ring"><svg viewBox="0 0 100 100"><circle class="dr-bg" cx="50" cy="50" r="42"/><circle class="dr-fill" id="dl-c" cx="50" cy="50" r="42"/></svg><div class="dial-num" id="dl-n">—</div></div>
+            <div class="dial-info"><div class="dial-title">DL Score <span style="font-size:9px;color:var(--w3);font-weight:400">(auto)</span></div><div class="dial-desc">Rubric v2 — average of Q1–Q4 band scores below, rounded to nearest 0.5</div></div>
+          </div>
+          <div class="score-guide">Per Rubric v2: score each question strictly from its band table — no eyeballing. The DL score above is calculated automatically as you select a band for each question.</div>
+          <div class="q-cards">
+            <div class="q-card" data-n="I"><div class="q-badge">Q1 · The Yes Velocity</div><div class="q-title">Speed of Strategic Decision</div><div class="q-quote">"When a high-value opportunity requires a strategic pivot or pricing exception, how many days does it take to get a final Go/No-Go — on average?"</div><textarea class="q-input" id="dl-q1" placeholder="Note the client's answer…"></textarea></div>
+            <div class="q-card" data-n="II"><div class="q-badge">Q2 · Authority Debt</div><div class="q-title">Stuck Decisions Inventory</div><div class="q-quote">"How many decisions are currently stuck on your desk because no one else has the authority or data to make them?"</div><textarea class="q-input" id="dl-q2" placeholder="Note the client's answer…"></textarea></div>
+            <div class="q-card" data-n="III"><div class="q-badge">Q3 · The Consensus Trap</div><div class="q-title">Speed vs. Comfort</div><div class="q-quote">"Do you prioritise speed of action or the comfort of total consensus? Give me an example of a decision delayed by more than a week recently."</div><textarea class="q-input" id="dl-q3" placeholder="Note the client's answer…"></textarea></div>
+            <div class="q-card" data-n="IV"><div class="q-badge">Q4 · Strategy vs. Reaction</div><div class="q-title">The 30-Day Bandwidth Audit</div><div class="q-quote">"In the last 30 days, what percentage of your strategic time was spent reacting to fires versus enacting the long-term vision?"</div><textarea class="q-input" id="dl-q4" placeholder="Note the client's answer…"></textarea></div>
+          </div>
+          <div class="notes-card"><div class="q-badge">Architect's Notes — Phase 2</div><textarea class="q-input" id="dl-n1" style="min-height:70px" placeholder="Summarise patterns and root cause driving the DL score…"></textarea></div>
+          <div class="btn-row"><button class="btn" onclick="go(3,2)">← Back</button><button class="btn" onclick="sendPhaseToWhatsApp('dl')">Send Answers to WhatsApp ↗</button><button class="btn btn-g" onclick="go(3,4)">Phase 3 — System Misalignment →</button></div>
+        </div>
+        <div class="diag-right">
+          <div class="insight-card"><div class="insight-img" style="background-image:url('https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&q=80')"></div><div class="insight-body"><div class="insight-tag">On Decision Velocity</div><div class="insight-quote">"The most expensive cost in any organisation is the compounding price of a decision that should have been made on Tuesday but was made on Friday."</div><div class="insight-attr">— AV ASCENT EFA Framework™</div></div></div>
+          <div class="stat-list">
+            <div class="stat-item"><div><div class="stat-val">5–7h</div></div><div class="stat-label">Average Principal hours lost per week to decision bottlenecking</div></div>
+            <div class="stat-item"><div><div class="stat-val">40%</div></div><div class="stat-label">Of A.C.E. principals spend less than 40% of time on pure strategy</div></div>
+            <div class="stat-item"><div><div class="stat-val">×3</div></div><div class="stat-label">Decision Lag weight in the F-Score — the most personal multiplier</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ S4 SYSTEM MISALIGNMENT ════ -->
+<div class="scr" id="s4">
+  <div class="appbar"><div class="bar-brand">AV <em>Ascent</em></div><div class="bar-label">Phase 3 · System Misalignment · 20 min</div><div class="bar-dots" id="d4"></div></div>
+  <div class="phase-shell">
+    <div class="side-photo" style="background-image:url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80')"></div>
+    <div class="phase-body">
+      <div class="phase-head">
+        <div class="ph-badge">Phase 3 of 3 · Weight ×2</div>
+        <div class="ph-title">System <em>Misalignment</em></div>
+        <div class="ph-sub">Identifying the structural disconnect between Vision, Infrastructure, and Execution.</div>
+      </div>
+      <div class="diag-grid">
+        <div class="diag-left">
+          <div class="dial-panel">
+            <div class="dial-ring"><svg viewBox="0 0 100 100"><circle class="dr-bg" cx="50" cy="50" r="42"/><circle class="dr-fill" id="sm-c" cx="50" cy="50" r="42"/></svg><div class="dial-num" id="sm-n">—</div></div>
+            <div class="dial-info"><div class="dial-title">SM Score <span style="font-size:9px;color:var(--w3);font-weight:400">(auto)</span></div><div class="dial-desc">Rubric v2 — average of Q1–Q4 band scores below, rounded to nearest 0.5</div></div>
+          </div>
+          <div class="score-guide">Per Rubric v2: score each question strictly from its band table — no eyeballing. The SM score above is calculated automatically as you select a band for each question.</div>
+          <div class="q-cards">
+            <div class="q-card" data-n="I"><div class="q-badge">Q1 · The Heroism Test</div><div class="q-title">14-Day Absence Test</div><div class="q-quote">"If you went completely offline for 14 days, would your BD system continue to generate and close leads — or would it come to a total standstill?"</div><textarea class="q-input" id="sm-q1" placeholder="Note the client's answer…"></textarea></div>
+            <div class="q-card" data-n="II"><div class="q-badge">Q2 · Tool Integrity</div><div class="q-title">Systems vs. Filing Cabinets</div><div class="q-quote">"Do your tools — CRM, ERP, Task Managers — actually enforce your strategy, or are they just digital filing cabinets where information goes to die?"</div><textarea class="q-input" id="sm-q2" placeholder="Note the client's answer…"></textarea></div>
+            <div class="q-card" data-n="III"><div class="q-badge">Q3 · The Delivery Gap</div><div class="q-title">Promise vs. Capacity</div><div class="q-quote">"How often does your sales team promise a solution your operational team struggles to deliver — because they weren't aligned on capacity or scope?"</div><textarea class="q-input" id="sm-q3" placeholder="Note the client's answer…"></textarea></div>
+            <div class="q-card" data-n="IV"><div class="q-badge">Q4 · The Leverage Check</div><div class="q-title">Calendar Audit</div><div class="q-quote">"Look at your calendar from last week. How many hours were spent on tasks a $20/hour assistant should have handled? Why are you still doing them?"</div><textarea class="q-input" id="sm-q4" placeholder="Note the client's answer…"></textarea></div>
+          </div>
+          <div class="notes-card"><div class="q-badge">Architect's Notes — Phase 3</div><textarea class="q-input" id="sm-n1" style="min-height:70px" placeholder="Summarise system coherence and what is driving the SM score…"></textarea></div>
+          <div class="btn-row"><button class="btn" onclick="go(4,3)">← Back</button><button class="btn" onclick="sendPhaseToWhatsApp('sm')">Send Answers to WhatsApp ↗</button><button class="btn btn-g" onclick="tryProceedToFScore()">Calculate F-Score →</button></div>
+        </div>
+        <div class="diag-right">
+          <div class="insight-card"><div class="insight-img" style="background-image:url('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&q=80')"></div><div class="insight-body"><div class="insight-tag">The Architect's Mandate</div><div class="insight-quote">"A firm that requires its founder's oxygen to breathe is not a business. It is a very expensive job. The difference between the two is System Architecture."</div><div class="insight-attr">— AV ASCENT EFA Framework™</div></div></div>
+          <div class="stat-list">
+            <div class="stat-item"><div><div class="stat-val">60%</div></div><div class="stat-label">Of critical-friction founders spend majority of time in Execution, not Architecture</div></div>
+            <div class="stat-item"><div><div class="stat-val">14d</div></div><div class="stat-label">The Heroism Test: how long your BD system runs without you</div></div>
+            <div class="stat-item"><div><div class="stat-val">×2</div></div><div class="stat-label">SM weight — the silent tax compounding across your entire operation</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ S5 F-SCORE ════ -->
+<div class="scr" id="s5">
+  <div class="appbar"><div class="bar-brand">AV <em>Ascent</em></div><div class="bar-label">Phase 4 · Synthesis · 15 min</div><div class="bar-dots" id="d5"></div></div>
+  <div class="phase-shell">
+    <div class="phase-body">
+      <div class="phase-head">
+        <div class="ph-badge">Synthesis · The Friction Score</div>
+        <div class="ph-title">Friction <em>Score</em></div>
+        <div class="ph-sub">Apply the Complexity Multiplier and lock in the diagnostic verdict.</div>
+      </div>
+      <div class="fscore-layout">
+        <div>
+          <div class="cf-label">Complexity Factor (C) — Select the correct multiplier for this organisation</div>
+          <div class="cf-grid">
+            <div class="cf-card on" id="c10" onclick="selC(1.0,this)"><div class="cf-val">× 1.0</div><div class="cf-desc">Single vertical · Team under 10 · Straightforward service</div></div>
+            <div class="cf-card" id="c15" onclick="selC(1.5,this)"><div class="cf-val">× 1.5</div><div class="cf-desc">Multi-vertical · Team 10–50 · Complex technical deliverables</div></div>
+            <div class="cf-card" id="c20" onclick="selC(2.0,this)"><div class="cf-val">× 2.0</div><div class="cf-desc">Regulated industry · 50+ staff · International operations</div></div>
+          </div>
+        </div>
+        <div class="score-breakdown" id="sb-row"></div>
+        <div class="formula-bar" id="f-bar">F-Score = [ (PG × 5) + (DL × 3) + (SM × 2) ] × C</div>
+        <div class="fscore-display"><div class="fs-number" id="fs-num">—</div><div id="fs-zone"></div></div>
+        <div class="btn-row" style="justify-content:center"><button class="btn" onclick="go(5,4)">← Revise Scores</button><button class="btn btn-g" onclick="go(5,6)">Reveal The Verdict →</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ S6 VERDICT ════ -->
+<div class="scr" id="s6">
+  <div class="v-photo"></div><div class="v-veil"></div><div class="s0-grid"></div>
+  <div class="v-content">
+    <div class="v-eyebrow"><span></span>EFA Diagnostic Verdict<span></span></div>
+    <div class="v-client" id="v-cl">—</div>
+    <div><div style="font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--w3);margin-bottom:5px">Your F-Score</div><div class="v-score" id="v-sc">—</div></div>
+    <div class="v-zone" id="v-zn">—</div>
+    <div class="v-desc" id="v-ds">—</div>
+    <div class="v-breakdown" id="v-bk"></div>
+    <div class="v-impl" id="v-im">—</div>
+    <div class="btn-row" style="justify-content:center;margin-top:.5rem"><button class="btn" onclick="go(6,5)">← Revise</button><button class="btn btn-g" onclick="go(6,7)">Select Your Mandate →</button></div>
+  </div>
+</div>
+
+<!-- ════ S7 MANDATE ════ -->
+<div class="scr" id="s7">
+  <div class="appbar"><div class="bar-brand">AV <em>Ascent</em></div><div class="bar-label">Mandate Selection</div><div class="bar-dots" id="d7"></div></div>
+  <div class="phase-shell">
+    <div class="phase-body">
+      <div class="phase-head">
+        <div class="ph-badge">The Prescription</div>
+        <div class="ph-title">Select Your <em>Mandate</em></div>
+        <div class="ph-sub">AV ASCENT does not offer ad-hoc services. Every engagement is a structured, non-negotiable System Mandate.</div>
+      </div>
+      <div style="background:rgba(184,150,90,.05);border:1px solid var(--br);padding:.9rem 1.1rem;font-family:var(--mono);font-size:11px;color:var(--w2);line-height:1.7;margin-bottom:1rem">Based on your F-Score of <strong id="m-score" style="color:var(--gold)">—</strong>, the mandate below is a structural requirement — not a preference.</div>
+      <div class="mandate-grid">
+        <div class="m-card" id="m1" onclick="selM('Mandate I — The Complete Blueprints (4–6 Weeks)',this,'g')"><div class="m-label">Mandate I</div><div class="m-title">The Complete Blueprints</div><div class="m-sub">4–6 Week Engagement</div><ul class="m-list"><li>Full BD System Blueprint installation</li><li>Friction Score diagnostic &amp; roadmap</li><li>Pipeline architecture &amp; qualification system</li><li>Authority asset library creation</li><li>Best for F-Score 31–60</li></ul></div>
+        <div class="m-card" id="m2" onclick="selM('Mandate II — The System Launchpad (3-Month Retainer)',this,'g')"><div class="m-badge">Most Chosen</div><div class="m-label">Mandate II</div><div class="m-title">The System Launchpad</div><div class="m-sub">3-Month Minimum Retainer</div><ul class="m-list"><li>Complete System Blueprint + installation</li><li>Leadership team training &amp; coaching</li><li>Ongoing governance &amp; accountability</li><li>Delivery Partner integration protocol</li><li>Best for F-Score 61–80</li></ul></div>
+        <div class="m-card" id="m3" onclick="selM('Mandate III — The Ecosystem (6-Month Retainer)',this,'g')"><div class="m-label">Mandate III</div><div class="m-title">The Ecosystem</div><div class="m-sub">6-Month Minimum Retainer</div><ul class="m-list"><li>Full-spectrum operational transformation</li><li>Fractional Chief Growth Architect embedded</li><li>Complete system installation across all verticals</li><li>Full principal extraction from execution</li><li>Best for F-Score 80+</li></ul></div>
+        <div class="m-card" id="m4" onclick="selM('Internal Mandate — System 2.0 Self-Execution (4–8 Weeks)',this,'r')"><div class="m-badge rb">Internal Track</div><div class="m-label rl">Internal Mandate</div><div class="m-title">System 2.0 Self-Execution</div><div class="m-sub">4–8 Week Internal Engineering Phase</div><ul class="m-list"><li>Internally executed by your leadership team</li><li>Blueprint Customisation Protocol provided</li><li>Process Automation: Friction Score Self-Assessment</li><li>Engine Delegation: Strategic Delivery Partner</li><li>For organisations ready to architect autonomously</li></ul></div>
+      </div>
+      <div class="btn-row"><button class="btn" onclick="go(7,6)">← Back</button><button class="btn btn-g" onclick="generateReport()">Generate Premium Report →</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ S8 REPORT ════ -->
+<div class="scr" id="s8">
+  <div class="appbar" id="r-bar"><div class="bar-brand">AV <em>Ascent</em></div><div class="bar-label" id="r-bar-lbl">EFA Report</div><div style="display:flex;gap:.6rem"><button class="btn" style="padding:7px 13px;font-size:10px" onclick="go(8,7)">← Revise</button><button class="btn" style="padding:7px 13px;font-size:10px" onclick="window.print()">Print / PDF ↓</button><button class="btn btn-g" id="waSendBtn" style="padding:7px 13px;font-size:10px" onclick="sendReportToWhatsApp()">Send to WhatsApp ↗</button></div></div>
+  <div class="phase-shell">
+    <div class="phase-body" style="max-width:920px">
+      <div class="report-doc" id="r-doc">
+        <!-- COVER -->
+        <div class="r-cover">
+          <div class="r-cov-photo"></div><div class="r-cov-veil"></div><div class="r-cov-grid"></div>
+          <div class="r-cov-brand">AV Ascent<br><span style="font-size:10px;font-weight:300;color:var(--w3)">System Architects</span></div>
+          <div class="r-cov-inner">
+            <div class="r-cov-eye">Executive Friction Audit (EFA) Report</div>
+            <div class="r-cov-stack">
+              <div class="r-cov-ghost">INTERNAL</div>
+              <div class="r-cov-ghost">EXECUTIVE</div>
+              <div class="r-cov-solid">FRICTION</div>
+              <div class="r-cov-solid">REPORT</div>
+              <div class="r-cov-ghost" style="font-size:clamp(15px,2.8vw,34px)">EFA DIAGNOSTIC</div>
+              <div class="r-cov-ghost" style="font-size:clamp(12px,2vw,24px)">BD SYSTEM AUDIT</div>
+            </div>
+            <div class="r-cov-meta">
+              <div class="rcm-item"><label>Client</label><span id="r-cl">—</span></div>
+              <div class="rcm-item"><label>Date</label><span id="r-dt">—</span></div>
+              <div class="rcm-item"><label>Principal</label><span id="r-pr">—</span></div>
+              <div class="rcm-item"><label>Sector</label><span id="r-sc">—</span></div>
+            </div>
+          </div>
+        </div>
+        <!-- WELCOME -->
+        <div class="r-sec">
+          <div class="r-sec-eye">The Architect's Edge</div>
+          <div class="r-sec-title">Welcome</div>
+          <div class="r-2col">
+            <div class="r-body">We treat business development not as marketing, but as <strong>System Architecture</strong>. There are many excellent builders, but only one Architect holds the original schematics.
+
+My firm, AV ASCENT, focuses exclusively on solving the most expensive problem faced by the top 1% of A.C.E. leadership: The inability to buy back time and guarantee predictable, high-ticket scale.
+
+If you are bottlenecked by your own success, my expertise is the only leverage that converts your high effort into non-resistant certainty.</div>
+            <div class="r-body">I don't advise; I <strong>mandate</strong> the structural change required for autonomous, leveraged growth.
+
+I am here to ensure that your firm's most valuable asset — your genius — is never again tied to a volatile, referral-based income stream.
+
+<em>"The true risk in scaling is Systemic Drift."</em>
+
+<strong>AV ASCENT exists to break the cycle.</strong></div>
+          </div>
+        </div>
+        <!-- SUMMARY -->
+        <div class="r-sec" style="background:rgba(14,21,32,.45)">
+          <div class="r-sec-eye">Executive Summary</div>
+          <div class="r-sec-title">The Diagnosis</div>
+          <div class="score-pair">
+            <div class="score-box"><div class="sb-label">F-Score (Friction Score)</div><div class="sb-big" id="r-fs">—</div><div style="font-family:var(--mono);font-size:10px;color:var(--w3);margin-top:3px" id="r-fr">—</div><div style="font-family:var(--mono);font-size:11px;font-weight:500;margin-top:6px" id="r-fz">—</div></div>
+            <div class="score-box"><div class="sb-label">Primary Leakage</div><div class="sb-text" id="r-pl">—</div><div style="font-family:var(--mono);font-size:10px;color:var(--w3);margin-top:7px;line-height:1.5">Time is the most expensive cost. Principal time is misallocated to execution instead of architecture.</div></div>
+          </div>
+          <div class="r-body" id="r-es" style="margin-top:.8rem">—</div>
+          <div style="margin-top:.8rem;padding:.85rem 1rem;background:rgba(255,255,255,.03);border:1px solid var(--br2)"><div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--w3);margin-bottom:4px">Mandate Level</div><div style="font-family:var(--serif);font-size:16px;color:var(--w)" id="r-ml">—</div></div>
+        </div>
+        <!-- METHODOLOGY -->
+        <div class="r-sec">
+          <div class="r-sec-eye">Part I — EFA Methodology</div>
+          <div class="r-sec-title">The F-Score <em style="font-family:var(--serif);font-style:italic;color:rgba(255,255,255,.12)">Variables</em></div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--w3);margin-bottom:.8rem;line-height:1.65">The following variables were scored based on live session responses, applying the AV ASCENT scoring rubric and the Founder's direct experience.</div>
+          <table class="r-table"><thead><tr><th>F-Score Variable</th><th>Systemic Definition</th><th>Observed Symptom</th><th style="text-align:center">Score</th></tr></thead><tbody id="r-tbl"></tbody></table>
+          <div style="margin-top:.8rem;padding:.85rem 1.1rem;background:var(--navy2);border:1px solid var(--br);font-family:var(--mono);font-size:12px;color:var(--gold);letter-spacing:.03em" id="r-formula">—</div>
+        </div>
+        <!-- FINDINGS -->
+        <div class="r-sec">
+          <div class="r-sec-eye">Part II — Audit Findings</div>
+          <div class="r-sec-title">The Blueprint <em style="font-family:var(--serif);font-style:italic;color:rgba(255,255,255,.1)">of Bottlenecks</em></div>
+          <textarea class="r-editable" id="r-findings" rows="10">—</textarea>
+        </div>
+        <!-- TPPE -->
+        <div class="r-sec" style="background:rgba(14,21,32,.35)">
+          <div class="r-sec-eye">Part III — Aligned Growth Model (TPPE)</div>
+          <div class="r-sec-title">The Prescribed <em style="font-family:var(--serif);font-style:italic;color:rgba(255,255,255,.1)">Mandate</em></div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--w3);margin-bottom:.8rem;line-height:1.65">The prescribed solution is a System Mandate focused on hardening the Delivery phase and automating the initial filter. This will permanently move the Principal from Executor to Pure Architect.</div>
+          <div class="tppe-grid">
+            <div class="tppe-card"><div class="tppe-letter">T</div><div class="tppe-name">Target — Hardening the Filter</div><div class="tppe-items">— Install Friction Score Self-Assessment Tool<br>— Develop Principal Pre-Commitment (PPC) hurdle<br>— Eliminate 80% of unaligned leads before Principal contact<br>— Elevate EFA price to attract certainty-buyers only</div></div>
+            <div class="tppe-card"><div class="tppe-letter">P</div><div class="tppe-name">Pitch — Foundation Asset Automation</div><div class="tppe-items">— Create modular System Blueprint Slide library<br>— Reduce pitch preparation from 5 hours to 30 minutes<br>— Eliminate customisation time from pitch phase entirely<br>— Enable partner to assemble client-specific decks</div></div>
+            <div class="tppe-card"><div class="tppe-letter">P</div><div class="tppe-name">Partnership — Scaling the Mandate</div><div class="tppe-items">— Codify 10-step Delivery Partner Onboarding Protocol<br>— Define KPIs for Mandate completion velocity<br>— Onboard first Strategic Delivery Partner<br>— Enable first 80% of installation without Principal</div></div>
+            <div class="tppe-card"><div class="tppe-letter">E</div><div class="tppe-name">Execution — Autonomous Operation</div><div class="tppe-items">— Create definitive Blueprint Customisation checklist<br>— Establish real-time Delivery Capacity Audit metric<br>— Monitor BD pipeline vs. installation capacity<br>— Principal at 100% Architecture, 0% Execution</div></div>
+          </div>
+        </div>
+        <!-- MANDATE -->
+        <div class="r-sec">
+          <div class="r-sec-eye">Part IV — The Mandate</div>
+          <div class="r-sec-title" id="r-mt">The Mandate</div>
+          <div class="mandate-result"><div class="mr-title" id="r-mr-name">—</div><div class="mr-sub" id="r-mr-sub">—</div></div>
+          <textarea class="r-editable" id="r-mandate" rows="8">—</textarea>
+        </div>
+        <!-- SCORE REDUCTION -->
+        <div class="r-sec" style="background:rgba(7,9,15,.3)">
+          <div class="r-sec-eye">Operational Blueprint — Score Reduction Guide</div>
+          <div class="r-sec-title">Guidelines to <em style="font-family:var(--serif);font-style:italic;color:rgba(255,255,255,.1)">Lower Your Score</em></div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--w3);margin-bottom:.8rem;line-height:1.65">These are not suggestions. They are architectural requirements for Non-Resistant Scale.</div>
+          <div class="red-grid">
+            <div class="red-card"><div class="red-head">↓ Reduce Pipeline Gaps</div><div class="red-body"><strong>1. Install a Qualification Gate</strong>Every lead must pass a 3-question digital filter before accessing the Principal's time.<br><br><strong>2. Codify the Proposal Protocol</strong>A written, non-negotiable process from first contact to signed contract — followed identically every time.<br><br><strong>3. Deploy a CRM Dashboard</strong>Every lead visible in one place. No lead lives in an inbox or in someone's memory.<br><br><strong>4. Build a Repeatable Outreach Machine</strong>Target: 60% system-generated revenue, 40% referral.</div></div>
+            <div class="red-card"><div class="red-head">↓ Reduce Decision Lag</div><div class="red-body"><strong>1. Create a Decision Authority Matrix</strong>Define which decisions require the Principal, which are delegated, and at what threshold.<br><br><strong>2. The 48-Hour Decision Protocol</strong>Every strategic decision has a 48-hour deadline. No commitment by day four = escalate to a decision.<br><br><strong>3. Distribute Data, Not Instructions</strong>Give your team the information required to decide without escalating. KPI dashboards are mandatory.<br><br><strong>4. Pre-approve Pricing Exceptions</strong>Define a pricing band within which the team operates without approval.</div></div>
+            <div class="red-card"><div class="red-head">↓ Reduce System Misalignment</div><div class="red-body"><strong>1. Implement an ERP / Odoo System</strong>Your tools must enforce your strategy — not store it. An ERP tracking delivery promises against capacity is non-negotiable.<br><br><strong>2. Define the Delivery Promise Protocol</strong>Create a scope matrix. No promises beyond capacity. No exceptions.<br><br><strong>3. Weekly Calendar Audit</strong>Every task the Principal performs below their leverage tier is a systems failure. Identify and delegate.<br><br><strong>4. Build the 14-Day Offline Protocol</strong>Document every action taken in 2 weeks. This becomes the delegation manual.</div></div>
+          </div>
+        </div>
+        <!-- ALIGNED BUSINESS MODEL -->
+        <div class="r-sec">
+          <div class="r-sec-eye">The Aligned Business Model</div>
+          <div class="r-sec-title">Creating <em style="font-family:var(--serif);font-style:italic;color:rgba(255,255,255,.1)">Order</em></div>
+          <div class="state-grid">
+            <div class="state-box current"><div class="state-label">The Executor Role — Current State</div><div class="state-items">Principal is the single point of failure<br>Revenue depends on personal bandwidth<br>Every decision requires founder approval<br>Team cannot operate without constant oxygen<br>Growth capped by the Principal's hours<br>High effort. Unpredictable results. Chaos Tax.</div></div>
+            <div class="state-box target"><div class="state-label tl">The Architect Role — Target State</div><div class="state-items">Principal at 100% strategy, 0% execution<br>Revenue generated by systems, not personality<br>Decisions are distributed and data-driven<br>Team operates autonomously within systems<br>Growth governed by architecture, not heroics<br>Non-Resistant Scale. Predictable. Sovereign.</div></div>
+          </div>
+          <div class="transition-box"><strong style="font-weight:400">The Transition Protocol:</strong> The path from Executor to Architect is not a mindset shift — it is a structural installation. It requires: (1) Systemised lead qualification that filters without the Principal. (2) A delivery protocol that installs solutions without the founder's customisation. (3) A decision architecture that distributes authority downward. (4) A real-time operational dashboard that replaces intuition with data. This is the work of the System Mandate.</div>
+        </div>
+        <!-- CONCLUSION -->
+        <div class="r-sec">
+          <div class="r-sec-eye">Conclusion &amp; Next Steps</div>
+          <div class="r-sec-title">Next <em style="font-family:var(--serif);font-style:italic;color:rgba(255,255,255,.1)">Steps</em></div>
+          <textarea class="r-editable" id="r-conclusion" rows="5">—</textarea>
+          <div style="margin-top:1rem;padding:1.2rem;background:rgba(14,21,32,.52);border:1px solid var(--br2)">
+            <div style="font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--w3);margin-bottom:.8rem">Immediate Actions — Within 7 Days</div>
+            <div class="action-grid">
+              <div class="action-item"><div class="action-day">Day 1–2</div><div class="action-txt">Schedule the Internal Mandate Kick-Off. Secure the resources required for the System 2.0 Engineering Phase.</div></div>
+              <div class="action-item"><div class="action-day">Day 3–5</div><div class="action-txt">Conduct a Calendar Audit. List every task performed this week below the Principal's leverage tier.</div></div>
+              <div class="action-item"><div class="action-day">Day 6–7</div><div class="action-txt">Commit to the Mandate. Non-resistant scale begins with a non-negotiable decision to architect the system.</div></div>
+            </div>
+          </div>
+        </div>
+        <!-- CLOSING -->
+        <div class="r-close">
+          <div class="r-close-q">"The most valuable step we can take now is the one that locks in our future capacity. The time to build our own scale is now."</div>
+          <div class="r-close-rule"></div>
+          <div class="r-body" style="max-width:500px;margin:0 auto .9rem;text-align:center;font-size:12px" id="r-close-body">This report represents AV ASCENT's absolute commitment to the principle of Systemic Integrity. We hold ourselves to the same rigorous standards we apply to our most valuable clients.</div>
+          <div class="r-close-sig"><strong>Areeba Viqar</strong>System Architect &amp; Founder, AV ASCENT</div>
+        </div>
+        <div class="r-footer"><a href="https://www.linkedin.com/company/avascent-khi">linkedin.com/company/avascent-khi</a> &nbsp;·&nbsp; info.avascent@gmail.com &nbsp;·&nbsp; +92-333-6076231<br><span style="opacity:.35;margin-top:3px;display:block">All rights reserved. AV ASCENT © 2025 &nbsp;·&nbsp; Confidential</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ SDASH DASHBOARD ════ -->
+<div class="scr" id="sDash">
+  <div class="appbar"><div class="bar-brand">AV <em>Ascent</em></div><div class="bar-label">EFA Data Dashboard</div>
+    <div style="display:flex;gap:.6rem">
+      <button class="btn" style="padding:7px 13px;font-size:10px" onclick="loadDashboard()">↻ Refresh</button>
+      <button class="btn" style="padding:7px 13px;font-size:10px" onclick="closeDashboard()">← Back</button>
+    </div>
+  </div>
+  <div style="flex:1;padding:1.6rem;max-width:1200px;margin:0 auto;width:100%">
+    <div id="dash-status" style="font-family:var(--mono);font-size:11px;color:var(--w3);letter-spacing:.08em;margin-bottom:1.2rem">Loading session data…</div>
+
+    <div id="dash-summary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.9rem;margin-bottom:1.8rem"></div>
+
+    <div class="s0-eyebrow" style="margin-bottom:.6rem"><span></span>Sessions &amp; Scores<span></span></div>
+    <div style="overflow-x:auto;margin-bottom:2rem">
+      <table style="width:100%;border-collapse:collapse;font-size:11.5px" id="dash-sessions-tbl">
+        <thead><tr style="text-align:left;border-bottom:1px solid var(--br)">
+          <th style="padding:8px 10px;color:var(--gold2);font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase">Date</th>
+          <th style="padding:8px 10px;color:var(--gold2);font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase">Client</th>
+          <th style="padding:8px 10px;color:var(--gold2);font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase">Principal</th>
+          <th style="padding:8px 10px;color:var(--gold2);font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase">Sector</th>
+          <th style="padding:8px 10px;color:var(--gold2);font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase">PG</th>
+          <th style="padding:8px 10px;color:var(--gold2);font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase">DL</th>
+          <th style="padding:8px 10px;color:var(--gold2);font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase">SM</th>
+          <th style="padding:8px 10px;color:var(--gold2);font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase">F-Score</th>
+          <th style="padding:8px 10px;color:var(--gold2);font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase">Zone</th>
+          <th style="padding:8px 10px;color:var(--gold2);font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase">Mandate</th>
+          <th style="padding:8px 10px;color:var(--gold2);font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase">Details</th>
+        </tr></thead>
+        <tbody id="dash-sessions-body"></tbody>
+      </table>
+    </div>
+
+    <div class="s0-eyebrow" style="margin-bottom:.6rem"><span></span>Phase-Level Answers<span></span></div>
+    <div style="overflow-x:auto;margin-bottom:2rem">
+      <table style="width:100%;border-collapse:collapse;font-size:11.5px" id="dash-phases-tbl">
+        <thead><tr style="text-align:left;border-bottom:1px solid var(--br)">
+          <th style="padding:8px 10px;color:var(--gold2);font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase">Date</th>
+          <th style="padding:8px 10px;color:var(--gold2);font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase">Client</th>
+          <th style="padding:8px 10px;color:var(--gold2);font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase">Phase</th>
+          <th style="padding:8px 10px;color:var(--gold2);font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase">Score</th>
+          <th style="padding:8px 10px;color:var(--gold2);font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase">Q1–Q4 Answers</th>
+          <th style="padding:8px 10px;color:var(--gold2);font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase">Notes</th>
+        </tr></thead>
+        <tbody id="dash-phases-body"></tbody>
+      </table>
+    </div>
+
+    <div class="s0-eyebrow" style="margin-bottom:.6rem"><span></span>Generated Reports &amp; Suggestions<span></span></div>
+    <div id="dash-reports-list" style="display:flex;flex-direction:column;gap:1rem;margin-bottom:2rem"></div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   CONFIG — fill these in after you deploy the Apps Script
+   backend (see README.md). Nothing below works fully until
+   BACKEND_URL points at your deployed Web App.
+   ══════════════════════════════════════════════════════════ */
+const WHATSAPP_NUMBER = '923336076231';           // no + or leading zeros
+const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwYFNZ70uG9wbPh8-isML0wg2_WnLRUUKE2ApU9uQfvsx_1yHOcnPHLqGAMxbyPvMee/exec';
+
+/* ── STATE ── */
+let C = 1.0, selMan = '', selManType = 'g';
+let sessionId = 'EFA-' + Date.now();
+
+/* ══════════════════════════════════════════════════════════
+   BACKEND LOGGING (Google Sheets via Apps Script Web App)
+   ══════════════════════════════════════════════════════════ */
+async function logToBackend(payload) {
+  if (!BACKEND_URL || BACKEND_URL.indexOf('PASTE_') === 0) {
+    console.warn('BACKEND_URL not configured — skipping Google Sheets log.');
+    return null;
+  }
+  try {
+    const res = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids CORS preflight on Apps Script
+      body: JSON.stringify(Object.assign({ sessionId, client: document.getElementById('f-client')?.value || '' }, payload))
+    });
+    return await res.json();
+  } catch (e) {
+    console.error('Backend log failed:', e);
+    return null;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   EFA DATA DASHBOARD — reads all logged sessions back out of
+   the Google Sheet via the same Apps Script Web App (GET request)
+   ══════════════════════════════════════════════════════════ */
+let dashPrevScreen = 's0';
+
+function openDashboard() {
+  const active = document.querySelector('.scr.on');
+  if (active) { dashPrevScreen = active.id; active.classList.remove('on'); }
+  document.getElementById('sDash').classList.add('on');
+  loadDashboard();
+}
+
+function closeDashboard() {
+  document.getElementById('sDash').classList.remove('on');
+  document.getElementById(dashPrevScreen || 's0').classList.add('on');
+}
+
+function escHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function loadDashboard() {
+  const status = document.getElementById('dash-status');
+  const summaryEl = document.getElementById('dash-summary');
+  const sessBody = document.getElementById('dash-sessions-body');
+  const phaseBody = document.getElementById('dash-phases-body');
+  const reportsList = document.getElementById('dash-reports-list');
+
+  if (!BACKEND_URL || BACKEND_URL.indexOf('PASTE_') === 0) {
+    status.textContent = 'Backend not configured — paste your Apps Script Web App URL into BACKEND_URL to enable the dashboard.';
+    return;
+  }
+
+  status.textContent = 'Loading session data…';
+  summaryEl.innerHTML = ''; sessBody.innerHTML = ''; phaseBody.innerHTML = ''; reportsList.innerHTML = '';
+
+  let data;
+  try {
+    const res = await fetch(BACKEND_URL + '?action=list', { method: 'GET' });
+    data = await res.json();
+  } catch (e) {
+    console.error('Dashboard load failed:', e);
+    status.textContent = 'Could not reach the backend. Check BACKEND_URL and that the Apps Script is deployed as a Web App accessible to "Anyone".';
+    return;
+  }
+
+  if (!data || data.error) {
+    status.textContent = 'Backend error: ' + (data && data.error ? data.error : 'unknown');
+    return;
+  }
+
+  const sessions = data.sessions || [];
+  const phases = data.phases || [];
+  const reports = data.reports || [];
+
+  status.textContent = sessions.length + ' session' + (sessions.length === 1 ? '' : 's') + ' logged · Last updated ' + new Date().toLocaleString();
+
+  /* Summary cards */
+  const avgF = sessions.length ? (sessions.reduce((a, s) => a + (parseFloat(s.fscore) || 0), 0) / sessions.length) : 0;
+  const zones = {};
+  sessions.forEach(s => { zones[s.zone] = (zones[s.zone] || 0) + 1; });
+  const topZone = Object.keys(zones).sort((a, b) => zones[b] - zones[a])[0] || '—';
+  const cards = [
+    { l: 'Total EFA Sessions', v: sessions.length },
+    { l: 'Average F-Score', v: avgF.toFixed(1) },
+    { l: 'Most Common Zone', v: topZone },
+    { l: 'Reports Generated', v: reports.length }
+  ];
+  cards.forEach(c => {
+    const d = document.createElement('div');
+    d.style.cssText = 'background:rgba(14,21,32,.52);border:1px solid var(--br2);padding:1rem 1.2rem';
+    d.innerHTML = '<div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--w3);margin-bottom:.4rem">' + escHtml(c.l) + '</div><div style="font-family:var(--serif);font-size:26px;color:var(--gold2)">' + escHtml(c.v) + '</div>';
+    summaryEl.appendChild(d);
+  });
+
+  /* Sessions table */
+  sessions.slice().reverse().forEach(s => {
+    const tr = document.createElement('tr');
+    tr.style.borderBottom = '1px solid var(--br2)';
+    tr.innerHTML =
+      '<td style="padding:7px 10px">' + escHtml(s.date) + '</td>' +
+      '<td style="padding:7px 10px">' + escHtml(s.client) + '</td>' +
+      '<td style="padding:7px 10px">' + escHtml(s.principal) + '</td>' +
+      '<td style="padding:7px 10px">' + escHtml(s.sector) + '</td>' +
+      '<td style="padding:7px 10px;text-align:center">' + escHtml(s.pg) + '</td>' +
+      '<td style="padding:7px 10px;text-align:center">' + escHtml(s.dl) + '</td>' +
+      '<td style="padding:7px 10px;text-align:center">' + escHtml(s.sm) + '</td>' +
+      '<td style="padding:7px 10px;text-align:center;color:var(--gold2)">' + escHtml(s.fscore) + '</td>' +
+      '<td style="padding:7px 10px">' + escHtml(s.zone) + '</td>' +
+      '<td style="padding:7px 10px">' + escHtml(s.mandate) + '</td>' +
+      '<td style="padding:7px 10px;font-family:var(--mono);font-size:10px;color:var(--w3)">' + escHtml(s.sessionId) + '</td>';
+    sessBody.appendChild(tr);
+  });
+  if (!sessions.length) sessBody.innerHTML = '<tr><td colspan="11" style="padding:14px 10px;color:var(--w3)">No sessions logged yet.</td></tr>';
+
+  /* Phase-level answers table */
+  phases.slice().reverse().forEach(p => {
+    const tr = document.createElement('tr');
+    tr.style.borderBottom = '1px solid var(--br2)';
+    const answers = ['q1', 'q2', 'q3', 'q4'].map(k => p[k] != null ? p[k] : '—').join(' / ');
+    tr.innerHTML =
+      '<td style="padding:7px 10px">' + escHtml(p.date) + '</td>' +
+      '<td style="padding:7px 10px">' + escHtml(p.client) + '</td>' +
+      '<td style="padding:7px 10px">' + escHtml(p.phase) + '</td>' +
+      '<td style="padding:7px 10px;text-align:center">' + escHtml(p.score) + '</td>' +
+      '<td style="padding:7px 10px;font-family:var(--mono);font-size:10px">' + escHtml(answers) + '</td>' +
+      '<td style="padding:7px 10px;color:rgba(255,255,255,.6)">' + escHtml(p.notes) + '</td>';
+    phaseBody.appendChild(tr);
+  });
+  if (!phases.length) phaseBody.innerHTML = '<tr><td colspan="6" style="padding:14px 10px;color:var(--w3)">No phase answers logged yet.</td></tr>';
+
+  /* Generated reports & suggestions */
+  reports.slice().reverse().forEach(r => {
+    const d = document.createElement('div');
+    d.style.cssText = 'background:rgba(14,21,32,.52);border:1px solid var(--br2);padding:1.1rem 1.3rem';
+    d.innerHTML =
+      '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.5rem"><strong style="font-family:var(--serif);color:var(--w)">' + escHtml(r.client) + '</strong><span style="font-family:var(--mono);font-size:10px;color:var(--w3)">' + escHtml(r.date) + ' · F-Score ' + escHtml(r.fscore) + '</span></div>' +
+      (r.execSummary ? '<div style="font-size:12px;color:rgba(255,255,255,.65);margin-bottom:.6rem">' + escHtml(r.execSummary) + '</div>' : '') +
+      (r.pdfUrl ? '<a href="' + escHtml(r.pdfUrl) + '" target="_blank" style="font-family:var(--mono);font-size:10px;color:var(--gold2);letter-spacing:.08em">↓ VIEW PDF REPORT</a>' : '<span style="font-family:var(--mono);font-size:10px;color:var(--w3)">PDF not attached to this log entry</span>');
+    reportsList.appendChild(d);
+  });
+  if (!reports.length) reportsList.innerHTML = '<div style="color:var(--w3);font-size:12px">No final reports logged yet.</div>';
+}
+
+/* ══════════════════════════════════════════════════════════
+   WHATSAPP — one-tap send (free, manual tap to send)
+   ══════════════════════════════════════════════════════════ */
+function openWhatsApp(text) {
+  const url = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(text);
+  window.open(url, '_blank');
+}
+
+/* Send a single phase's Q&A (PG / DL / SM) as text to WhatsApp + log it */
+function sendPhaseToWhatsApp(cat) {
+  const labels = { pg: 'Pipeline Gaps', dl: 'Decision Lag', sm: 'System Misalignment' };
+  const cl = document.getElementById('f-client').value || 'Unnamed Client';
+  const qs = ['q1','q2','q3','q4'].map(q => {
+    const el = document.getElementById(cat + '-' + q);
+    return el ? el.value.trim() : '';
+  });
+  const notesEl = document.getElementById(cat + '-n1');
+  const notes = notesEl ? notesEl.value.trim() : '';
+  const score = catScore(cat);
+
+  let msg = 'EFA SESSION — ' + labels[cat] + '\n';
+  msg += 'Client: ' + cl + '\n';
+  msg += 'Score: ' + (score ?? '—') + '/10\n\n';
+  qs.forEach((a, i) => { msg += 'Q' + (i+1) + ': ' + (a || '(no answer recorded)') + '\n'; });
+  if (notes) msg += '\nArchitect Notes: ' + notes;
+
+  openWhatsApp(msg);
+  logToBackend({
+    type: 'phase_answers',
+    phase: labels[cat],
+    score: score,
+    q1: qs[0], q2: qs[1], q3: qs[2], q4: qs[3],
+    notes: notes
+  });
+}
+
+/* Send the finished PDF report to WhatsApp (uploads PDF to Drive via backend, then opens wa.me with the link) */
+async function sendReportToWhatsApp() {
+  const btn = document.getElementById('waSendBtn');
+  const originalLabel = btn ? btn.textContent : '';
+  if (btn) { btn.textContent = 'Preparing PDF…'; btn.disabled = true; }
+
+  try {
+    const cl = document.getElementById('f-client').value || 'Client';
+    const fs = document.getElementById('fs-num') ? document.getElementById('fs-num').textContent : getFS().toFixed(1);
+    const reportEl = document.getElementById('r-doc') || document.querySelector('#s8 .phase-shell');
+
+    const worker = html2pdf().set({
+      margin: 0.4,
+      filename: 'EFA-Report-' + cl.replace(/[^a-z0-9]+/gi,'_') + '.pdf',
+      image: { type: 'jpeg', quality: 0.95 },
+      html2canvas: { scale: 2, backgroundColor: '#07090f' },
+      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+    }).from(reportEl);
+
+    const pdfBlob = await worker.outputPdf('blob');
+    const base64 = await new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result.split(',')[1]);
+      r.onerror = reject;
+      r.readAsDataURL(pdfBlob);
+    });
+
+    if (btn) btn.textContent = 'Uploading…';
+    const result = await logToBackend({
+      type: 'final_report',
+      fscore: fs,
+      pdfBase64: base64,
+      pdfFilename: 'EFA-Report-' + cl.replace(/[^a-z0-9]+/gi,'_') + '.pdf'
+    });
+
+    const driveLink = result && result.pdfUrl ? result.pdfUrl : null;
+
+    let msg = 'EFA FINAL REPORT — ' + cl + '\n';
+    msg += 'F-Score: ' + fs + '\n';
+    msg += 'Mandate: ' + (selMan || 'To be determined') + '\n';
+    if (driveLink) {
+      msg += '\nFull PDF report: ' + driveLink;
+    } else {
+      msg += '\n(PDF generated locally — attach the downloaded file manually; Google Sheets backend not yet configured.)';
+      worker.save(); // fall back: trigger local download so it can be attached by hand
+    }
+    openWhatsApp(msg);
+  } catch (err) {
+    console.error(err);
+    alert('Could not prepare the report automatically. Falling back to Print/PDF — please attach the downloaded PDF to WhatsApp manually.');
+    window.print();
+  } finally {
+    if (btn) { btn.textContent = originalLabel; btn.disabled = false; }
+  }
+}
+
+/* ── PARTICLES ── */
+(function() {
+  const cv = document.getElementById('pc'), ctx = cv.getContext('2d');
+  let W, H, pts = [];
+  function rsz() { W = cv.width = innerWidth; H = cv.height = innerHeight; init(); }
+  function init() {
+    pts = [];
+    const n = Math.floor(W * H / 18000);
+    for (let i = 0; i < n; i++) pts.push({ x: Math.random()*W, y: Math.random()*H, vx: (Math.random()-.5)*.18, vy: (Math.random()-.5)*.18, r: Math.random()*1.2+.4 });
+  }
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    pts.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(184,150,90,.32)'; ctx.fill();
+    });
+    for (let i = 0; i < pts.length; i++) {
+      for (let j = i+1; j < pts.length; j++) {
+        const d = Math.hypot(pts[i].x - pts[j].x, pts[i].y - pts[j].y);
+        if (d < 110) {
+          ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y);
+          ctx.strokeStyle = 'rgba(184,150,90,' + ((1 - d/110) * .1) + ')';
+          ctx.lineWidth = .5; ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize', rsz); rsz(); draw();
+})();
+
+function tryProceedToFScore() {
+  if (!allQuestionsScored()) {
+    const labels = { pg: 'Pipeline Gaps', dl: 'Decision Lag', sm: 'System Misalignment' };
+    const missing = ['pg','dl','sm'].filter(cat => scores[cat].some(v => v === null)).map(cat => labels[cat]);
+    alert('Please select a band for every question before calculating the F-Score.\n\nStill missing: ' + missing.join(', '));
+    return;
+  }
+  go(4, 5);
+}
+
+/* ── NAVIGATION ── */
+const SCREENS = ['s0','s1','s2','s3','s4','s5','s6','s7','s8'];
+function go(from, to) {
+  document.getElementById(SCREENS[from]).classList.remove('on');
+  document.getElementById(SCREENS[to]).classList.add('on');
+  updDots(to);
+  if (to === 5) renderFScore();
+  if (to === 6) showVerdict();
+  if (to === 7) document.getElementById('m-score').textContent = getFS().toFixed(1);
+  window.scrollTo(0, 0);
+}
+function updDots(cur) {
+  const map = {1:'d1',2:'d2',3:'d3',4:'d4',5:'d5',7:'d7'};
+  const steps = [1,2,3,4,5,7];
+  const ci = steps.indexOf(cur);
+  steps.forEach((s, i) => {
+    const el = document.getElementById(map[s]);
+    if (!el) return;
+    el.innerHTML = '';
+    for (let j = 0; j < 7; j++) {
+      const d = document.createElement('div');
+      d.className = 'bd' + (j < ci ? ' done' : j === ci ? ' now' : '');
+      el.appendChild(d);
+    }
+  });
+}
+
+/* ── RUBRIC v2 : BAND-BASED SCORING ENGINE ── */
+/* Each question is scored ONLY off its fixed band table (Governing Rule, EFA Scoring Rubric v2).
+   Category score = average of its 4 question scores, rounded to nearest 0.5. */
+const RUBRIC = {
+  pg: [
+    { q:'q1', label:'Q1 — The Lead Leak', bands:[
+      {range:'1–2', score:1.5, txt:'8–10 of 10 — Proposals go out on autopilot; founder involvement optional.'},
+      {range:'3–5', score:4, txt:'6–7 of 10 — Mostly systemised, a few slip without a nudge.'},
+      {range:'6–7', score:6.5, txt:'4–5 of 10 — Roughly half need the founder to personally chase it out the door.'},
+      {range:'8–10', score:9, txt:'0–3 of 10 — Almost nothing moves without the founder personally pushing it.'}
+    ]},
+    { q:'q2', label:'Q2 — Standardisation', bands:[
+      {range:'1–2', score:1.5, txt:'Documented & followed — written protocol exists and is followed consistently.'},
+      {range:'3–5', score:4, txt:'Documented, inconsistent — protocol exists on paper but is followed loosely.'},
+      {range:'6–7', score:6.5, txt:'Informal / tribal knowledge — no written protocol; lives in senior staff\u2019s heads.'},
+      {range:'8–10', score:9, txt:'No protocol — handled purely by gut feeling, differently every time.'}
+    ]},
+    { q:'q3', label:'Q3 — Data Visibility', bands:[
+      {range:'1–2', score:1.5, txt:'Live dashboard — real-time and demonstrably current.'},
+      {range:'3–5', score:4, txt:'Dashboard, but stale — exists but requires manual updates and lags reality.'},
+      {range:'6–7', score:6.5, txt:'Spreadsheet only — tracking exists only in ad-hoc spreadsheets.'},
+      {range:'8–10', score:9, txt:'No tracking — lead status lives in email or the founder\u2019s memory only.'}
+    ]},
+    { q:'q4', label:'Q4 — Outreach ROI', bands:[
+      {range:'1–2', score:1.5, txt:'>70% systemised — revenue driven mainly by a repeatable engine.'},
+      {range:'3–5', score:4, txt:'40–70% systemised — a real mix; the machine carries meaningful weight.'},
+      {range:'6–7', score:6.5, txt:'15–40% systemised — mostly referral/network-driven with a thin systemised layer.'},
+      {range:'8–10', score:9, txt:'<15% systemised — almost entirely personal network and referrals.'}
+    ]}
+  ],
+  dl: [
+    { q:'q1', label:'Q1 — The Yes Velocity', bands:[
+      {range:'1–2', score:1.5, txt:'\u2264 2 days — fast, decisive turnaround on high-stakes calls.'},
+      {range:'3–5', score:4, txt:'3–5 days — a short deliberation cycle, within a business week.'},
+      {range:'6–7', score:6.5, txt:'6–14 days — roughly one to two weeks to get a final answer.'},
+      {range:'8–10', score:9, txt:'> 14 days — decisions routinely stretch past two weeks.'}
+    ]},
+    { q:'q2', label:'Q2 — Authority Debt', bands:[
+      {range:'1–2', score:1.5, txt:'0–1 stuck decisions — almost nothing is bottlenecked on the founder right now.'},
+      {range:'3–5', score:4, txt:'2–3 stuck decisions — a small, manageable backlog.'},
+      {range:'6–7', score:6.5, txt:'4–6 stuck decisions — a meaningful backlog of undelegated calls.'},
+      {range:'8–10', score:9, txt:'7+ stuck decisions — a significant queue only the founder can make.'}
+    ]},
+    { q:'q3', label:'Q3 — The Consensus Trap', bands:[
+      {range:'1–2', score:1.5, txt:'Speed prioritised — cannot readily name a recent week-plus delay.'},
+      {range:'3–5', score:4, txt:'Isolated delay — one identifiable delayed decision, treated as an exception.'},
+      {range:'6–7', score:6.5, txt:'Recurring pattern — multiple recent delays tied to seeking consensus.'},
+      {range:'8–10', score:9, txt:'Chronic paralysis — cannot point to a single recent fast decision.'}
+    ]},
+    { q:'q4', label:'Q4 — Strategy vs. Reaction', bands:[
+      {range:'1–2', score:1.5, txt:'<20% reactive — strategic time is protected; firefighting is rare.'},
+      {range:'3–5', score:4, txt:'20–40% reactive — a meaningful chunk lost to fires, but vision work still leads.'},
+      {range:'6–7', score:6.5, txt:'40–65% reactive — reactive work consumes close to or over half of strategic time.'},
+      {range:'8–10', score:9, txt:'>65% reactive — strategic time is almost entirely consumed reacting to fires.'}
+    ]}
+  ],
+  sm: [
+    { q:'q1', label:'Q1 — The Heroism Test', bands:[
+      {range:'1–2', score:1.5, txt:'Full continuity — system runs without a visible dip in the founder\u2019s absence.'},
+      {range:'3–5', score:4, txt:'Minor slowdown — mostly continues, with small delays in edge cases.'},
+      {range:'6–7', score:6.5, txt:'Significant slowdown — several deals visibly stall without founder involvement.'},
+      {range:'8–10', score:9, txt:'Total standstill — the system effectively stops without the founder present.'}
+    ]},
+    { q:'q2', label:'Q2 — Tool Integrity', bands:[
+      {range:'1–2', score:1.5, txt:'Actively enforces strategy — tools drive workflow and are the source of truth.'},
+      {range:'3–5', score:4, txt:'Used, but passive — tools used consistently but mainly for reporting.'},
+      {range:'6–7', score:6.5, txt:'Inconsistently used — tools exist but are bypassed with workarounds.'},
+      {range:'8–10', score:9, txt:'Filing cabinet — tools are effectively unused or purely archival.'}
+    ]},
+    { q:'q3', label:'Q3 — The Delivery Gap', bands:[
+      {range:'1–2', score:1.5, txt:'Rarely / never — sales and delivery are consistently aligned.'},
+      {range:'3–5', score:4, txt:'Occasionally — a few times a quarter, a mismatch surfaces.'},
+      {range:'6–7', score:6.5, txt:'Frequently — roughly monthly, delivery struggles to match what was promised.'},
+      {range:'8–10', score:9, txt:'Constantly — nearly every major deal surfaces a scope/capacity mismatch.'}
+    ]},
+    { q:'q4', label:'Q4 — Leverage Check', bands:[
+      {range:'1–2', score:1.5, txt:'0–2 hours — founder time is well protected from low-leverage tasks.'},
+      {range:'3–5', score:4, txt:'3–6 hours — a noticeable but non-dominant chunk of low-leverage work remains.'},
+      {range:'6–7', score:6.5, txt:'7–12 hours — close to two full days a week lost to delegable tasks.'},
+      {range:'8–10', score:9, txt:'13+ hours — a third or more of the working week on sub-$20/hr tasks.'}
+    ]}
+  ]
+};
+const scores = { pg:[null,null,null,null], dl:[null,null,null,null], sm:[null,null,null,null] };
+
+function injectBands() {
+  ['pg','dl','sm'].forEach(cat => {
+    RUBRIC[cat].forEach((question, qi) => {
+      const ta = document.getElementById(cat + '-' + question.q);
+      if (!ta) return;
+      ta.placeholder = "Evidence Log — one-line paraphrase of the client's exact answer (required to make this score defensible)";
+      const wrap = document.createElement('div');
+      wrap.className = 'band-row';
+      wrap.style.cssText = 'display:flex;flex-direction:column;gap:6px;margin:8px 0 10px';
+      question.bands.forEach((b, bi) => {
+        const opt = document.createElement('div');
+        opt.className = 'band-opt';
+        opt.dataset.cat = cat; opt.dataset.qi = qi; opt.dataset.bi = bi;
+        opt.style.cssText = 'display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border:1px solid var(--br2);border-radius:4px;cursor:pointer;font-size:11px;line-height:1.5;color:var(--w2);transition:all .15s';
+        opt.innerHTML = '<span style="font-family:var(--mono);font-size:10px;color:var(--gold);flex-shrink:0;min-width:40px">' + b.range + '</span><span>' + b.txt + '</span>';
+        opt.onclick = () => selBand(cat, qi, bi, wrap);
+        wrap.appendChild(opt);
+      });
+      ta.parentNode.insertBefore(wrap, ta);
+    });
+  });
+}
+
+function selBand(cat, qi, bi, wrap) {
+  const band = RUBRIC[cat][qi].bands[bi];
+  scores[cat][qi] = band.score;
+  wrap.querySelectorAll('.band-opt').forEach(o => {
+    const isSel = parseInt(o.dataset.bi) === bi;
+    o.style.borderColor = isSel ? 'var(--gold)' : 'var(--br2)';
+    o.style.background = isSel ? 'rgba(184,150,90,.08)' : 'transparent';
+  });
+  updCatDial(cat);
+}
+
+function catScore(cat) {
+  const vals = scores[cat];
+  if (vals.some(v => v === null)) return null;
+  const avg = vals.reduce((a,b)=>a+b,0) / vals.length;
+  return Math.round(avg * 2) / 2; // nearest 0.5
+}
+
+function updCatDial(cat) {
+  const val = catScore(cat);
+  const ids = { pg: ['pg-n','pg-c'], dl: ['dl-n','dl-c'], sm: ['sm-n','sm-c'] };
+  const [numId, circId] = ids[cat];
+  const numEl = document.getElementById(numId);
+  const circ = document.getElementById(circId);
+  if (val === null) { numEl.textContent = '—'; numEl.style.color = 'var(--w2)'; circ.style.strokeDashoffset = 314; return; }
+  numEl.textContent = val;
+  const col = val >= 7 ? '#e74c3c' : val >= 4 ? 'var(--gold)' : '#4ecf8a';
+  numEl.style.color = col;
+  circ.style.stroke = col;
+  circ.style.strokeDashoffset = 314 * (1 - (val-1)/9);
+  if (document.getElementById('s5').classList.contains('on')) renderFScore();
+}
+
+/* ── C FACTOR & F-SCORE ── */
+function selC(v, el) {
+  C = v;
+  document.querySelectorAll('.cf-card').forEach(e => e.classList.remove('on'));
+  el.classList.add('on');
+  renderFScore();
+}
+function getVals() {
+  // Falls back to the rubric's own midpoint (5.5) only if a question was skipped —
+  // this should not happen if the Consistency Checklist is honoured before reporting.
+  return {
+    pg: catScore('pg') ?? 5.5,
+    dl: catScore('dl') ?? 5.5,
+    sm: catScore('sm') ?? 5.5
+  };
+}
+function allQuestionsScored() {
+  return ['pg','dl','sm'].every(cat => scores[cat].every(v => v !== null));
+}
+function getFS() {
+  const { pg, dl, sm } = getVals();
+  return ((pg*5) + (dl*3) + (sm*2)) * C;
+}
+function getZone(fs) {
+  if (fs <= 30) return { l:'LOW FRICTION', c:'z-low', col:'#4ecf8a', d:'System is stable. High-leverage BD is operational.', i:'"Your system is functional. The focus now is optimisation — not reconstruction."' };
+  if (fs <= 60) return { l:'HIGH FRICTION', c:'z-high', col:'var(--gold)', d:'Growth is possible but inconsistent. 1–2 major architectural leaks are present.', i:'"You are growing in spite of your systems, not because of them. One structural failure away from a plateau."' };
+  if (fs <= 80) return { l:'CRITICAL FRICTION', c:'z-crit', col:'#e74c3c', d:'Growth is severely capped. The founder is the permanent bottleneck.', i:'"Your talent is being held hostage by your own organisation. The cost of inaction now exceeds the cost of transformation."' };
+  return { l:'CRITICAL SYSTEMIC FAILURE', c:'z-fail', col:'#ff8080', d:'Expertise is being actively sabotaged by the architecture.', i:'"This is a structural emergency. Immediate system intervention is the only path to survival at scale."' };
+}
+function renderFScore() {
+  const { pg, dl, sm } = getVals();
+  const fs = getFS();
+  const z = getZone(fs);
+  document.getElementById('sb-row').innerHTML =
+    '<div class="sb-box"><div class="sb-var">Pipeline Gaps (PG)</div><div class="sb-num">' + pg + '</div><div class="sb-wt">× 5 = ' + (pg*5) + '</div></div>' +
+    '<div class="sb-box"><div class="sb-var">Decision Lag (DL)</div><div class="sb-num">' + dl + '</div><div class="sb-wt">× 3 = ' + (dl*3) + '</div></div>' +
+    '<div class="sb-box"><div class="sb-var">System Misalignment (SM)</div><div class="sb-num">' + sm + '</div><div class="sb-wt">× 2 = ' + (sm*2) + '</div></div>';
+  document.getElementById('f-bar').textContent = 'F-Score = [(' + pg + '×5) + (' + dl + '×3) + (' + sm + '×2)] × ' + C + ' = [' + (pg*5) + ' + ' + (dl*3) + ' + ' + (sm*2) + '] × ' + C + ' = ' + fs.toFixed(1);
+  const fn = document.getElementById('fs-num');
+  fn.textContent = fs.toFixed(1); fn.style.color = z.col;
+  document.getElementById('fs-zone').innerHTML = '<div class="fs-zone-pill ' + z.c + '">' + z.l + '</div>';
+}
+
+/* ── VERDICT ── */
+function showVerdict() {
+  const cl = document.getElementById('f-client').value || 'Your Organisation';
+  const fs = getFS(); const z = getZone(fs); const { pg, dl, sm } = getVals();
+  document.getElementById('v-cl').textContent = cl;
+  setTimeout(() => { const el = document.getElementById('v-sc'); el.textContent = fs.toFixed(1); el.style.color = z.col; el.classList.add('show'); }, 200);
+  setTimeout(() => { const el = document.getElementById('v-zn'); el.textContent = z.l; el.className = 'v-zone show ' + z.c; }, 700);
+  setTimeout(() => { const el = document.getElementById('v-ds'); el.textContent = z.d; el.classList.add('show'); }, 1050);
+  setTimeout(() => {
+    const el = document.getElementById('v-bk');
+    el.innerHTML = '<div class="vb-item"><div class="vb-num">' + pg + '</div><div class="vb-lbl">Pipeline Gaps</div></div>' +
+      '<div style="width:1px;background:rgba(255,255,255,.08);height:32px;align-self:center"></div>' +
+      '<div class="vb-item"><div class="vb-num">' + dl + '</div><div class="vb-lbl">Decision Lag</div></div>' +
+      '<div style="width:1px;background:rgba(255,255,255,.08);height:32px;align-self:center"></div>' +
+      '<div class="vb-item"><div class="vb-num">' + sm + '</div><div class="vb-lbl">Sys. Misalignment</div></div>' +
+      '<div style="width:1px;background:rgba(255,255,255,.08);height:32px;align-self:center"></div>' +
+      '<div class="vb-item"><div class="vb-num">×' + C + '</div><div class="vb-lbl">Complexity</div></div>';
+    el.classList.add('show');
+  }, 1300);
+  setTimeout(() => { const el = document.getElementById('v-im'); el.textContent = z.i; el.classList.add('show'); }, 1600);
+}
+
+/* ── MANDATE ── */
+function selM(name, el, type) {
+  selMan = name; selManType = type;
+  document.querySelectorAll('.m-card').forEach(e => { e.classList.remove('sel'); e.classList.remove('sel-r'); });
+  el.classList.add(type === 'r' ? 'sel-r' : 'sel');
+}
+
+/* ── GENERATE REPORT ── */
+async function generateReport() {
+  const { pg, dl, sm } = getVals();
+  const fs = getFS(); const z = getZone(fs);
+  const cl = document.getElementById('f-client').value || 'The Client';
+  const pr = document.getElementById('f-principal').value || 'The Principal';
+  const dt = document.getElementById('f-date').value;
+  const sc = document.getElementById('f-sector').value || 'A.C.E. Sector';
+  const cx = document.getElementById('f-context').value || '';
+  const sn = {
+    pg: { score: pg, q1: document.getElementById('pg-q1').value, q2: document.getElementById('pg-q2').value, q3: document.getElementById('pg-q3').value, q4: document.getElementById('pg-q4').value, notes: document.getElementById('pg-n1').value },
+    dl: { score: dl, q1: document.getElementById('dl-q1').value, q2: document.getElementById('dl-q2').value, q3: document.getElementById('dl-q3').value, q4: document.getElementById('dl-q4').value, notes: document.getElementById('dl-n1').value },
+    sm: { score: sm, q1: document.getElementById('sm-q1').value, q2: document.getElementById('sm-q2').value, q3: document.getElementById('sm-q3').value, q4: document.getElementById('sm-q4').value, notes: document.getElementById('sm-n1').value }
+  };
+  document.getElementById('aiGate').classList.add('on');
+  /* Fill static fields */
+  document.getElementById('r-cl').textContent = cl;
+  document.getElementById('r-dt').textContent = dt;
+  document.getElementById('r-pr').textContent = pr;
+  document.getElementById('r-sc').textContent = sc;
+  document.getElementById('r-fs').textContent = fs.toFixed(1);
+  document.getElementById('r-fs').style.color = z.col;
+  document.getElementById('r-fr').textContent = 'F-Score Range: ' + (fs<=30?'1–30':fs<=60?'31–60':fs<=80?'61–80':'80+');
+  document.getElementById('r-fz').textContent = z.l;
+  document.getElementById('r-fz').style.color = z.col;
+  document.getElementById('r-ml').textContent = selMan || 'To be determined';
+  document.getElementById('r-mt').textContent = 'The Mandate for ' + cl;
+  document.getElementById('r-bar-lbl').textContent = 'EFA Report — ' + cl;
+  const pLeak = dl>=pg && dl>=sm ? 'Decision Lag (DL) & Delivery Capacity Debt' : pg>=dl && pg>=sm ? 'Pipeline Gaps (PG) — Non-Systemic BD Infrastructure' : 'System Misalignment (SM) — Vision-Execution Disconnect';
+  document.getElementById('r-pl').innerHTML = '<strong>' + pLeak + '</strong>';
+  /* Score table */
+  document.getElementById('r-tbl').innerHTML =
+    '<tr><td><strong>Decision Lag (DL)</strong><br><span style="font-family:var(--mono);font-size:9px;color:var(--w3)">Weight ×3</span></td><td style="font-size:11px;color:var(--w3)">The time cost of Principal bottleneck on strategic pivots.</td><td style="font-size:11px;color:rgba(255,255,255,.58)">' + (sn.dl.notes || 'Principal bottleneck on all strategic decisions.') + '</td><td style="text-align:center"><span class="r-score-n">' + dl + '</span></td></tr>' +
+    '<tr><td><strong>Pipeline Gaps (PG)</strong><br><span style="font-family:var(--mono);font-size:9px;color:var(--w3)">Weight ×5</span></td><td style="font-size:11px;color:var(--w3)">Revenue loss due to non-systemic BD assets and unreliable conversion processes.</td><td style="font-size:11px;color:rgba(255,255,255,.58)">' + (sn.pg.notes || 'Pipeline conversion relies on personal effort.') + '</td><td style="text-align:center"><span class="r-score-n">' + pg + '</span></td></tr>' +
+    '<tr><td><strong>System Misalignment (SM)</strong><br><span style="font-family:var(--mono);font-size:9px;color:var(--w3)">Weight ×2</span></td><td style="font-size:11px;color:var(--w3)">Disconnect between core value and scalable BD execution infrastructure.</td><td style="font-size:11px;color:rgba(255,255,255,.58)">' + (sn.sm.notes || 'BD narrative and delivery capacity are not aligned.') + '</td><td style="text-align:center"><span class="r-score-n">' + sm + '</span></td></tr>' +
+    '<tr><td><strong>Complexity (C)</strong></td><td style="font-size:11px;color:var(--w3)">Scaling factor for industry complexity and team size.</td><td style="font-size:11px;color:rgba(255,255,255,.58)">' + (C===1.0?'Single vertical, small team':C===1.5?'Multi-vertical, mid-sized team':'Complex, large-scale operations') + '</td><td style="text-align:center"><span class="r-score-n">×' + C + '</span></td></tr>';
+  document.getElementById('r-formula').textContent = 'F-Score = [(' + pg + '×5) + (' + dl + '×3) + (' + sm + '×2)] × ' + C + ' = [' + (pg*5) + ' + ' + (dl*3) + ' + ' + (sm*2) + '] × ' + C + ' = ' + fs.toFixed(1);
+  /* Mandate rec */
+  const mmap = { m1:{n:'Mandate I — The Complete Blueprints',s:'4–6 week engagement · Full BD System Blueprint installation · For F-Score 31–60'}, m2:{n:'Mandate II — The System Launchpad',s:'3-month minimum retainer · System build + governance · For F-Score 61–80'}, m3:{n:'Mandate III — The Ecosystem',s:'6-month retainer · Complete operational transformation · For F-Score 80+'}, m4:{n:'Internal Mandate — System 2.0 Self-Execution',s:'4–8 week internal engineering phase · Architect-led with AV ASCENT framework'} };
+  let mk = 'm2';
+  document.querySelectorAll('.m-card.sel, .m-card.sel-r').forEach(el => { mk = el.id; });
+  const mi = mmap[mk] || mmap.m2;
+  document.getElementById('r-mr-name').textContent = mi.n;
+  document.getElementById('r-mr-sub').textContent = mi.s;
+  /* Call Claude API */
+  const prompt = 'You are Areeba Viqar, System Architect and Founder of AV ASCENT. Write an Executive Friction Audit report in your authoritative, precise voice. Use proprietary terminology naturally: Chaos Tax, Systemic Drift, Delivery Capacity Debt (DCD), Non-Resistant Scale, Founder Trap, Executor vs Architect Role, Blueprint Customisation, System Mandate, Principal bandwidth.\n\nCLIENT: ' + cl + ' | Principal: ' + pr + ' | Sector: ' + sc + '\nCONTEXT: ' + cx + '\n\nDIAGNOSTIC SCORES:\n- Pipeline Gaps (PG): ' + pg + '/10 × 5 = ' + (pg*5) + '\n  Notes: ' + sn.pg.notes + '\n  Q1 (Lead Leak): ' + sn.pg.q1 + '\n  Q2 (Standardisation): ' + sn.pg.q2 + '\n  Q3 (Data Visibility): ' + sn.pg.q3 + '\n  Q4 (Outreach ROI): ' + sn.pg.q4 + '\n- Decision Lag (DL): ' + dl + '/10 × 3 = ' + (dl*3) + '\n  Notes: ' + sn.dl.notes + '\n  Q1 (Yes Velocity): ' + sn.dl.q1 + '\n  Q2 (Authority Debt): ' + sn.dl.q2 + '\n  Q3 (Consensus Trap): ' + sn.dl.q3 + '\n  Q4 (Strategy vs Reaction): ' + sn.dl.q4 + '\n- System Misalignment (SM): ' + sm + '/10 × 2 = ' + (sm*2) + '\n  Notes: ' + sn.sm.notes + '\n  Q1 (Heroism Test): ' + sn.sm.q1 + '\n  Q2 (Tool Integrity): ' + sn.sm.q2 + '\n  Q3 (Delivery Gap): ' + sn.sm.q3 + '\n  Q4 (Leverage Check): ' + sn.sm.q4 + '\n- Complexity Factor: ×' + C + '\n- F-SCORE: ' + fs.toFixed(1) + ' — ' + z.l + '\n- Recommended Mandate: ' + (selMan || mi.n) + '\n\nWrite the following sections. Reference the client\'s actual session responses where provided. Be clinical, architectural, and authoritative — not motivational.\n\nReturn ONLY a valid JSON object with no markdown, no code blocks:\n{"exec_summary":"3 sentences: diagnostic verdict referencing F-Score and zone. Name the dominant friction variable. State what this means for the firm\'s trajectory. Reference actual responses if provided.","findings":"4 paragraphs. (1) F-Score verdict and what zone placement means structurally. (2) Primary bottleneck — name it precisely using session data and actual answers. (3) Secondary bottleneck and the Codification Gap. (4) Root cause: misallocation of founder time — cite the Executor vs Architect imbalance with specific evidence from session. Tone: forensic diagnosis, not advice.","mandate_body":"3 paragraphs. (1) Why this mandate is non-negotiable for this specific client given their F-Score and session data. (2) Focus Area 1 — Process Automation: specific actions for this client. (3) Focus Area 2 — Engine Delegation: specific delegation protocol and what the Principal does and does not touch. Be specific to their context.","conclusion":"2 sentences. First: reference the F-Score and what structural shift is required. Second: give the single most important next action with a timeline. End with quiet conviction — no motivational language."}';
+  let genExec = '', genFindings = '', genMandate = '', genConclusion = '';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1200, messages: [{ role: 'user', content: prompt }] })
+    });
+    const data = await res.json();
+    const raw = data.content.map(b => b.text || '').join('');
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+    document.getElementById('r-es').textContent = parsed.exec_summary;
+    document.getElementById('r-findings').value = parsed.findings;
+    document.getElementById('r-mandate').value = parsed.mandate_body;
+    document.getElementById('r-conclusion').value = parsed.conclusion;
+    genExec = parsed.exec_summary || ''; genFindings = parsed.findings || '';
+    genMandate = parsed.mandate_body || ''; genConclusion = parsed.conclusion || '';
+  } catch(e) {
+    const dom = dl>=pg && dl>=sm ? 'Decision Lag (DL: ' + dl + '/10)' : pg>=dl && pg>=sm ? 'Pipeline Gaps (PG: ' + pg + '/10)' : 'System Misalignment (SM: ' + sm + '/10)';
+    document.getElementById('r-es').textContent = 'The EFA confirms that ' + cl + ' has an F-Score of ' + fs.toFixed(1) + ', placing the firm in the ' + z.l + ' zone. The dominant friction variable is ' + dom + '. ' + z.d;
+    document.getElementById('r-findings').value = 'The F-Score of ' + fs.toFixed(1) + ' places ' + cl + ' in the ' + z.l + ' zone (F-Score Range: ' + (fs<=30?'1–30':fs<=60?'31–60':fs<=80?'61–80':'80+') + ').\n\nPrimary Bottleneck — ' + dom + ': ' + (sn.dl.notes || sn.pg.notes || sn.sm.notes || 'The session data reveals a structural failure in the critical friction variable. The Principal is personally absorbing the cost of an unbuilt system.') + '\n\nThe Codification Gap is present across all three dimensions. While the firm\'s client-facing value proposition is strong, the internal architecture required to deliver it without constant Principal involvement has not been built. This is the Chaos Tax in its most structural form.\n\nRoot Cause — Misallocation of Founder Time: ' + pr + ' is spending the majority of strategic bandwidth on Execution rather than Architecture. This is the definition of ' + z.l + ' for a high-value consultancy.';
+    document.getElementById('r-mandate').value = 'The ' + mi.n + ' is the non-negotiable prescription for ' + cl + '. The F-Score of ' + fs.toFixed(1) + ' is a clear structural signal: the BD system has succeeded in attracting clients, but the Delivery System is failing to keep pace.\n\nFocus Area 1 — Process Automation: Design and deploy the Friction Score Self-Assessment Tool as an automated digital asset. This creates a Principal Pre-Commitment hurdle that disqualifies unaligned leads before they consume Principal time. Target: 80% reduction in unqualified diagnostic conversations.\n\nFocus Area 2 — Engine Delegation: Finalise the Blueprint Customisation Protocol — a definitive checklist allowing a Strategic Delivery Partner to execute the first 80% of System Installation independently. The Principal\'s involvement covers only the 20% that requires architectural judgment. Everything else is delegated, codified, and systematised.';
+    document.getElementById('r-conclusion').value = 'The Executive Friction Audit has delivered a clear verdict: ' + cl + ' has reached its ' + z.l + ' ceiling, and the path forward requires a permanent structural shift — ' + pr + ' must move from the Executor role to the Pure Architect role through the installation of ' + mi.n + '. Schedule the Mandate Kick-Off within 7 days.';
+    genExec = document.getElementById('r-es').textContent; genFindings = document.getElementById('r-findings').value;
+    genMandate = document.getElementById('r-mandate').value; genConclusion = document.getElementById('r-conclusion').value;
+  }
+  document.getElementById('aiGate').classList.remove('on');
+  logToBackend({
+    type: 'session_intake',
+    client: cl, principal: pr, date: dt, sector: sc, context: cx,
+    pg: pg, dl: dl, sm: sm, complexity: C, fscore: fs.toFixed(1), zone: z.l,
+    mandate: selMan || mi.n,
+    pgAnswers: sn.pg, dlAnswers: sn.dl, smAnswers: sn.sm,
+    execSummary: genExec, findings: genFindings, mandateBody: genMandate, conclusion: genConclusion
+  });
+  go(7, 8);
+}
+
+/* ── ACCESS GATE ── */
+const EFA_PASS = 'ASCENT2026';
+function checkGate() {
+  const val = (document.getElementById('gatePass').value || '').trim();
+  if (val.toUpperCase() === EFA_PASS) {
+    document.getElementById('sGate').classList.remove('on');
+    document.getElementById('s0').classList.add('on');
+  } else {
+    document.getElementById('gateErr').textContent = 'Incorrect access code. Please try again.';
+  }
+}
+document.getElementById('gatePass').addEventListener('keydown', function(e){ if (e.key === 'Enter') checkGate(); });
+
+/* ── INIT ── */
+document.getElementById('f-date').valueAsDate = new Date();
+injectBands();
+</script>
+</body>
+</html>
